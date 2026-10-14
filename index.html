@@ -1,0 +1,1278 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Shahzodbek O'roqov — tekshiruv konsoli</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0A0E22; --panel:rgba(255,255,255,.045); --head:rgba(255,255,255,.03); --chip:rgba(255,255,255,.05); --field:rgba(255,255,255,.05);
+  --fg:#E7EAF6; --dim:#98A1C4; --faint:#66709A;
+  --line:rgba(255,255,255,.10); --linehi:rgba(94,234,212,.45);
+  --accent:#5EEAD4; --onaccent:#062229; --accentbg:rgba(94,234,212,.08); --ring:rgba(94,234,212,.20);
+  --ok:#A78BFA; --onok:#140A2E; --okbg:rgba(167,139,250,.12);
+  --warn:#FBBF6E; --warnbg:rgba(251,191,110,.10);
+  --stop:#FB7B8E; --stopbg:rgba(251,123,142,.10);
+  --display:"Space Grotesk",system-ui,sans-serif; --body:"Space Grotesk",system-ui,sans-serif; --mono:"Space Mono",monospace;
+  --h1w:700; --h1ls:-.035em; --h1tt:none; --h2w:600; --h2ls:-.01em; --h2tt:none;
+  --btntt:none; --btnls:.01em;
+  --r:14px; --rpill:999px; --rnum:9px;
+  --pborder:1px solid rgba(255,255,255,.10); --shadow:0 30px 70px -40px rgba(0,0,0,.9);
+  --numbg:linear-gradient(135deg,#5EEAD4,#A78BFA); --numfg:#0A0E22; --numbd:0;
+  --hdrule:1px solid rgba(255,255,255,.10); --blur:blur(16px);
+  --gatebg:radial-gradient(900px 600px at 30% 20%, #1B2150, #070A1A 70%);
+  --gateshadow:0 40px 100px -40px rgba(0,0,0,1);
+  }
+
+*{box-sizing:border-box} html,body{margin:0}
+:root{color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1000px;margin:0 auto;padding:38px 20px 90px;position:relative;z-index:1}
+
+header{padding-bottom:22px;margin-bottom:26px;border-bottom:var(--hdrule)}
+.eyebrow{font-family:var(--mono);font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);margin:0 0 12px}
+h1{font-family:var(--display);font-weight:var(--h1w);font-size:clamp(27px,4.6vw,45px);line-height:1.06;letter-spacing:var(--h1ls);margin:0;color:var(--fg);text-transform:var(--h1tt)}
+h1 .thin{display:block;font-family:var(--body);font-weight:400;text-transform:none;letter-spacing:0;font-size:.38em;color:var(--dim);margin-top:14px;line-height:1.55;max-width:70ch}
+.who{display:inline-block;font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);border:1px solid var(--line);padding:6px 13px;margin-bottom:16px;border-radius:var(--rpill);background:var(--chip)}
+.who b{color:var(--fg);font-weight:600}
+
+.step{background:var(--panel);border:var(--pborder);border-radius:var(--r);box-shadow:var(--shadow);margin-bottom:18px;overflow:hidden;backdrop-filter:var(--blur)}
+.step.off{opacity:.35;pointer-events:none;filter:saturate(.4)}
+.sh{display:flex;align-items:center;gap:13px;padding:16px 22px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.num{font-family:var(--display);font-weight:700;font-size:14px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;flex:0 0 auto;background:var(--numbg);color:var(--numfg);border:var(--numbd);border-radius:var(--rnum)}
+.sh h2{font-family:var(--display);font-weight:var(--h2w);font-size:15.5px;text-transform:var(--h2tt);letter-spacing:var(--h2ls);margin:0;color:var(--fg)}
+.sh .sub{font-size:12.5px;color:var(--dim);margin-left:auto;font-family:var(--mono);letter-spacing:.05em}
+.sb{padding:22px}
+
+.seg,.filt,.verd{display:inline-flex;gap:0;border:1px solid var(--line);border-radius:var(--rpill);overflow:hidden;margin-bottom:18px;flex-wrap:wrap;background:var(--chip)}
+.seg button,.filt button,.verd button{font-family:var(--mono);font-size:11px;letter-spacing:.09em;text-transform:uppercase;background:transparent;border:0;padding:11px 20px;cursor:pointer;color:var(--dim);transition:.16s}
+.seg button:hover,.filt button:hover,.verd button:hover{color:var(--fg)}
+.seg button[aria-pressed="true"],.filt button[aria-pressed="true"],.verd button[aria-pressed="true"]{background:var(--accent);color:var(--onaccent)}
+.row{display:flex;gap:11px;flex-wrap:wrap}
+input[type=text]{font-family:var(--mono);font-size:17px;padding:14px 17px;border:1px solid var(--line);background:var(--field);color:var(--fg);flex:1 1 300px;min-width:0;border-radius:var(--r);transition:.16s}
+input[type=text]:focus{outline:0;border-color:var(--accent);box-shadow:0 0 0 3px var(--ring)}
+input[type=text]::placeholder{color:var(--faint)}
+.btn{font-family:var(--display);font-weight:600;text-transform:var(--btntt);letter-spacing:var(--btnls);font-size:14px;padding:14px 30px;background:var(--accent);color:var(--onaccent);border:0;cursor:pointer;border-radius:var(--r);transition:.16s}
+.btn:hover{filter:brightness(1.12)} .btn[disabled]{opacity:.4;cursor:default}
+.btn.g{background:var(--ok);color:var(--onok)}
+.tip{font-size:13px;color:var(--dim);margin:12px 0 0}
+
+.dec{margin-top:16px;border-top:1px dashed var(--line);padding-top:15px;min-height:32px}
+.dec .idle{font-size:13px;color:var(--dim);margin:0}
+.dh{display:flex;align-items:baseline;gap:11px;flex-wrap:wrap;margin-bottom:11px}
+.dh .s{font-family:var(--display);font-weight:600;font-size:15px;letter-spacing:var(--h2ls);text-transform:var(--h2tt);color:var(--fg)}
+.dh .k{font-family:var(--mono);font-size:10.5px;color:var(--dim);text-transform:uppercase;letter-spacing:.1em}
+.dh .g{font-family:var(--mono);font-size:10px;color:var(--warn);text-transform:uppercase;letter-spacing:.1em}
+.segs{display:flex;gap:6px;flex-wrap:wrap}
+.sg{border:1px solid var(--line);border-top:2px solid var(--accent);padding:7px 12px 8px;background:var(--chip);border-radius:var(--r)}
+.sg b{display:block;font-family:var(--mono);font-size:14.5px;font-weight:600;color:var(--fg)}
+.sg span{display:block;font-size:9.5px;color:var(--dim);text-transform:uppercase;letter-spacing:.07em;margin-top:3px;white-space:nowrap}
+
+.fdabox{border:1px solid var(--line);border-radius:var(--r);overflow:hidden;background:var(--chip)}
+.fdabar{padding:12px 17px;font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.11em}
+.fdabar.hit{background:var(--okbg);color:var(--ok)}
+.fdabar.none{background:var(--chip);color:var(--dim)}
+.fdabar.err{background:var(--stopbg);color:var(--stop)}
+dl.kv{margin:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(195px,1fr));gap:1px;background:var(--line)}
+dl.kv > div{background:var(--panel);padding:13px 17px}
+dl.kv dt{font-family:var(--mono);font-size:9.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--dim);margin-bottom:4px}
+dl.kv dd{margin:0;font-size:14.5px;font-weight:500;color:var(--fg)}
+
+.fhint{font-size:12.5px;color:var(--fg);background:var(--accentbg);border-left:2px solid var(--accent);padding:11px 15px;margin:0 0 16px;border-radius:0 var(--r) var(--r) 0}
+.filt{margin-bottom:12px}
+
+.src{border:1px solid var(--line);border-radius:var(--r);margin-bottom:12px;background:var(--panel);overflow:hidden;transition:.16s}
+.src:hover{border-color:var(--linehi)}
+.srch{display:flex;align-items:center;gap:12px;padding:14px 18px;flex-wrap:wrap;background:var(--head)}
+.srch .nm{font-family:var(--display);font-weight:600;font-size:15px;letter-spacing:var(--h2ls);text-transform:var(--h2tt);color:var(--fg)}
+.srch .cn{font-size:12.5px;color:var(--dim)}
+.srch .pf{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:4px 10px;border-radius:var(--rpill);background:var(--okbg);color:var(--ok);border:1px solid var(--ok)}
+.srch .mk{margin-left:auto;font-family:var(--mono);font-size:9.5px;text-transform:uppercase;letter-spacing:.1em;padding:4px 11px;border:1px solid currentColor;border-radius:var(--rpill)}
+.mk.n{color:var(--faint)} .mk.y{color:var(--ok)} .mk.x{color:var(--stop)} .mk.q{color:var(--warn)}
+.srcb{padding:16px 18px 18px;font-size:13.5px;color:var(--fg)}
+.fld{background:var(--accentbg);padding:11px 15px;margin:0 0 10px;font-size:13px;border-left:2px solid var(--accent);border-radius:0 var(--r) var(--r) 0;color:var(--fg)}
+.fld b{font-family:var(--mono);font-size:12.5px}
+.trap{background:var(--warnbg);padding:11px 15px;margin:0 0 14px;font-size:12.5px;border-left:2px solid var(--warn);border-radius:0 var(--r) var(--r) 0;color:var(--fg)}
+.lnks{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 13px}
+.lnks a{font-family:var(--mono);font-size:10.5px;padding:7px 12px;border:1px solid var(--line);color:var(--accent);text-decoration:none;background:var(--chip);border-radius:var(--rpill);transition:.16s}
+.lnks a:hover{background:var(--accent);color:var(--onaccent);border-color:var(--accent)}
+.acts{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.mini{font-family:var(--mono);font-size:11px;letter-spacing:.07em;text-transform:uppercase;padding:10px 16px;border:1px solid var(--line);background:transparent;color:var(--fg);cursor:pointer;text-decoration:none;display:inline-block;border-radius:var(--rpill);transition:.16s}
+.mini:hover{border-color:var(--accent);color:var(--accent)}
+.mini.solid{background:var(--accent);border-color:var(--accent);color:var(--onaccent)}
+.mini.solid:hover{filter:brightness(1.12);color:var(--onaccent)}
+.mini.gold{background:var(--ok);border-color:var(--ok);color:var(--onok)}
+.mini.gold:hover{filter:brightness(1.12);color:var(--onok)}
+.marks{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;padding-top:14px;border-top:1px dashed var(--line)}
+.marks button{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.07em;padding:10px 16px;border:1px solid var(--line);background:transparent;cursor:pointer;color:var(--dim);border-radius:var(--rpill);transition:.16s}
+.marks button:hover{color:var(--fg)}
+.marks button[aria-pressed="true"]{color:var(--onaccent);border-color:transparent}
+.marks button[data-v="y"][aria-pressed="true"]{background:var(--ok);color:var(--onok)}
+.marks button[data-v="x"][aria-pressed="true"]{background:var(--stop);color:#fff}
+.marks button[data-v="q"][aria-pressed="true"]{background:var(--warn);color:#fff}
+.note{width:100%;margin-top:11px;font-family:var(--body);font-size:13.5px;padding:11px 14px;border:1px solid var(--line);background:var(--field);color:var(--fg);resize:vertical;min-height:40px;border-radius:var(--r)}
+.note:focus{outline:0;border-color:var(--accent);box-shadow:0 0 0 3px var(--ring)}
+
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th{text-align:left;font-family:var(--mono);font-size:9.5px;text-transform:uppercase;letter-spacing:.11em;color:var(--dim);font-weight:500;border-bottom:1px solid var(--line);padding:11px 12px 9px 0}
+td{padding:11px 12px 11px 0;border-bottom:1px solid var(--line);vertical-align:top;color:var(--fg)}
+td.mono{font-family:var(--mono);font-size:12.5px}
+.empty{padding:20px 0;color:var(--dim);font-size:13.5px}
+.bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.bar input[type=text]{flex:1 1 200px;font-size:14px;padding:11px 14px}
+.warnbox{background:var(--warnbg);border-left:2px solid var(--warn);padding:13px 17px;font-size:13px;margin-bottom:16px;border-radius:0 var(--r) var(--r) 0;color:var(--fg)}
+.cfs{background:var(--stopbg);border-left:2px solid var(--stop);padding:15px 18px;font-size:13.5px;margin-bottom:18px;border-radius:0 var(--r) var(--r) 0;color:var(--fg)}
+.cfs h4{font-family:var(--display);font-weight:600;text-transform:var(--h2tt);font-size:13.5px;letter-spacing:var(--h2ls);margin:0 0 8px;color:var(--stop)}
+footer{margin-top:44px;font-size:12.5px;color:var(--dim);border-top:1px solid var(--line);padding-top:18px}
+
+#gate{position:fixed;inset:0;background:var(--gatebg);z-index:999;display:flex;align-items:center;justify-content:center;padding:22px}
+#gate .card{background:var(--panel);max-width:430px;width:100%;padding:38px 34px;border:var(--pborder);border-radius:var(--r);box-shadow:var(--gateshadow);backdrop-filter:var(--blur)}
+#gate .eb{font-family:var(--body);font-size:14px;font-weight:500;letter-spacing:.01em;text-transform:none;color:var(--accent);margin:0 0 12px}
+#gate h2{font-family:var(--display);font-weight:var(--h1w);text-transform:var(--h1tt);font-size:23px;letter-spacing:var(--h1ls);margin:0 0 8px;line-height:1.15;color:var(--fg)}
+#gate p.d{font-size:13px;color:var(--dim);margin:0 0 22px;line-height:1.55}
+#gate label{display:block;font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);margin:0 0 6px}
+#gate input,#gate select{width:100%;font-size:16px;padding:13px 15px;border:1px solid var(--line);background:var(--field);color:var(--fg);margin-bottom:16px;font-family:var(--body);border-radius:var(--r)}
+#gate input:focus,#gate select:focus{outline:0;border-color:var(--accent);box-shadow:0 0 0 3px var(--ring)}
+/* Ochiladigan ro'yxatni brauzer o'zi chizadi — ranglarni aniq beramiz */
+#gate select{color-scheme:dark;appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--accent) 50%),linear-gradient(135deg,var(--accent) 50%,transparent 50%);background-position:calc(100% - 20px) calc(50% - 2px),calc(100% - 15px) calc(50% - 2px);background-size:5px 5px,5px 5px;background-repeat:no-repeat;padding-right:42px}
+#gate input[readonly]{background:transparent;border-style:dashed;color:var(--accent);cursor:default}
+#gate input[readonly]:focus{box-shadow:none;border-color:var(--line)}
+#gate select option{background:#141A38;color:#E7EAF6;padding:10px}
+#gate select option:checked,#gate select option:hover{background:var(--accent);color:var(--onaccent)}
+#gate button{width:100%;font-family:var(--display);font-weight:600;text-transform:var(--btntt);letter-spacing:var(--btnls);font-size:14.5px;padding:15px;background:var(--accent);color:var(--onaccent);border:0;cursor:pointer;border-radius:var(--r);transition:.16s}
+#gate button:hover{filter:brightness(1.12)}
+#gate .err{color:var(--stop);font-size:13px;margin:12px 0 0;min-height:19px}
+body.locked{overflow:hidden}
+
+@media(max-width:620px){ .wrap{padding:24px 14px 70px} .sb{padding:16px} }
+
+/* --- Kristall --- */
+
+  body::before{content:"";position:fixed;inset:0;background:
+    radial-gradient(950px 600px at 12% -8%, rgba(94,234,212,.16), transparent 62%),
+    radial-gradient(800px 520px at 92% 4%, rgba(167,139,250,.16), transparent 62%),
+    radial-gradient(700px 500px at 60% 100%, rgba(59,130,246,.10), transparent 65%);
+    pointer-events:none;z-index:0}
+  h1{background:linear-gradient(96deg,#FFFFFF 18%,#5EEAD4 62%,#A78BFA 100%);
+     -webkit-background-clip:text;background-clip:text;color:transparent}
+  h1 .thin{background:none;-webkit-text-fill-color:var(--dim);color:var(--dim)}
+  .btn,.mini.solid{box-shadow:0 10px 26px -12px rgba(94,234,212,.55)}
+  .mini.gold,.btn.g{box-shadow:0 10px 26px -12px rgba(167,139,250,.6)}
+  .src:hover{background:rgba(255,255,255,.065)}
+  .sg{backdrop-filter:blur(8px)}
+  
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;margin-bottom:18px}
+.kpi{background:var(--panel);padding:16px 18px}
+.kpi .lb{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);margin-bottom:7px}
+.kpi .vl{font-family:var(--display);font-size:30px;font-weight:700;line-height:1;letter-spacing:-.02em;color:var(--fg)}
+.kpi .vl small{font-size:15px;font-weight:400;color:var(--dim)}
+.mtr{margin-bottom:18px}
+.mtr .rw{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+.mtr .nmm{font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--dim);flex:0 0 190px}
+.mtr .br{flex:1;height:7px;background:var(--chip);border:1px solid var(--line);border-radius:999px;overflow:hidden}
+.mtr .br i{display:block;height:100%;background:var(--accent)}
+.mtr .pc{font-family:var(--mono);font-size:12px;color:var(--fg);flex:0 0 46px;text-align:right}
+.opn{font-family:var(--mono);font-size:9.5px;text-transform:uppercase;letter-spacing:.09em;color:var(--ok);border:1px solid var(--ok);padding:4px 9px;border-radius:var(--rpill)}
+
+.avtobar{font-size:12.5px;padding:11px 15px;margin-bottom:14px;border-radius:0 var(--r) var(--r) 0;color:var(--fg)}
+.avtobar.on{background:var(--okbg);border-left:2px solid var(--ok)}
+.avtobar.off{background:var(--warnbg);border-left:2px solid var(--warn)}
+
+.err2{color:var(--stop);font-size:13px;margin:12px 0 0;min-height:19px}
+
+/* --- 3-nashr qo'shimchalari --- */
+.muddat{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:14px}
+.muddat label{font-size:13px;color:var(--dim)}
+input[type=date]{font-family:var(--mono);font-size:14px;padding:10px 14px;border:1px solid var(--line);background:var(--field);color:var(--fg);border-radius:var(--r);color-scheme:dark}
+input[type=date]:focus{outline:0;border-color:var(--accent);box-shadow:0 0 0 3px var(--ring)}
+.expmsg{font-size:12.5px;padding:5px 12px;border-radius:var(--rpill);border:1px solid currentColor}
+.expmsg:empty{display:none}
+.expmsg.ok{color:var(--ok)} .expmsg.warn{color:var(--warn)} .expmsg.stop{color:var(--stop)}
+.need{color:var(--warn);font-size:12.5px;margin:8px 0 0}
+.need:empty{display:none}
+.verd{margin-bottom:12px}
+.verd button[data-vd="no"][aria-pressed="true"]{background:var(--stop);color:#fff}
+.verd button[data-vd="more"][aria-pressed="true"]{background:var(--warn);color:#241500}
+.marks button[data-v="q"][aria-pressed="true"]{color:#241500}
+.srch .pf.match{background:var(--accentbg);color:var(--accent);border-color:var(--accent)}
+
+
+/* --- bayroqlar va davlatlar paneli --- */
+.flag{display:inline-block;flex:none;width:30px;height:20px;border-radius:4px;overflow:hidden;position:relative;
+  box-shadow:0 0 0 1px rgba(255,255,255,.16),0 3px 8px -2px rgba(0,0,0,.55)}
+.flag>svg{width:100%;height:100%;display:block}
+.flag::after{content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(140deg,rgba(255,255,255,.28),rgba(255,255,255,0) 42%,rgba(0,0,0,0) 60%,rgba(0,0,0,.18))}
+.srch .flag{width:36px;height:24px}
+.rail{display:grid;gap:16px;margin:0 0 22px;padding:18px;border:1px solid var(--line);border-radius:var(--r);
+  background:radial-gradient(600px 160px at 0% 0%,rgba(94,234,212,.07),transparent 70%),radial-gradient(600px 160px at 100% 100%,rgba(167,139,250,.07),transparent 70%)}
+.rl{font-size:12.5px;color:var(--dim);margin:0 0 9px}
+.rl b{color:var(--fg);font-weight:600}
+.rc{display:flex;flex-wrap:wrap;gap:9px}
+.chip{display:inline-flex;align-items:center;gap:10px;padding:6px 13px 6px 7px;border:1px solid var(--line);border-radius:var(--rpill);
+  background:var(--chip);color:var(--fg);font:500 13.5px var(--body);cursor:pointer;transition:border-color .16s,transform .16s,background .16s}
+.chip:hover{border-color:var(--accent);background:var(--accentbg);transform:translateY(-1px)}
+.chip:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.chip .dt{width:7px;height:7px;border-radius:50%;background:var(--faint)}
+.chip.st-y{border-color:var(--ok)} .chip.st-y .dt{background:var(--ok);box-shadow:0 0 8px var(--ok)}
+.chip.st-x{border-color:var(--stop)} .chip.st-x .dt{background:var(--stop);box-shadow:0 0 8px var(--stop)}
+.chip.st-q{border-color:var(--warn)} .chip.st-q .dt{background:var(--warn)}
+.rail.intro .chip{animation:chipIn .5s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i)*45ms)}
+@keyframes chipIn{from{opacity:0;transform:translateY(8px) scale(.96)}to{opacity:1;transform:none}}
+.grp{display:flex;align-items:center;gap:12px;font-size:12.5px;color:var(--dim);margin:24px 0 12px}
+.grp::after{content:"";flex:1;height:1px;background:var(--line)}
+.src.flash{animation:flash 1.6s ease-out}
+@keyframes flash{0%{box-shadow:0 0 0 2px var(--accent),0 0 30px -4px var(--accent)}100%{box-shadow:0 0 0 0 transparent}}
+.sh .sub .flag{width:21px;height:14px;vertical-align:-2px;margin-right:7px}
+@media (prefers-reduced-motion:reduce){.rail.intro .chip,.src.flash{animation:none}}
+
+#bayon{display:none}
+@media print{
+  @page{size:A4;margin:16mm 15mm}
+  body{background:#fff!important;color:#000}
+  body::before{display:none!important}
+  .wrap,#gate{display:none!important}
+  #bayon{display:block;font-family:"Times New Roman",Times,serif;font-size:11.5pt;line-height:1.45;color:#000}
+  #bayon .b-org{text-align:center;font-size:11pt;margin:0 0 4mm}
+  #bayon .b-tt{text-align:center;font-weight:700;font-size:14pt;text-transform:uppercase;margin:0 0 2mm}
+  #bayon .b-no{display:flex;justify-content:space-between;margin:0 0 6mm}
+  #bayon h4{font-size:11.5pt;margin:5mm 0 2mm;font-weight:700}
+  #bayon table{width:100%;border-collapse:collapse;font-size:10.5pt}
+  #bayon th,#bayon td{border:1px solid #000;padding:1.6mm 2mm;vertical-align:top;color:#000;text-align:left;font-family:inherit;letter-spacing:0;text-transform:none}
+  #bayon th{background:#eee;font-weight:700;font-size:10pt}
+  #bayon td.k{width:38%;font-weight:700}
+  #bayon .b-vd{font-weight:700}
+  #bayon .b-txt{white-space:pre-wrap;border:1px solid #000;padding:2.5mm;min-height:22mm}
+  #bayon .b-note{font-size:9.5pt;margin-top:3mm;font-style:italic}
+  #bayon .b-sig{display:grid;grid-template-columns:1fr 1fr;gap:12mm;margin-top:12mm}
+  #bayon .b-sig div{border-top:1px solid #000;padding-top:1.5mm;font-size:10pt}
+  #bayon tr{break-inside:avoid}
+}
+</style>
+</head>
+<body class="locked">
+
+<!-- ==========================================================
+     PAROLLAR
+     Har bir xodimning shaxsiy paroli pastdagi XODIMLAR ro'yxatida
+     shifrlangan (SHA-256) holda saqlanadi — kodni ochgan odam parolni ko'rmaydi.
+     Parolni almashtirish: konsolni oching (F12 → Console), yozing:
+         parolXesh("yangiparol")
+     chiqqan ikki qiymatni (tuz va xesh) o'sha xodim qatoriga qo'ying.
+     Arxiv paroli — pastdagi BOSHQARUV qatorida.
+     ========================================================== -->
+<script>
+const BOSHQARUV = "Shahzod_arxiv";  /* arxiv va statistikani ochish paroli */
+</script>
+
+<div id="gate">
+  <div class="card">
+    <p class="eb">Shahzodbek O'roqov</p>
+    <h2>Ekspert ma'lumotlari</h2>
+    <p class="d">Ro'yxatdan o'zingizni tanlang va shaxsiy parolingizni kiriting. Bu ma'lumot har bir tekshiruv yozuviga va bayonnomaga tushadi.</p>
+    <label for="gnm">Familiya, ism, otasining ismi</label>
+    <select id="gnm" autofocus><option value="">— ro'yxatdan tanlang —</option></select>
+    <label for="gpw">Shaxsiy parol</label>
+    <input type="password" id="gpw" autocomplete="off" placeholder="Parol">
+    <label for="gpos">Lavozim</label>
+    <input type="text" id="gpos" readonly tabindex="-1">
+    <button id="gbtn">Ishni boshlash</button>
+    <p class="err" id="gerr"></p>
+  </div>
+</div>
+
+<div class="wrap">
+
+<header>
+  <p class="who" id="who"></p>
+  <p class="eyebrow">Tibbiy jihozlar qo'mitasi · Shahzodbek O'roqov · 3-nashr</p>
+  <h1>Xorijiy hujjatni tekshirish
+    <span class="thin">PF-6221 bo'yicha tan olinadigan olti vakolatli organ — FDA, EMA, CE sertifikatini beruvchi organlar, PMDA, MFDS, MHRA — hamda ma'lumot uchun boshqa davlatlar reestrlari va ISO 13485 sertifikatlari. Har bir manba uchun aniq maydon nomi va ma'lum tuzoqlar ko'rsatilgan.</span>
+  </h1>
+</header>
+
+<section class="step" id="s1">
+  <div class="sh"><span class="num">1</span><h2>Hujjatni kiriting</h2></div>
+  <div class="sb">
+    <div class="row">
+      <input type="text" id="q" placeholder="Raqam yoki ishlab chiqaruvchi nomi" autocomplete="off" spellcheck="false">
+      <button class="btn" id="go">Boshlash</button>
+    </div>
+    <div class="muddat">
+      <label for="expd">Hujjatning amal qilish muddati (ixtiyoriy)</label>
+      <input type="date" id="expd">
+      <span class="expmsg" id="expmsg"></span>
+    </div>
+    <div class="dec" id="dec"><p class="idle">Raqam kiritilganda uning tarkibi shu yerda ochib beriladi.</p></div>
+    <p class="tip" id="tip"></p>
+  </div>
+</section>
+
+<section class="step off" id="s2">
+  <div class="sh"><span class="num">2</span><h2>Avtomatik tekshiruv</h2><span class="sub">AQSH · FDA</span></div>
+  <div class="sb"><div class="fdabox" id="fda"></div></div>
+</section>
+
+<section class="step" id="s3">
+  <div class="sh"><span class="num">3</span><h2>Davlatlar reestrlari</h2><span class="sub" id="prog"></span></div>
+  <div class="sb">
+    <p class="tip" style="margin:0 0 13px"><b>Nusxala</b> → <b>Manbani ochish</b> → sahifada ko'rsatilgan maydonga qo'ying → natijani shu yerda belgilang.</p>
+    <div class="rail intro" id="rail"></div>
+    <div id="srcs"></div>
+  </div>
+</section>
+
+<section class="step" id="s3i">
+  <div class="sh"><span class="num">4</span><h2>ISO 13485 sertifikati</h2><span class="sub" id="isoprog"></span></div>
+  <div class="sb"><div id="isosrcs"></div></div>
+</section>
+
+<section class="step off" id="s4">
+  <div class="sh"><span class="num">5</span><h2>Xulosa</h2></div>
+  <div class="sb">
+    <div class="cfs">
+      <h4>Har safar so'rang</h4>
+      Hujjat <b>Certificate of Free Sale</b> (erkin savdo sertifikati) bo'lsa — bu ro'yxatdan o'tkazish hujjati emas va hech qanday reestrda saqlanmaydi.
+      Asosiy hujjatni talab qiling: Yevropa uchun <b>CE sertifikati va muvofiqlik deklaratsiyasi</b>, boshqa davlatlar uchun <b>ruxsat guvohnomasi</b>.
+      Sertifikatda "Page 1 of N" yozilgan bo'lsa — <b>barcha betlarni</b> so'rang, mahsulotlar ro'yxati odatda ilovada.
+    </div>
+    <div class="verd" role="group" aria-label="Xulosa turi">
+      <button data-vd="ok" aria-pressed="false">Tasdiqlandi</button>
+      <button data-vd="more" aria-pressed="false">Qo'shimcha hujjat talab qilinadi</button>
+      <button data-vd="no" aria-pressed="false">Rad etiladi</button>
+    </div>
+    <textarea class="note" id="concl" placeholder="Ekspert xulosasi"></textarea>
+    <div class="row" style="margin-top:12px">
+      <button class="btn g" id="save">Arxivga saqlash</button>
+      <button class="mini" id="print">Bayonnomani chop etish</button>
+      <button class="mini" id="yangi">Yangi tekshiruv</button>
+    </div>
+  </div>
+</section>
+
+<section class="step" id="lock">
+  <div class="sh"><span class="num">A</span><h2>Arxiv va statistika</h2><span class="sub">yopiq bo'lim</span></div>
+  <div class="sb">
+    <p class="tip" style="margin:0 0 14px">Bu bo'lim faqat bo'lim boshlig'i uchun. Arxiv va statistikani ochish uchun boshqaruv paroli talab etiladi.</p>
+    <div class="row">
+      <input type="password" id="apw" autocomplete="off" placeholder="Boshqaruv paroli" style="flex:1 1 240px">
+      <button class="btn" id="abtn">Ochish</button>
+    </div>
+    <p class="err2" id="aerr"></p>
+  </div>
+</section>
+<section class="step" id="s5" style="display:none">
+  <div class="sh"><span class="num">A</span><h2>Arxiv</h2><span class="sub" id="acount">0 ta yozuv</span></div>
+  <div class="sb">
+    <div class="avtobar on noprint" id="avto"></div>
+    <div class="bar noprint">
+      <input type="text" id="find" placeholder="Arxivdan qidirish: raqam yoki ekspert">
+      <button class="mini" id="exp">Arxivni saqlash</button>
+      <button class="mini" id="imp">Arxivni yuklash</button>
+      <button class="mini" id="csv">CSV</button>
+      <button class="mini" id="tozala">Arxivni tozalash</button>
+      <input type="file" id="file" accept=".json" style="display:none">
+    </div>
+    <div id="arch"><div class="empty">Hali yozuv yo'q.</div></div>
+  </div>
+</section>
+
+<section class="step" id="s6" style="display:none">
+  <div class="sh"><span class="num">S</span><h2>Statistika</h2><span class="sub" id="scount"></span></div>
+  <div class="sb">
+    <div id="stats"><div class="empty">Tekshiruv saqlangandan keyin statistika shu yerda chiqadi.</div></div>
+  </div>
+</section>
+
+<footer class="noprint">
+  Manbada yozuv topilmasligi hujjat haqiqiy emasligini bildirmaydi. Yakuniy tasdiq — vakolatli organ javobi.
+</footer>
+</div>
+<div id="bayon"></div>
+
+<script>
+const $=id=>document.getElementById(id);
+let EXPERT={nm:"",pos:""};
+/* Ismda faqat harf, bo'shliq va o' g' apostrofi. Raqam va belgilar kiritilmaydi. */
+const TAQIQ=/[^A-Za-zЎўҚқҒғҲҳА-Яа-яЁёʻʼ'’ ]/g;
+const harfSoni=v=>v.replace(/[^A-Za-zЎўҚқҒғҲҳА-Яа-яЁё]/g,"").length;
+
+/* ---- SHA-256: parollarni ochiq saqlamaslik uchun ---- */
+function sha256(str){
+  const K=[0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2];
+  const b=Array.from(new TextEncoder().encode(str)), l=b.length*8;
+  b.push(0x80); while(b.length%64!==56) b.push(0);
+  for(let i=7;i>=0;i--) b.push(i>3?0:(l>>>(i*8))&255);
+  let H=[0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19];
+  const r=(x,n)=>(x>>>n)|(x<<(32-n));
+  for(let o=0;o<b.length;o+=64){
+    const w=new Array(64);
+    for(let i=0;i<16;i++) w[i]=(b[o+4*i]<<24)|(b[o+4*i+1]<<16)|(b[o+4*i+2]<<8)|b[o+4*i+3];
+    for(let i=16;i<64;i++){ const s0=r(w[i-15],7)^r(w[i-15],18)^(w[i-15]>>>3), s1=r(w[i-2],17)^r(w[i-2],19)^(w[i-2]>>>10); w[i]=(w[i-16]+s0+w[i-7]+s1)|0; }
+    let [a,bb,c,d,e,f,g,h]=H;
+    for(let i=0;i<64;i++){
+      const t1=(h+(r(e,6)^r(e,11)^r(e,25))+((e&f)^(~e&g))+K[i]+w[i])|0;
+      const t2=((r(a,2)^r(a,13)^r(a,22))+((a&bb)^(a&c)^(bb&c)))|0;
+      h=g; g=f; f=e; e=(d+t1)|0; d=c; c=bb; bb=a; a=(t1+t2)|0;
+    }
+    H=[H[0]+a,H[1]+bb,H[2]+c,H[3]+d,H[4]+e,H[5]+f,H[6]+g,H[7]+h].map(x=>x|0);
+  }
+  return H.map(x=>(x>>>0).toString(16).padStart(8,"0")).join("");
+}
+/* Yangi parol uchun: konsolda parolXesh("yangiparol") */
+function parolXesh(p){ const t=Array.from(crypto.getRandomValues(new Uint8Array(4)),x=>x.toString(16).padStart(2,"0")).join("");
+  const r={tuz:t,xesh:sha256(t+":"+String(p).trim().toLowerCase())}; console.log(JSON.stringify([r.tuz,r.xesh])); return r; }
+
+/* ---- XODIMLAR RO'YXATI (Excel asosida): [F.I.Sh., lavozim, tuz, parol xeshi] ---- */
+const XODIMLAR=[
+  ["Temirov Umid Maxmatkobilovich", "Bo'lim boshlig'i", "b48089f1", "e5ff095c90657584049a63d9c9cebde8e0107c73376b289b4281d766d2d765f7"],
+  ["Hamroyeva Safura Qobilovna", "Bosh mutaxassis", "5e108a5d", "cd1e1a85e50ba1d4661a24c2e6426416922ad38a802a764fbb0159fc69c90332"],
+  ["Aymurzayeva Bibizoda Kurbanbayevna", "Yetakchi mutaxassis", "219e18b9", "82bfaf9439d498c324e12ff6dbe31cb6052c7849618e49c038bf1b3e85d7fd3d"],
+  ["Alimova Saodat Taxirovna", "Yetakchi mutaxassis", "64a9d095", "bbd1eeb99879fae951b9cd4f655524744fbf9b8bbc62c204c35c8632490595fa"],
+  ["Karimova Madina Ulugʻbek qizi", "Yetakchi mutaxassis", "29788df1", "6491f33075778f4765c46a2c5a0aeb207cd11d39c197d4a58989a4e72c1fd6e3"],
+  ["Normatova Kamola Baxtiyor qizi", "Yetakchi mutaxassis", "a818e2df", "d8e1f7dcb5d21e56eb2aeb7754ad25e74fa41ddeee45ec5d72ad1701528ef75b"],
+  ["Noʻmonov Xasan Otabek oʻgʻli", "Yetakchi mutaxassis", "ca84e201", "f1ef27165629a3e14600a3ff137c99a80b8bd55986ef794b3c1a14c7954f4176"],
+  ["Podgornov Vyacheslav Vladimirovich", "Yetakchi mutaxassis", "fbd4d68d", "82373dc266bf8b4cbedfb261478b3a180bf9ed6eee1a7561f031c261077ce7c2"],
+  ["Rozikova Surayyo Hamidullayevna", "1-toifali mutaxassis", "2829ead3", "359b005d7acdc89c5be6ceb3f1f97c0464f2b7b2d8d3a36fe94c68e9de6b0a3f"],
+  ["Xojiboyev Azizjon Xabibulla oʻgʻli", "1-toifali mutaxassis", "6c4d77d7", "39ff8cf7639582bf08150ac3101fd0f98fc2c15fa6d83976c88451b2426aea4a"],
+  ["Bokiyeva Iroda Toxir qizi", "Yetakchi mutaxassis", "abe7aa62", "d9862b897e7f53139742bc9a0795f53c3ab11f855945e1c9fb340d00088cf41c"],
+  ["Sodikova Gulrux", "1-toifali mutaxassis", "6864bd7d", "d51e8e3a229dc3f3939b60ba74a6a5560f0a1706f94dbc80cfb8caefe4001962"]
+];
+const RAHBAR="Bo'lim boshlig'i";   /* arxiv va statistika faqat shu lavozimga ko'rinadi */
+
+/* ---- kirish oynasi ---- */
+(function(){
+  const g=$("gate"), pw=$("gpw"), nm=$("gnm"), pos=$("gpos"), err=$("gerr");
+  nm.insertAdjacentHTML("beforeend", XODIMLAR.map((x,i)=>`<option value="${i}">${x[0]}</option>`).join(""));
+  nm.addEventListener("change",()=>{ pos.value = nm.value==="" ? "" : XODIMLAR[+nm.value][1]; err.textContent=""; if(nm.value!=="") pw.focus(); });
+  function kirish(){
+    if(nm.value===""){ err.textContent="Ro'yxatdan familiya va ismingizni tanlang."; nm.focus(); return; }
+    const x=XODIMLAR[+nm.value];
+    if(sha256(x[2]+":"+pw.value.trim().toLowerCase())!==x[3]){ err.textContent="Parol noto'g'ri."; pw.value=""; pw.focus(); return; }
+    EXPERT={nm:x[0], pos:x[1]};
+    $("who").innerHTML=`Ekspert: <b>${EXPERT.nm}</b> · ${EXPERT.pos}`;
+    /* arxiv va statistika faqat bo'lim boshlig'iga */
+    if(EXPERT.pos!==RAHBAR){ ["lock","s5","s6"].forEach(id=>{ const e=$(id); if(e) e.style.display="none"; }); }
+    g.remove(); document.body.classList.remove("locked"); $("q").focus();
+  }
+  $("gbtn").addEventListener("click",kirish);
+  [pw,nm,pos].forEach(i=>i.addEventListener("keydown",e=>{ if(e.key==="Enter") kirish(); }));
+})();
+
+const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const enc=encodeURIComponent;
+const dt=d=>!d?"—":String(d).replace(/^(\d{4})(\d{2})(\d{2})$/,"$1-$2-$3").slice(0,10);
+const now=()=>{ const d=new Date(), p=n=>String(n).padStart(2,"0"); return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`; };
+let TYPE="dev", CUR=null, ARCH=[];
+
+/* ============ BAYROQLAR (inline SVG, internetsiz ishlaydi) ============ */
+let FLID=0;
+function starPts(cx,cy,r,rot){ rot=rot==null?-90:rot; const p=[];
+  for(let i=0;i<10;i++){ const a=(rot+i*36)*Math.PI/180, rr=i%2?r*0.382:r; p.push((cx+rr*Math.cos(a)).toFixed(2)+","+(cy+rr*Math.sin(a)).toFixed(2)); }
+  return p.join(" "); }
+const st=(cx,cy,r,f,rot)=>`<polygon points="${starPts(cx,cy,r,rot)}" fill="${f}"/>`;
+function ujack(x,y,w,h){ const id="uj"+(++FLID);
+  return `<svg x="${x}" y="${y}" width="${w}" height="${h}" viewBox="0 0 60 30" preserveAspectRatio="none">
+  <clipPath id="${id}"><path d="M30,15h30v15zv15h-30zh-30v-15zv-15h30z"/></clipPath>
+  <rect width="60" height="30" fill="#012169"/>
+  <path d="M0,0L60,30M60,0L0,30" stroke="#fff" stroke-width="6"/>
+  <path d="M0,0L60,30M60,0L0,30" clip-path="url(#${id})" stroke="#C8102E" stroke-width="4"/>
+  <path d="M30,0v30M0,15h60" stroke="#fff" stroke-width="10"/>
+  <path d="M30,0v30M0,15h60" stroke="#C8102E" stroke-width="6"/></svg>`; }
+function trigram(cx,cy,ang,pat){
+  return `<g transform="translate(${cx} ${cy}) rotate(${ang})">${pat.map((solid,i)=>{
+    const y=(i-1)*0.95-0.25;
+    return solid?`<rect x="-1.9" y="${y}" width="3.8" height="0.5"/>`
+                :`<rect x="-1.9" y="${y}" width="1.65" height="0.5"/><rect x="0.25" y="${y}" width="1.65" height="0.5"/>`;}).join("")}</g>`; }
+const FLAGS={
+  us:()=>{ let s=`<rect width="30" height="20" fill="#B22234"/>`;
+    for(let i=1;i<13;i+=2) s+=`<rect y="${(i*20/13).toFixed(3)}" width="30" height="${(20/13).toFixed(3)}" fill="#fff"/>`;
+    s+=`<rect width="12" height="${(7*20/13).toFixed(3)}" fill="#3C3B6E"/>`;
+    for(let r=0;r<9;r++) for(let c=0;c<(r%2?5:6);c++) s+=`<circle cx="${(1+c*2+(r%2)).toFixed(2)}" cy="${(0.75+r*1.17).toFixed(2)}" r="0.36" fill="#fff"/>`;
+    return s; },
+  eu:()=>{ let s=`<rect width="30" height="20" fill="#003399"/>`;
+    for(let i=0;i<12;i++){ const a=i*30*Math.PI/180; s+=st(15+6*Math.sin(a),10-6*Math.cos(a),1.05,"#FFCC00"); } return s; },
+  gb:()=>ujack(0,0,30,20),
+  kr:()=>`<rect width="30" height="20" fill="#fff"/>
+    <g transform="rotate(33.69 15 10)"><circle cx="15" cy="10" r="5" fill="#0047A0"/>
+    <path d="M10,10A5,5 0 0 1 20,10A2.5,2.5 0 0 0 15,10A2.5,2.5 0 0 1 10,10z" fill="#CD2E3A"/></g>
+    <g fill="#000">${trigram(9.1,6.05,-56.31,[1,1,1])}${trigram(20.9,6.05,56.31,[0,1,0])}${trigram(20.9,13.95,-56.31,[0,0,0])}${trigram(9.1,13.95,56.31,[1,0,1])}</g>`,
+  jp:()=>`<rect width="30" height="20" fill="#fff"/><circle cx="15" cy="10" r="6" fill="#BC002D"/>`,
+  ca:()=>`<rect width="30" height="20" fill="#fff"/><rect width="7.5" height="20" fill="#D52B1E"/><rect x="22.5" width="7.5" height="20" fill="#D52B1E"/>
+    <path fill="#D52B1E" d="M15,3.6l1.15,2.15c.13.23.36.21.6.08l.83-.43-.62,3.27c-.13.6.29.6.5.34l1.45-1.53.38.87c.13.26.32.22.58.17l1.5-.31-.5,1.7v.04c-.06.22-.16.4.1.5l.53.25-3.08,2.6c-.31.32-.2.42-.09.77l.29.88-2.86-.51c-.35-.09-.6-.09-.6.19l.12,3.27h-.58l.12-3.27c0-.28-.25-.28-.6-.19l-2.86.51.29-.88c.11-.35.22-.45-.09-.77l-3.08-2.6.53-.25c.26-.1.16-.28.1-.5v-.04l-.5-1.7,1.5.31c.26.05.45.09.58-.17l.38-.87,1.45,1.53c.21.26.63.26.5-.34l-.62-3.27.83.43c.24.13.47.15.6-.08z"/>`,
+  au:()=>`<rect width="30" height="20" fill="#012169"/>${ujack(0,0,15,10)}
+    ${st(7.5,15,2.4,"#fff")}${st(22.5,16.8,1.25,"#fff")}${st(18.2,9.4,1.25,"#fff")}${st(22.5,4,1.25,"#fff")}${st(26.4,8.2,1.25,"#fff")}${st(24.4,11.6,.7,"#fff")}`,
+  ch:()=>`<rect width="30" height="20" fill="#DA291C"/><rect x="13.2" y="4.6" width="3.6" height="10.8" fill="#fff"/><rect x="9.6" y="8.2" width="10.8" height="3.6" fill="#fff"/>`,
+  il:()=>`<rect width="30" height="20" fill="#fff"/><rect y="2" width="30" height="3" fill="#0038B8"/><rect y="15" width="30" height="3" fill="#0038B8"/>
+    <g fill="none" stroke="#0038B8" stroke-width=".7"><polygon points="15,6.4 18.1,11.8 11.9,11.8"/><polygon points="15,13.6 11.9,8.2 18.1,8.2"/></g>`,
+  ru:()=>`<rect width="30" height="20" fill="#fff"/><rect y="6.67" width="30" height="6.67" fill="#0039A6"/><rect y="13.33" width="30" height="6.67" fill="#D52B1E"/>`,
+  tr:()=>`<rect width="30" height="20" fill="#E30A17"/><circle cx="11.25" cy="10" r="5" fill="#fff"/><circle cx="12.5" cy="10" r="4" fill="#E30A17"/>${st(17.3,10,2.5,"#fff",180)}`,
+  in:()=>{ let s=`<rect width="30" height="20" fill="#fff"/><rect width="30" height="6.67" fill="#FF9933"/><rect y="13.33" width="30" height="6.67" fill="#138808"/>
+    <circle cx="15" cy="10" r="2.6" fill="none" stroke="#000080" stroke-width=".4"/>`;
+    for(let i=0;i<12;i++){ const a=i*15*Math.PI/180; s+=`<line x1="${(15-2.5*Math.cos(a)).toFixed(2)}" y1="${(10-2.5*Math.sin(a)).toFixed(2)}" x2="${(15+2.5*Math.cos(a)).toFixed(2)}" y2="${(10+2.5*Math.sin(a)).toFixed(2)}" stroke="#000080" stroke-width=".18"/>`; }
+    return s; },
+  by:()=>{ let s=`<rect width="30" height="20" fill="#C8313E"/><rect y="13.33" width="30" height="6.67" fill="#4AA657"/><rect width="3.2" height="20" fill="#fff"/>`;
+    for(let i=0;i<5;i++){ const y=2+i*4; s+=`<polygon points="1.6,${y-1.6} 3,${y} 1.6,${y+1.6} .2,${y}" fill="#C8313E"/><polygon points="1.6,${y-.6} 2.2,${y} 1.6,${y+.6} 1,${y}" fill="#fff"/>`; }
+    return s; },
+  cn:()=>`<rect width="30" height="20" fill="#EE1C25"/>${st(5,5,3,"#FFFF00")}${st(10,2,1,"#FFFF00",-36)}${st(12,4,1,"#FFFF00",-70)}${st(12,7,1,"#FFFF00",-108)}${st(10,9,1,"#FFFF00",-140)}`,
+  de:()=>`<rect width="30" height="6.67" fill="#000"/><rect y="6.67" width="30" height="6.67" fill="#DD0000"/><rect y="13.33" width="30" height="6.67" fill="#FFCE00"/>`,
+  un:()=>`<rect width="30" height="20" fill="#14324F"/><g fill="none" stroke="#7FE7D6" stroke-width=".7"><circle cx="15" cy="10" r="6.2"/><ellipse cx="15" cy="10" rx="2.8" ry="6.2"/><path d="M8.8,10h12.4M9.7,7h10.6M9.7,13h10.6"/></g>`
+};
+function flag(code,cls){ const f=FLAGS[code]; if(!f) return "";
+  return `<span class="flag ${cls||""}" aria-hidden="true"><svg viewBox="0 0 30 20" preserveAspectRatio="xMidYMid slice">${f()}</svg></span>`; }
+
+const CC={fecv:"us",eudamed:"eu",nando:"eu",pard:"gb",mfds:"kr",mfdsdoc:"kr",pmda:"jp",mdall:"ca",tga:"au",swissmedic:"ch",
+  israel:"il",rzn:"ru",titck:"tr",cdsco:"in",rceth:"by",nmpa:"cn",iaf:"un",iso13485:"de",tuvsud:"de",bsi:"gb",certipedia:"de"};
+const CNAME={us:"AQSH",eu:"Yevropa Ittifoqi",gb:"Buyuk Britaniya",kr:"Koreya",jp:"Yaponiya",ca:"Kanada",au:"Avstraliya",ch:"Shveytsariya",
+  il:"Isroil",ru:"Rossiya",tr:"Turkiya",in:"Hindiston",by:"Belarus",cn:"Xitoy"};
+
+/* ============ ISO ORGANINI ANIQLASH ============ */
+function isoBody(q){
+  const s=String(q||"").trim().toUpperCase();
+  if(/^D\d{10}$/.test(s)) return "mdc";
+  if(/^Q5\s?\d{6}\s?\d{4}/.test(s)) return "tuv";
+  if(/^(MD|FM)\s?\d{5,6}$/.test(s)) return "bsi";
+  if(/^\d{5}-\d{2}-\d{2}(_EN)?$/.test(s)) return "dekra";
+  return null;
+}
+function tuvNum(q){ const m=String(q).toUpperCase().match(/Q5\s?(\d{6})\s?(\d{4})/); return m?`Q5 ${m[1]} ${m[2]}`:String(q).trim(); }
+function bsiNum(q){ const m=String(q).trim().toUpperCase().match(/^(MD|FM)\s?(\d{5,6})$/); return m?m[1]+" "+m[2]:String(q).trim(); }
+
+/* ============ RAQAM DEKODERI ============ */
+function decode(raw){
+  const s=raw.trim().toUpperCase().replace(/\s+/g," ");
+  if(!s) return null;
+  let m;
+  if((m=s.match(/^(NDA|ANDA|BLA)\s*0*(\d{4,6})$/))) return {s:"FDA · AQSH",k:"Dori arizasi",
+    g:[[m[1],"ariza turi"],[m[2].padStart(6,"0"),"raqam"]]};
+  if((m=s.match(/^K\s*(\d{2})(\d{4})$/))) return {s:"FDA · AQSH",k:"510(k) ruxsati",
+    g:[["K","510(k)"],[m[1],"yil ≈ 20"+m[1]],[m[2],"tartib"]]};
+  if((m=s.match(/^P\s*(\d{2})(\d{4})$/))) return {s:"FDA · AQSH",k:"PMA ruxsati",
+    g:[["P","PMA"],[m[1],"yil ≈ 20"+m[1]],[m[2],"tartib"]]};
+  if((m=s.match(/^EU\s*\/\s*([12])\s*\/\s*(\d{2})\s*\/\s*(\d{3,4})(?:\s*\/\s*(\d{1,3}))?$/)))
+    return {s:"EMA · Yevropa Ittifoqi",k:m[1]==="1"?"Inson uchun markazlashtirilgan ruxsat":"Veterinariya",
+      g:[["EU/"+m[1],m[1]==="1"?"inson":"veterinariya"],[m[2],"yil ≈ 20"+m[2]],[m[3],"mahsulot"],...(m[4]?[[m[4],"qadoq"]]:[])]};
+  if((m=s.match(/^PL\s*(GB|NI)?\s*(\d{4,5})\s*\/\s*(\d{3,4})$/)))
+    return {s:"MHRA · Buyuk Britaniya",k:"Dori litsenziyasi",
+      g:[["PL"+(m[1]||""),m[1]==="GB"?"Buyuk Britaniya":m[1]==="NI"?"Sh. Irlandiya":"butun BB"],[m[2],"litsenziat"],[m[3],"mahsulot"]]};
+  if((m=s.match(/^([A-Z]{2})-(MF|AR|IM|PR)-(\d{9})$/)))
+    return {s:"EUDAMED · Yevropa Ittifoqi",k:"Tashkilot raqami (SRN)",
+      g:[[m[1],"mamlakat"],[m[2],{MF:"ishlab chiqaruvchi",AR:"vakil",IM:"importchi",PR:"paket ishlab chiqaruvchi"}[m[2]]],[m[3],"tartib"]]};
+  if((m=s.match(/^(\d{5})([A-Z]{3})(\d{5})(\d{3})$/)))
+    return {s:"PMDA · Yaponiya",k:"Ruxsat raqami (承認番号)",guess:1,
+      g:[[m[1],"yil kodi ("+m[1].slice(0,2)+" → "+(1988+parseInt(m[1].slice(0,2)))+")"],[m[2],"hujjat sinfi"],[m[3],"tartib"],[m[4],"o'zgartirish"]]};
+  if((m=s.match(/^国药准字\s*([HZSJBTF])(\d{8})$/)))
+    return {s:"NMPA · Xitoy",k:"Dori ruxsati",
+      g:[["国药准字","ruxsat"],[m[1],{H:"kimyoviy",Z:"an'anaviy",S:"biologik",J:"import",B:"sog'lomlashtiruvchi",T:"sinov",F:"yordamchi"}[m[1]]||"turkum"],[m[2],"raqam"]]};
+  if((m=s.match(/^国械注(准|进|许)\s*(\d{4})(\d)(\d{2})(\d{4})$/)))
+    return {s:"NMPA · Xitoy",k:"Tibbiy jihoz ruxsati",
+      g:[["国械注"+m[1],{"准":"ichki ishlab chiqarish","进":"import","许":"Gonkong/Makao/Tayvan"}[m[1]]],[m[2],"yil"],[m[3],m[3]+"-sinf"],[m[4],"turkum"],[m[5],"tartib"]]};
+  if((m=s.match(/^([\u4e00-\u9fa5]{1,2})械注准\s*(\d{11})$/)))
+    return {s:"NMPA · Xitoy",k:"Viloyat darajasidagi ruxsat (2-sinf)",guess:1,
+      g:[[m[1],"viloyat"],[m[2],"raqam"]]};
+  const ib=isoBody(s);
+  if(ib==="mdc") return {s:"mdc · Germaniya",k:"ISO 13485 / MDR sertifikati",g:[[s,"Registration no."]]};
+  if(ib==="tuv") return {s:"TÜV SÜD Product Service",k:"ISO 13485 / CE sertifikati",g:[[tuvNum(s),"sertifikat raqami"]]};
+  if(ib==="bsi") return {s:"BSI",k:"ISO 13485 sertifikati",g:[[bsiNum(s).split(" ")[0],s.startsWith("MD")?"tibbiy jihoz QMS":"QMS"],[bsiNum(s).split(" ")[1],"raqam"]]};
+  if(ib==="dekra") return {s:"DEKRA Certification",k:"ISO 13485 sertifikati — ochiq bazasi yo'q",guess:1,g:[[s,"Certificate registration no."]]};
+  if((m=s.match(/^(\d{2})-(\d{3,4})$/)))
+    return {s:"MFDS · Koreya Respublikasi",k:"Mahsulot litsenziyasi",guess:1,
+      g:[[m[1],"yil ≈ 20"+m[1]],[m[2],"tartib"]]};
+  if((m=s.match(/^([A-Z0-9]{4})-([A-Z0-9]{4})-([A-Z0-9]{4})-([A-Z0-9]{4})$/)))
+    return {s:"MFDS · Koreya Respublikasi",k:"Hujjat raqami — onlayn tasdiqlanadi",
+      g:[[s,"hujjat raqami"]]};
+  if(isCFG(s)){ const c=cfgParts(s), n=c.num.split("-");
+    return {s:"FDA · AQSH",k:"Eksport sertifikati (CFG) — FECV tizimida tasdiqlanadi",guess:1,
+      g:[[n[0],"asosiy raqam"],[n[1],"kod"],[n[2],"berilgan yil"],[n[3],"tartib"],
+         ...(c.uz?[[c.us,"amal qilish muddati → "+c.uz]]:[["sana kiritilmagan","raqamdan keyin qo'shing"]])]};
+  }
+  if(/^\d{12,14}$/.test(s)) return {s:"UDI",k:"Jihoz identifikatori",g:[[s,"UDI-DI"]]};
+  return {s:null,k:"Format tanilmadi",guess:1,g:[[s.slice(0,30),"kiritilgan matn"]]};
+}
+function paintDec(){
+  const d=decode($("q").value);
+  if(!d){$("dec").innerHTML='<p class="idle">Raqam kiritilganda uning tarkibi shu yerda ochib beriladi.</p>';return;}
+  $("dec").innerHTML=`<div class="dh"><span class="s">${d.s||"Manba aniqlanmadi"}</span><span class="k">${d.k}</span>
+    ${d.guess?'<span class="g">taxminiy</span>':''}</div>
+    <div class="segs">${d.g.map(x=>`<div class="sg"><b>${esc(x[0])}</b><span>${esc(x[1])}</span></div>`).join("")}</div>`;
+}
+$("q").addEventListener("input",paintDec);
+
+/* ============ MANBALAR ============ */
+/* ============ MANBALAR ============
+   pf:1  — PP-3948 / PF-6221 bo'yicha ro'yxatdan o'tkazish natijalari tan olinadigan davlatlar
+   pf:0  — ro'yxatda yo'q, lekin amalda ko'p uchraydi
+   ================================================ */
+const EMEDI_VERIFY="https://emedi.mfds.go.kr/msismext/emd/uif/issuDocTruflsEngView.do";
+
+function sources(type,q){
+  const Q=enc(q);
+  const c=cfgParts(q);
+  const CFG={k:"fecv",nm:"FDA · hujjat",cn:"AQSH · eksport sertifikatini tasdiqlash",pf:1,gold:1,
+    cps: c ? [["Raqamni nusxala",c.num], ...(c.us?[["Sanani nusxala",c.us]]:[])] : null,
+    fld: (c && c.us)
+      ? `FDA sahifasida ikkita maydon bo'ladi. <b>Certificate Number</b> → <b>${c.num}</b>. <b>Expiration Date</b> → <b>${c.us}</b> (${c.uz}). Har biri uchun alohida nusxalash tugmasi tayyor.`
+      : "Ikkita ma'lumot kerak: <b>Certificate Number</b> va <b>Expiration Date</b> — «valid from … to …» satridagi <b>oxirgi</b> sana. Sanani ham tayyor olish uchun uni qidiruv oynasiga raqamdan keyin yozing: <b>13542-9-2025-4 2027-10-05</b> yoki <b>13542-9-2025-4 05.10.2027</b>",
+    trap:"Sertifikat tasviri bilan birga korxona nomi, hujjat turi va <b>betlar soni</b> qaytadi — betlar sonini sizdagi nusxa bilan solishtiring. «FOR VERIFICATION PURPOSES ONLY» — haqiqiy; «CERTIFICATE WITHDRAWN» — bekor qilingan. Qalqib chiquvchi oynaga ruxsat bering, aks holda natija ochilmaydi.",
+    url:"https://www.access.fda.gov/fecv/CDRH"};
+
+  /* --- YeI milliy reestrlari (dori uchun) --- */
+  const EU_NAT={k:"eunat",nm:"YeI milliy reestrlari",cn:"Germaniya, Fransiya, Italiya va boshqalar",pf:0,
+    fld:"Dori nomi yoki milliy ruxsat raqami bo'yicha qidiring. Har bir davlatning o'z raqam formati bor.",
+    trap:"EMA'da topilmagan dorilar aynan shu yerda bo'ladi. Diqqat: PF-6221 bo'yicha tan olinadigan organ — EMA, milliy reestrlar emas. Bu manbalar ma'lumot uchun; ekspertiza xulosasiga asos bo'la olmaydi.",
+    url:"https://www.ema.europa.eu/en/medicines",
+    links:[["Germaniya",  "https://www.pharmnet-bund.de/"],
+           ["Fransiya",   "https://base-donnees-publique.medicaments.gouv.fr/"],
+           ["Italiya",    "https://www.aifa.gov.it/"],
+           ["Ispaniya",   "https://cima.aemps.es/"],
+           ["Niderlandiya","https://www.geneesmiddeleninformatiebank.nl/"],
+           ["Belgiya",    "https://www.famhp.be/"],
+           ["Irlandiya",  "https://www.hpra.ie/"],
+           ["Daniya",     "https://laegemiddelstyrelsen.dk/"],
+           ["Shvetsiya",  "https://www.lakemedelsverket.se/"],
+           ["Norvegiya",  "https://www.dmp.no/"],
+           ["Finlyandiya","https://www.fimea.fi/"],
+           ["Sloveniya",  "https://www.jazmp.si/"]]};
+
+  /* --- tan olinadigan davlatlar, alohida tizimlar --- */
+  const CANADA_D={k:"hc",nm:"Health Canada",cn:"Kanada · dori",pf:0,
+    fld:"DIN raqami yoki dori nomi bo'yicha qidiring. Baza inglizcha va fransuzcha.",
+    trap:"Kanada PF-6221 ro'yxatida yo'q. Baza ochiq va sifatli, lekin ma'lumot uchun. Holat «Marketed», «Dormant» yoki «Cancelled» bo'lishi mumkin; faqat birinchisi faol.",
+    url:"https://health-products.canada.ca/dpd-bdpp/"};
+  const CANADA_M={k:"mdall",nm:"Health Canada · MDALL",cn:"Kanada · tibbiy jihoz",pf:0,
+    fld:"Litsenziya raqami, kompaniya nomi yoki jihoz nomi bo'yicha qidiring.",
+    trap:"Kanada PF-6221 ro'yxatida yo'q — ma'lumot uchun. MDALL faqat II, III va IV sinf jihozlarni ko'rsatadi; I sinf uchun litsenziya berilmaydi va bu qoidabuzarlik emas.",
+    url:"https://health-products.canada.ca/mdall-limh/"};
+  const AUS={k:"tga",nm:"TGA · ARTG",cn:"Avstraliya",pf:0,
+    fld:"AUST R yoki AUST L raqamini, yoki mahsulot nomini kiriting.",
+    trap:"Avstraliya PF-6221 ro'yxatida yo'q — ma'lumot uchun. AUST R — to'liq baholangan, AUST L — faqat ro'yxatga olingan; ikkalasi bir xil emas.",
+    url:"https://www.tga.gov.au/"};
+  const CH={k:"swissmedic",nm:"Swissmedic",cn:"Shveytsariya",pf:0,
+    fld:"Ruxsat raqami yoki mahsulot nomi. Ro'yxatlar Excel fayl shaklida ham yuklab olinadi.",
+    trap:"Shveytsariya PF-6221 ro'yxatida yo'q va Yevropa Ittifoqiga ham kirmaydi — uning mahsuloti EUDAMED yoki EMA'da bo'lmasligi mumkin.",
+    url:"https://www.swissmedic.ch/"};
+  const IL={k:"israel",nm:"Sog'liqni saqlash vazirligi",cn:"Isroil",pf:0,
+    fld:"Dori yoki jihoz nomi bo'yicha qidiring. Sahifa ibroniy tilida, inglizcha versiyasi ham bor.",
+    trap:"Isroil PF-6221 ro'yxatida yo'q — ma'lumot uchun. Bazasi boshqalarga qaraganda kamroq qulay; topilmasa vazirlikka rasmiy so'rov yo'li qoladi.",
+    url:"https://www.gov.il/en/departments/ministry_of_health"};
+
+  /* --- ro'yxatda yo'q, lekin ko'p uchraydigan davlatlar --- */
+  const RU_D={k:"grls",nm:"ГРЛС",cn:"Rossiya · dori",pf:0,
+    fld:"Dori nomi yoki ro'yxatdan o'tkazish raqamini kiriting. Baza rus tilida, qidiruv oddiy.",
+    trap:"Rossiya PF-6221 ro'yxatida yo'q — u yerdagi ro'yxatdan o'tkazish O'zbekistonda avtomatik tan olinmaydi. Baza faqat ma'lumot uchun.",
+    url:"https://grls.rosminzdrav.ru/"};
+  const RU_M={k:"rzn",nm:"Росздравнадзор",cn:"Rossiya · tibbiy jihoz",pf:0,
+    fld:"Ro'yxatdan o'tkazish guvohnomasi raqami, ishlab chiqaruvchi yoki jihoz nomi.",
+    trap:"EAEU guvohnomasi bilan chalkashtirmang: EAEU va Rossiya milliy guvohnomasi alohida hujjatlar. Ikkalasi ham PF-6221 ro'yxatiga kirmaydi.",
+    url:"https://roszdravnadzor.gov.ru/services/misearch"};
+  const TR={k:"titck",nm:"TİTCK · ÜTS",cn:"Turkiya",pf:0,
+    fld:"Tibbiy jihozlar uchun ÜTS tizimi — mahsulot, barkod yoki ishlab chiqaruvchi bo'yicha qidiriladi. Dorilar uchun TİTCK ruxsat ro'yxatlari.",
+    trap:"ÜTS'da fuqarolar uchun alohida bo'lim bor («Vatandaş»), hisob yozuvi kerak emas. Turk tilida; brauzer tarjimasini yoqing.",
+    url:"https://www.titck.gov.tr/faaliyetalanlari/tibbicihaz/urun-takip-sistemi-uts"};
+  const IN={k:"cdsco",nm:"CDSCO",cn:"Hindiston",pf:0,
+    fld:"Mahsulot yoki ishlab chiqaruvchi nomi bo'yicha qidiring. Ruxsatlar ro'yxati bo'limlar bo'yicha tarqoq.",
+    trap:"Hindiston bazasi tartibsiz: ma'lumot PDF va Excel fayllarda tarqalgan, yagona qidiruv yo'q. Topilmasa bu hujjat yaroqsizligini bildirmaydi.",
+    url:"https://cdsco.gov.in/"};
+  const BY={k:"rceth",nm:"RUP «Sog'liqni saqlash ekspertiza markazi»",cn:"Belarus",pf:0,
+    fld:"Dori yoki tibbiy jihoz reestrini oching va nom yoki raqam bo'yicha qidiring.",
+    trap:"Belarus PF-6221 ro'yxatida yo'q. EAEU doirasidagi guvohnoma bo'lsa, u alohida hujjat — Belarus milliy reestrida bo'lmasligi mumkin.",
+    url:"https://www.rceth.by/"};
+  const CN_D={k:"nmpa",nm:"NMPA",cn:"Xitoy · dori",pf:0,
+    fld:"<b>国药准字</b> bilan boshlanadigan raqamni yoki dori nomini yozing.",
+    trap:"Sayt robotlarni bloklaydi va tekshirish kodi so'rashi mumkin. Xitoy PF-6221 ro'yxatida yo'q.",
+    url:"https://www.nmpa.gov.cn/datasearch/home-index.html#category=yp"};
+  const CN_M={k:"nmpa",nm:"NMPA",cn:"Xitoy · tibbiy jihoz",pf:0,
+    fld:"<b>国械注准</b> (ichki), <b>国械注进</b> (import) yoki <b>国械注许</b> bilan boshlanadigan raqam.",
+    trap:"Raqamdagi yil va sinf hujjatdagi sana va sinfga mos kelishini solishtiring. Sayt robotlarni bloklaydi; kod so'rasa qo'lda kiriting.",
+    url:"https://www.nmpa.gov.cn/datasearch/home-index.html#category=ylqx"};
+
+  /* --- ISO 13485: sertifikat organlari --- */
+  const ib=isoBody(q);
+  const IAF={k:"iaf",nm:"IAF CertSearch",cn:"Akkreditatsiyalangan sertifikatlarning xalqaro bazasi",pf:1,gold:1,
+    fld:"Sertifikat raqami yoki kompaniya nomini kiriting. Natijada sertifikat holati, uni bergan organ va akkreditatsiya organi ko'rinadi.",
+    trap:"Hamma organlar ma'lumot yubormaydi — bu yerda topilmaslik soxtalik belgisi emas, organning o'z bazasida tekshiring. Batafsil ma'lumot uchun bepul ro'yxatdan o'tish so'ralishi mumkin.",
+    url:"https://www.iafcertsearch.org/"};
+  const MDC={k:"iso13485",nm:"mdc",cn:"mdc medical device certification · Germaniya",pf:1,
+    fld:"Sertifikatdagi <b>Registration no.</b> raqamini (masalan D1043500087) kiriting va tekshirish tugmasini bosing.",
+    trap:"Faqat mdc tomonidan 2014-yildan beri berilgan EN ISO 13485/9001 hamda MDR/IVDR sertifikatlari shu yerda tekshiriladi.",
+    url:"https://www.mdc-ce.de/en/service-portal/validity-check/"};
+  const TUV={k:"tuvsud",nm:"TÜV SÜD",cn:"Product Service · Q5 bilan boshlanadigan sertifikatlar",pf:1,
+    fld:"Raqam <b>Q5 105767 0001</b> ko'rinishida bo'ladi. Sertifikat pastida «certificate validity see: www.tuvsud.com/ps-cert…» havolasi turadi — u aynan shu sahifa, raqam unga avtomatik qo'yiladi.",
+    trap:"«Rev.» qismisiz qidiring. Sertifikat Rev. raqami bazadagidan eski bo'lsa — sizdagi nusxa almashtirilgan, yangisini so'rang. TÜV SÜD Management Service sertifikatlari boshqa bazada — pastdagi ikkinchi havola.",
+    url:"https://www.tuvsud.com/ps-cert?q=cert:"+enc(tuvNum(q)),
+    links:[["Product Service (Q5)","https://www.tuvsud.com/ps-cert?q=cert:"+enc(tuvNum(q))],
+           ["Management Service","https://www.tuvsud.com/de-certificate-validity-check"]]};
+  const BSI={k:"bsi",nm:"BSI",cn:"Buyuk Britaniya / Niderlandiya · MD va FM raqamlar",pf:1,
+    fld:"Raqam <b>MD 817890</b> yoki <b>FM 704485</b> ko'rinishida. Raqam aniqlansa, sertifikat sahifasi to'g'ridan-to'g'ri ochiladi; aks holda qidiruvga raqam yoki kompaniya nomini yozing.",
+    trap:"Sahifada boshlanish va tugash sanasi hamda faoliyat doirasi (Scope) chiqadi — Scope'ni sertifikatdagi matn bilan solishtiring. MDR sertifikatlari alohida raqamda (MDR …).",
+    url: ib==="bsi" ? "https://www.bsigroup.com/en-GB/products-and-services/assessment-and-certification/validation-and-verification/client-directory-certificate/"+enc(bsiNum(q))
+                    : "https://www.bsigroup.com/en-GB/validate-bsi-issued-certificates/"};
+  const CERTI={k:"certipedia",nm:"TÜV Rheinland · Certipedia",cn:"TÜV Rheinland sertifikatlari",pf:1,
+    fld:"Sertifikat raqami, ID raqami yoki kompaniya nomi bo'yicha qidiring.",
+    trap:"Certipedia faqat TÜV Rheinland sertifikatlarini ko'rsatadi. TÜV SÜD va TÜV NORD — boshqa tashkilotlar, nomi o'xshashligiga aldanmang.",
+    url:"https://www.certipedia.com/"};
+  const NANDO_I={k:"nando",nm:"NANDO",cn:"Organning YeI vakolatini aniqlash",pf:1,
+    fld:"Sertifikatda to'rt xonali organ raqami bo'lsa (masalan 0123), shu yerda organ va uning vakolat doirasini tekshiring.",
+    trap:"ISO 13485 sertifikatini YeI vakolatli organi bo'lmagan tashkilot ham berishi mumkin — bu qonuniy. Lekin CE sertifikati faqat vakolatli organdan bo'ladi.",
+    url:"https://webgate.ec.europa.eu/single-market-compliance-space/#/notified-bodies/notified-body-list?filter=legislationId:34,notificationStatusId:1"};
+
+  const ISO_L=[IAF,MDC,TUV,BSI,CERTI];
+  const map={mdc:"iso13485",tuv:"tuvsud",bsi:"bsi"};
+  if(ib && map[ib]){ const i=ISO_L.findIndex(x=>x.k===map[ib]); const [x]=ISO_L.splice(i,1); x.gold=1; x.match=1; ISO_L.unshift(x); }
+  ISO_L.forEach(x=>{ x.cat="iso"; x.pf=0; });
+  if(type==="iso") return [...ISO_L,NANDO_I];
+
+  if(type==="drug") return [
+   ...(isCFG(q)?[CFG]:[]),
+   {k:"ema",nm:"EMA",cn:"Yevropa Ittifoqi",pf:1,
+    fld:"Qidiruv oynasiga dori nomini yoki <b>EU/1/…</b> raqamini yozing.",
+    trap:"EU/1 faqat markazlashtirilgan ruxsatlarda bo'ladi. Topilmasa — dori milliy tartibda ro'yxatdan o'tgan bo'lishi mumkin; pastdagi «YeI milliy reestrlari» kartochkasiga o'ting.",
+    url:"https://www.ema.europa.eu/en/medicines"},
+   EU_NAT,
+   {k:"mhra",nm:"MHRA",cn:"Buyuk Britaniya",pf:1,
+    fld:"Qidiruv oynasiga <b>PL raqami</b>ni to'liq yozing.",
+    trap:"Prefiks PL, PLGB yoki PLNI bo'lishi mumkin — uchalasi ham amal qiladi, o'zgartirmang.",
+    url:"https://products.mhra.gov.uk/?search="+Q+"&page=1&doc="},
+   {k:"mfds",nm:"MFDS",cn:"Koreya Respublikasi · dori",pf:1,
+    fld:"Mahsulot nomi yoki ruxsat raqami bo'yicha qidiring.",
+    trap:"Koreyada tibbiy jihozlar butunlay boshqa saytda (emedi). Bu manzil faqat dorilar uchun.",
+    url:"https://nedrug.mfds.go.kr/searchDrug"},
+   {k:"pmda",nm:"PMDA",cn:"Yaponiya · dori",pf:1,
+    fld:"Sahifani pastga aylantiring va <b>承認・認証番号等</b> maydonini toping. Tarjimada «Номер разрешения/сертификации».",
+    trap:"Boshqa maydonlarni bo'sh qoldiring. Bir vaqtda ikki maydonni to'ldirsangiz, ikkalasiga mos yozuv qidiriladi va hech nima chiqmaydi.",
+    url:"https://www.pmda.go.jp/PmdaSearch/iyakuSearch/"},
+   CANADA_D, AUS, CH, IL,
+   RU_D, TR, IN, BY, CN_D
+  ];
+
+  return [
+   CFG,
+   {k:"eudamed",nm:"EUDAMED",cn:"Yevropa Ittifoqi",pf:1,
+    fld:"<b>Actors</b> → «Search criteria» ni oching → <b>Actor ID/SRN</b> maydoniga SRN yozing. Yoki <b>Name</b> maydoniga kompaniya nomining bitta so'zini.",
+    trap:"SRN ni «Name» maydoniga yozmang — sayt uni kompaniya nomi deb qidiradi va hech nima topmaydi. Kartochka ochilgach chapdagi «Devices» → «View Economic Operator devices» — jihozlar va ularning xavf sinfi shu yerda.",
+    url:"https://ec.europa.eu/tools/eudamed"},
+   {k:"nando",nm:"NANDO",cn:"Vakolatli organlar",pf:1,
+    fld:"Sertifikatdagi <b>to'rt xonali organ raqami</b>ni toping (masalan 0123 — TÜV SÜD, 1639 — SGS Belgium).",
+    trap:"Organ mavjudligi yetarli emas — maqomi faol ekanini va vakolat doirasi shu jihozni qamrab olishini ham tekshiring. Soxta sertifikatlar ko'pincha shu yerda ochiladi.",
+    url:"https://webgate.ec.europa.eu/single-market-compliance-space/#/notified-bodies/notified-body-list?filter=legislationId:34,notificationStatusId:1"},
+   {k:"pard",nm:"MHRA · PARD",cn:"Buyuk Britaniya",pf:1,
+    fld:"Qidiruv oynasiga <b>ishlab chiqaruvchi nomi</b>ni yozing. Chapda «MANUFACTURERS» rejimi tanlangan bo'lsin.",
+    trap:"Sertifikat raqamini yozmang — PARD ularni saqlamaydi. «DEVICES» rejimi jihoz turining inglizcha nomini kutadi. MHRA'da qayd etilish ma'qullash emas.",
+    url:"https://pard.mhra.gov.uk/manufacturer-search/"+Q},
+   {k:"mfds",nm:"MFDS",cn:"Koreya Respublikasi · jihoz",pf:1,
+    fld:"«Поиск товаров и компаний» bo'limida kompaniya nomi, litsenziya raqami yoki mahsulot nomi bo'yicha qidiring.",
+    trap:"Bu dorilar sayti emas. Koreyada jihozlar uchun emedi, dorilar uchun nedrug — ikki alohida tizim.",
+    url:"https://emedi.mfds.go.kr"},
+   {k:"mfdsdoc",nm:"MFDS · hujjat",cn:"Koreya · hujjatni tasdiqlash",pf:1,gold:1,
+    fld:"Hujjatning <b>yuqori o'ng burchagidagi</b> berilish raqamini kiriting (masalan 6FDO-6SGA-1LVX-WYUW) va tasdiqlash tugmasini bosing.",
+    trap:"FDA FECV bilan bir qatorda — hujjatning o'zini onlayn tasdiqlaydigan ikkinchi tizim. 2026-yilgacha berilganlar uchun sahifada alohida «Minwon 24» tugmasi bor.",
+    url:EMEDI_VERIFY},
+   {k:"pmda",nm:"PMDA",cn:"Yaponiya · jihoz",pf:1,
+    fld:"Sahifani pastga aylantiring va <b>承認・認証番号等</b> maydonini toping.",
+    trap:"Topilmasa savdo nomi bo'yicha qidiring. Baza asosan hozir bozorda bo'lgan jihozlarni ko'rsatadi — eski ruxsat chiqmasligi mumkin.",
+    url:"https://www.pmda.go.jp/PmdaSearch/kikiSearch/"},
+   CANADA_M, AUS, CH, IL,
+   RU_M, TR, IN, BY, CN_M,
+   ...ISO_L
+  ];
+}
+
+/* ============ FDA ============ */
+const FECV="https://www.access.fda.gov/fecv/CDRH";
+const CFG_RE=/^(\d{4,6}-\d{1,2}-20\d{2}-\d{1,3})(?:\s+(?:(20\d{2})-(\d{1,2})-(\d{1,2})|(\d{1,2})\.(\d{1,2})\.(20\d{2})))?$/;
+const isCFG=q=>CFG_RE.test(String(q).trim());
+const OYLAR=["yanvar","fevral","mart","aprel","may","iyun","iyul","avgust","sentabr","oktabr","noyabr","dekabr"];
+/* CFG raqami va (ixtiyoriy) sanani ajratadi */
+function cfgParts(q){
+  const m=String(q).trim().match(CFG_RE); if(!m) return null;
+  let y,mo,d;
+  if(m[2]){ y=+m[2]; mo=+m[3]; d=+m[4]; }
+  else if(m[7]){ y=+m[7]; d=+m[5]; mo=+m[6]; }
+  const p2=n=>String(n).padStart(2,"0");
+  return { num:m[1],
+           us: y?`${p2(mo)}/${p2(d)}/${y}`:null,
+           uz: y?`${d}-${OYLAR[mo-1]||"?"} ${y}`:null,
+           iso: y?`${y}-${p2(mo)}-${p2(d)}`:null };
+}
+function fdaPlan(type,q){
+  const s=q.trim().toUpperCase(); let m;
+  if(isCFG(s)) return {k:"cfg",u:FECV,p:FECV,pn:"FECV — hujjatni tasdiqlash"};
+  if((m=s.match(/^(NDA|ANDA|BLA)\s*0*(\d{4,6})$/))){ const n=m[2].padStart(6,"0");
+    return {u:`https://api.fda.gov/drug/drugsfda.json?search=application_number:"${n}"&limit=1`,k:"drug",
+            p:`https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=${n}`,pn:"Drugs@FDA"}; }
+  if((m=s.match(/^K\s*(\d{6})$/)))  return {u:`https://api.fda.gov/device/510k.json?search=k_number:"K${m[1]}"&limit=1`,k:"k",
+    p:`https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfPMN/pmn.cfm?ID=K${m[1]}`,pn:"510(k) bazasi"};
+  if((m=s.match(/^P\s*(\d{6})$/)))  return {u:`https://api.fda.gov/device/pma.json?search=pma_number:"P${m[1]}"&limit=1`,k:"p",
+    p:`https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfPMA/pma.cfm?num=P${m[1]}`,pn:"PMA bazasi"};
+  if(/^\d{12,14}$/.test(s))         return {u:`https://api.fda.gov/device/udi.json?search=identifiers.id:"${s}"&limit=1`,k:"udi",
+    p:"https://accessgudid.nlm.nih.gov/",pn:"AccessGUDID"};
+  if(type==="drug")                 return {u:`https://api.fda.gov/drug/drugsfda.json?search=sponsor_name:"${enc(q.replace(/"/g,""))}"&limit=5`,k:"drug",
+    p:"https://www.accessdata.fda.gov/scripts/cder/daf/",pn:"Drugs@FDA"};
+  return {u:`https://api.fda.gov/device/registrationlisting.json?search=registration.name:"${enc(q.replace(/"/g,""))}"&limit=5`,k:"firm",
+    p:`https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfRL/rl.cfm?start_search=1&establishmentName=${encodeURIComponent(q)}`,pn:"Korxonalar reestri"};
+}
+/* FDA natijasi ostidagi tugmalar */
+function fdaActs(p){
+  return `<div class="acts" style="padding:12px 14px;border-top:1px solid var(--line);background:var(--head)">
+    <a class="mini solid" href="${p.p}" target="_blank" rel="noopener">${p.pn} — manbani ochish</a>
+    <a class="mini" href="${p.u}" target="_blank" rel="noopener">API javobi</a></div>`;
+}
+async function runFDA(type,q){
+  const box=$("fda"), p=fdaPlan(type,q);
+  if(p.k==="cfg"){
+    box.innerHTML='<div class="fdabar none">Eksport sertifikati — avtomatik tekshirilmaydi</div>'
+     +'<div style="padding:12px 14px;font-size:13.5px;color:var(--fg)">'
+     +'FDA ochiq bazasida faqat ruxsatlar saqlanadi (NDA, 510(k), PMA, UDI). '
+     +'Eksport sertifikatlari alohida <b>FECV</b> tizimida tasdiqlanadi.<br><br>'
+     +'Pastdagi <b>«FDA · hujjat»</b> kartochkasiga o\'ting — tekshirish va natijani belgilash o\'sha yerda.'
+     +'</div>';
+    return {mark:"q",data:null};
+  }
+  box.innerHTML='<div class="fdabar none">So\'ralmoqda…</div>';
+  try{
+    const r=await fetch(p.u);
+    if(r.status===404){
+      box.innerHTML='<div class="fdabar none">FDA bazasida topilmadi</div><div style="padding:12px 14px;font-size:13.5px;color:var(--fg)">Bu normal: FDA faqat AQSH bozorini qamrab oladi. Baribir rasmiy sahifadan qo\'lda tekshirib ko\'ring.</div>'+fdaActs(p);
+      return {mark:"x",data:null};
+    }
+    if(!r.ok) throw new Error("HTTP "+r.status);
+    const j=await r.json(), rows=j.results||[]; if(!rows.length) throw new Error("bo'sh javob");
+    const d=rows[0]; let kv=[];
+    if(p.k==="drug") kv=[["Ariza raqami",d.application_number],["Ruxsat egasi",d.sponsor_name],
+      ["Savdo nomi",(d.openfda?.brand_name||[])[0]||d.products?.[0]?.brand_name],
+      ["Savdo holati",[...new Set((d.products||[]).map(x=>x.marketing_status))].join(" · ")],
+      ["Amal qilish muddati","Muddatsiz (AQSH tizimi)"]];
+    if(p.k==="k") kv=[["510(k)",d.k_number],["Ariza beruvchi",d.applicant],["Jihoz",d.device_name],["Qaror sanasi",dt(d.decision_date)],["Qaror",d.decision_description]];
+    if(p.k==="p") kv=[["PMA",d.pma_number],["Ariza beruvchi",d.applicant],["Savdo nomi",d.trade_name],["Qaror sanasi",dt(d.decision_date)]];
+    if(p.k==="udi") kv=[["Savdo nomi",d.brand_name],["Kompaniya",d.company_name],["Tavsif",d.device_description],["Model",d.version_or_model_number]];
+    if(p.k==="firm") kv=[["Korxona",d.registration?.name],["Mamlakat",d.registration?.iso_country_code],["Ro'yxat raqami",d.registration?.registration_number],["Jihoz turi",(d.products||[])[0]?.openfda?.device_name]];
+    box.innerHTML=`<div class="fdabar hit">Topildi${rows.length>1?" · jami "+rows.length+" ta":""}</div>
+      <dl class="kv">${kv.filter(x=>x[1]).map(x=>`<div><dt>${x[0]}</dt><dd>${esc(x[1])}</dd></div>`).join("")}</dl>`+fdaActs(p);
+    return {mark:"y",data:kv.filter(x=>x[1])};
+  }catch(e){
+    box.innerHTML=`<div class="fdabar err">Ulanib bo'lmadi</div><div style="padding:12px 14px;font-size:13.5px">Avtomatik so'rov bajarilmadi — internet yo'q yoki sayt tashqi so'rovlarni cheklaydi. FDA bazasini pastdagi tugma orqali qo'lda oching, qolgan qadamlar odatdagidek ishlaydi.<br><span style="font-family:var(--mono);font-size:11.5px;color:var(--dim)">${esc(e.message)}</span></div>`+fdaActs(p);
+    return {mark:"q",data:null};
+  }
+}
+
+/* ============ OQIM ============ */
+const MISOL={
+  drug:"Masalan: NDA 021436 · EU/1/24/1832/001 · PL 34985/0004 · 国药准字H20143001",
+  dev:"Masalan: K223088 · DE-MF-000005273 · 21800BZX10102000 · 国械注进20243080661 · 19-4291 · 13542-9-2025-4 2027-10-05",
+  iso:"Masalan: D1043500087 (mdc) · Q5 105767 0001 (TÜV SÜD) · MD 817890 (BSI)"};
+const nMarks=r=>Object.keys((r&&r.marks)||{}).filter(k=>k!=="fda").length;
+const ochiq=()=>CUR && !CUR.saqlandi && nMarks(CUR)>0;
+document.querySelectorAll(".seg button").forEach(b=>b.addEventListener("click",()=>{
+  if(b.dataset.t===TYPE) return;
+  if(ochiq() && !confirm("Joriy tekshiruv saqlanmagan. Turini almashtirsangiz, belgilar yo'qoladi. Davom etilsinmi?")) return;
+  TYPE=b.dataset.t;
+  document.querySelectorAll(".seg button").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));
+  $("tip").innerHTML=MISOL[TYPE];
+  $("s2").style.display = TYPE==="iso" ? "none" : "";
+  resetCheck(false);
+}));
+function resetCheck(clearQ){
+  CUR=null; SRCLIST=[]; FILTER="pf";
+  ["s2","s4"].forEach(id=>$(id).classList.add("off"));
+  $("fda").innerHTML=""; paintSources("");
+  $("concl").value=""; setVerdict("");
+  $("expd").value=""; expCheck();
+  if(clearQ){ $("q").value=""; paintDec(); }
+  $("q").focus();
+}
+$("go").addEventListener("click",start);
+$("q").addEventListener("keydown",e=>{if(e.key==="Enter")start();});
+$("tip").innerHTML=MISOL.dev+" · ISO 13485: D1043500087 · Q5 105767 0001 · MD 817890";
+
+async function start(){
+  const q=$("q").value.trim(); if(!q){$("q").focus();return;}
+  if(ochiq() && !confirm("Joriy tekshiruv saqlanmagan. Yangisini boshlasangiz, belgilar yo'qoladi. Davom etilsinmi?")) return;
+  /* oldingi tekshiruvdan qolgan sana va xulosani tozalaymiz */
+  if(CUR && $("expd").value===CUR.exp) $("expd").value="";
+  $("concl").value=""; setVerdict("");
+  const c=cfgParts(q); if(c && c.iso && !$("expd").value) $("expd").value=c.iso;
+  const isoQ=!!isoBody(q);
+  CUR={id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),q,type:isoQ?"iso":"dev",ts:now(),expert:EXPERT.nm,pos:EXPERT.pos,
+       marks:{},mt:{},notes:{},opened:{},t0:Date.now(),fda:null,concl:"",verdict:"",exp:$("expd").value||""};
+  expCheck();
+  $("s4").classList.remove("off");
+  if(isoQ){
+    $("s2").classList.add("off"); $("fda").innerHTML="";
+    paintSources(q);
+    $("s3i").scrollIntoView({behavior:"smooth",block:"start"});
+    return;
+  }
+  $("s2").classList.remove("off");
+  $("go").disabled=true;$("go").textContent="So'ralmoqda…";
+  const f=await runFDA(TYPE,q); CUR.fda=f.data; CUR.marks.fda=f.mark;
+  paintSources(q);
+  $("go").disabled=false;$("go").textContent="Boshlash";
+  $("s2").scrollIntoView({behavior:"smooth",block:"start"});
+}
+let FILTER="pf", SRCLIST=[];
+function paintSources(q){
+  SRCLIST=sources(TYPE,q).slice().sort((a,b)=>(b.pf||0)-(a.pf||0));
+  /* koeffitsient uchun majburiy manbalar: ISO — oltin kartochkalar; qolganlari — PF-6221 manbalari */
+  if(CUR) CUR.reqk = CUR.type==="iso"
+    ? SRCLIST.filter(x=>x.cat==="iso" && x.gold).map(x=>x.k)
+    : SRCLIST.filter(x=>x.pf && !(x.k==="fecv" && !isCFG(q))).map(x=>x.k);
+  drawSources();
+}
+function card(s){
+  const mk=CUR?CUR.marks[s.k]:null, nt=CUR?(CUR.notes[s.k]||""):"";
+  return `
+    <div class="src" id="src-${s.k}">
+      <div class="srch">${flag(CC[s.k])}<span class="nm">${s.nm}</span><span class="cn">${s.cn}</span>
+        ${ s.match ? `<span class="pf match">sertifikat organi</span>` : `` }
+        ${ s.pf ? `<span class="pf yes">6221-PF bo'yicha tan olish</span>` : `` }
+        <span class="mk ${mk||"n"}" id="mk-${s.k}">${mk?{y:"topildi",x:"topilmadi",q:"ochilmadi"}[mk]:"belgilanmagan"}</span></div>
+      <div class="srcb">
+        <p class="fld">${s.fld}</p>
+        ${ s.links ? `<div class="lnks">${s.links.map(l=>`<a data-open="${s.k}" href="${l[1]}" target="_blank" rel="noopener">${esc(l[0])}</a>`).join("")}</div>` : "" }
+        <p class="trap">Eslatma: ${s.trap}</p>
+        <div class="acts">
+          ${ s.cps ? s.cps.map(c=>`<button class="mini" data-cp="${esc(c[1])}" data-lb="${esc(c[0])}">${esc(c[0])}</button>`).join("")
+                   : CUR ? `<button class="mini" data-cp="${esc(CUR.q)}" data-lb="Nusxala">Nusxala</button>` : `` }
+          <a class="mini ${s.gold?"gold":"solid"}" data-open="${s.k}" href="${s.url}" target="_blank" rel="noopener">${s.links?"Umumiy manba":"Manbani ochish"}</a>
+          ${ CUR && CUR.opened[s.k] ? `<span class="opn">manba ochilgan</span>` : `` }
+        </div>
+        ${ !CUR ? `<p class="need">Natijani belgilash uchun yuqorida raqamni kiriting va «Boshlash»ni bosing.</p>` : `
+        <div class="marks">
+          <button data-k="${s.k}" data-v="y" aria-pressed="${mk==="y"}">Topildi</button>
+          <button data-k="${s.k}" data-v="x" aria-pressed="${mk==="x"}">Topilmadi</button>
+          <button data-k="${s.k}" data-v="q" aria-pressed="${mk==="q"}">Ochilmadi</button>
+        </div>
+        <p class="need" id="need-${s.k}"></p>
+        <textarea class="note" data-n="${s.k}" placeholder="Izoh: nima topildi, qaysi sana, qanday holat">${esc(nt)}</textarea>` }
+      </div></div>`;
+}
+let RAIL_INTRO=true;
+function drawRail(){
+  const L=SRCLIST.filter(s=>s.cat!=="iso");
+  const grp=pf=>{ const seen={}, out=[];
+    L.filter(s=>!!s.pf===pf).forEach(s=>{ const c=CC[s.k]; if(!c||seen[c]) return; seen[c]=1; out.push({c,k:s.k}); });
+    return out; };
+  const stat=c=>{ const v=L.filter(s=>CC[s.k]===c).map(s=>CUR&&CUR.marks[s.k]).filter(Boolean);
+    return v.includes("y")?"y":v.includes("x")?"x":v.includes("q")?"q":"n"; };
+  let n=0;
+  const chips=a=>a.map(x=>`<button class="chip st-${stat(x.c)}" data-go="${x.k}" style="--i:${n++}" title="${CNAME[x.c]} — kartochkaga o'tish">
+      ${flag(x.c)}<span>${CNAME[x.c]}</span><i class="dt"></i></button>`).join("");
+  const A=grp(true), B=grp(false);
+  const el=$("rail");
+  el.innerHTML=`<div><p class="rl"><b>PF-6221 bo'yicha tan olinadi</b> — natijasi ekspertizada asos bo'ladi</p><div class="rc">${chips(A)}</div></div>
+    <div><p class="rl"><b>Ma'lumot uchun</b> — PF-6221 ro'yxatida yo'q, yordamchi manba</p><div class="rc">${chips(B)}</div></div>`;
+  if(!RAIL_INTRO) el.classList.remove("intro");
+  RAIL_INTRO=false;
+  el.querySelectorAll("[data-go]").forEach(b=>b.addEventListener("click",()=>{
+    const t=$("src-"+b.dataset.go); if(!t) return;
+    t.scrollIntoView({behavior:"smooth",block:"center"});
+    t.classList.remove("flash"); void t.offsetWidth; t.classList.add("flash");
+  }));
+}
+function drawSources(){
+  const L=SRCLIST;
+  const pf=L.filter(s=>s.pf), oth=L.filter(s=>!s.pf && s.cat!=="iso"), iso=L.filter(s=>s.cat==="iso");
+  const ib=CUR&&CUR.type==="iso"?isoBody(CUR.q):null;
+  $("srcs").innerHTML = pf.map(card).join("")
+    + `<p class="grp">Ma'lumot uchun — natijasi xulosaga mustaqil asos bo'la olmaydi</p>`
+    + oth.map(card).join("");
+  const isoHint = !(CUR && CUR.type==="iso")
+    ? `Sertifikat raqamini yuqoriga kiritib «Boshlash»ni bossangiz, organ avtomatik aniqlanadi va uning bazasi birinchi qatorga chiqadi. Doim <b>IAF CertSearch</b>dan boshlang.`
+    : ib==="dekra"
+    ? `<b>DEKRA sertifikati aniqlandi.</b> DEKRA'ning ochiq onlayn bazasi yo'q: avval <b>IAF CertSearch</b>da qidiring, topilmasa DEKRA Certification GmbH'ga rasmiy so'rov yuboring.`
+    : `Raqamdan sertifikat organi aniqlandi — uning bazasi birinchi turibdi. <b>IAF CertSearch</b> bilan birga ikkalasi majburiy.`;
+  $("isosrcs").innerHTML = `<p class="fhint noprint" style="margin-top:0">${isoHint}</p>` + iso.map(card).join("");
+  drawRail();
+  [$("srcs"),$("isosrcs")].forEach(bindSources);
+  prog();
+}
+function bindSources(root){
+  root.querySelectorAll("[data-open]").forEach(a=>a.addEventListener("click",()=>{
+    if(CUR && !CUR.opened[a.dataset.open]){ CUR.opened[a.dataset.open]=Date.now(); drawSources(); }
+  }));
+  root.querySelectorAll("[data-cp]").forEach(b=>b.addEventListener("click",async()=>{
+    try{await navigator.clipboard.writeText(b.dataset.cp);b.textContent="Nusxalandi";}catch{b.textContent="Nusxalanmadi";}
+    setTimeout(()=>b.textContent=b.dataset.lb||"Nusxala",1500);
+  }));
+  root.querySelectorAll(".marks button").forEach(b=>b.addEventListener("click",()=>{
+    const k=b.dataset.k;
+    if(!CUR.opened[k]){
+      $("need-"+k).textContent="Avval «Manbani ochish» tugmasini bosing — belgi faqat ochilgan manbaga qo'yiladi.";
+      return;
+    }
+    $("need-"+k).textContent="";
+    CUR.mt[k]=Date.now();
+    document.querySelectorAll(`.marks button[data-k="${k}"]`).forEach(x=>x.setAttribute("aria-pressed",String(x===b)));
+    CUR.marks[k]=b.dataset.v;
+    const mk=$("mk-"+k); mk.className="mk "+b.dataset.v;
+    mk.textContent={y:"topildi",x:"topilmadi",q:"ochilmadi"}[b.dataset.v];
+    drawRail(); prog();
+  }));
+  root.querySelectorAll("[data-n]").forEach(t=>t.addEventListener("input",()=>CUR.notes[t.dataset.n]=t.value));
+}
+function prog(){
+  const nC=SRCLIST.filter(s=>s.cat!=="iso").length, nI=SRCLIST.length-nC;
+  if(!CUR){ $("prog").textContent=nC+" ta manba · "+new Set(SRCLIST.filter(s=>s.cat!=="iso").map(s=>CC[s.k])).size+" ta davlat"; $("isoprog").textContent=nI+" ta baza"; return; }
+  $("isoprog").textContent=SRCLIST.filter(s=>s.cat==="iso"&&CUR.marks[s.k]).length+" / "+nI+" belgilandi";
+  const req=CUR.reqk||[], r=req.filter(k=>CUR.marks[k]).length;
+  $("prog").textContent=`majburiy: ${r} / ${req.length} · jami belgi: ${nMarks(CUR)}`;
+}
+/* ============ KOEFFITSIENT ============
+   Maqsad: shunchaki tugma bosib "tekshirdim" deb qo'yishning oldini olish.
+   To'rt o'lchov, eng katta og'irlik manbani haqiqatan ochganlikka beriladi. */
+function koef(r){
+  const marks=Object.entries(r.marks||{}).filter(([k])=>k!=="fda");
+  const nM=marks.length;
+  const req=(r.reqk&&r.reqk.length)?r.reqk:null;
+  const total=req?req.length:(r.total||0);
+  if(!total||!nM) return {k:0,A:0,B:0,C:0,D:0,nM:0};
+  /* A — majburiy manbalar qamrovi */
+  const A=req ? req.filter(k=>(r.marks||{})[k]).length/req.length : Math.min(1,nM/total);
+  /* B — manba ochilgandan keyin kamida 8 soniya o'tib belgilangan (eski yozuvlarda — faqat ochilganligi) */
+  const B=marks.filter(([k])=>{ const o=r.opened&&r.opened[k]; if(!o) return false;
+    const t=r.mt&&r.mt[k]; return t ? (t-o)>=8000 : true; }).length/nM;
+  /* C — mazmunli izoh (kamida 10 belgi) */
+  const C=marks.filter(([k])=>String((r.notes||{})[k]||"").trim().length>=10).length/nM;
+  /* D — har bir belgiga kamida 30 soniya */
+  const D=Math.min(1,(r.secs||0)/(nM*30));
+  return {k:Math.round((A*0.25+B*0.40+C*0.20+D*0.15)*100),
+          A:Math.round(A*100),B:Math.round(B*100),C:Math.round(C*100),D:Math.round(D*100),nM};
+}
+const koefRang=v=>v>=75?"var(--ok)":v>=45?"var(--warn)":"var(--stop)";
+
+/* ============ ARXIV ============ */
+const LBL={y:"topildi",x:"topilmadi",q:"ochilmadi"};
+$("save").addEventListener("click",()=>{
+  if(!CUR)return; CUR.concl=$("concl").value;
+  if(!CUR.verdict){ alert("Xulosa turini tanlang: Tasdiqlandi, Qo'shimcha hujjat talab qilinadi yoki Rad etiladi."); return; }
+  CUR.exp=$("expd").value||"";
+  CUR.total=SRCLIST.length;
+  CUR.secs=Math.round((Date.now()-CUR.t0)/1000);
+  CUR.koef=koef(CUR).k;
+  const nus=JSON.parse(JSON.stringify(CUR)); delete nus.saqlandi;
+  const i=ARCH.findIndex(r=>r.id && r.id===CUR.id);
+  if(i>=0) ARCH[i]=nus; else ARCH.unshift(nus);
+  saqla(); CUR.saqlandi=true;
+  if($("s5") && $("s5").style.display!=="none"){ paintArch(); paintStats(); }
+  $("save").textContent="Saqlandi"; setTimeout(()=>$("save").textContent="Arxivga saqlash",1600);
+});
+$("print").addEventListener("click",()=>{ buildBayon(); window.print(); });
+window.addEventListener("beforeprint",buildBayon);
+$("yangi").addEventListener("click",()=>{
+  if(ochiq() && !confirm("Joriy tekshiruv saqlanmagan. Tozalansinmi?")) return;
+  resetCheck(true); window.scrollTo({top:0,behavior:"smooth"});
+});
+function paintArch(f){
+  $("acount").textContent=ARCH.length+" ta yozuv";
+  const rows=ARCH.filter(r=>!f||(r.q+" "+(r.expert||"")).toLowerCase().includes(f.toLowerCase()));
+  if(!rows.length){$("arch").innerHTML=`<div class="empty">${f?"Mos yozuv yo'q.":"Hali yozuv yo'q."}</div>`;return;}
+  $("arch").innerHTML=`<table><thead><tr><th>Sana</th><th>Ekspert</th><th>So'rov</th><th>Turi</th><th>Koef.</th><th>Natijalar</th><th>Xulosa</th></tr></thead><tbody>
+    ${rows.map(r=>`<tr><td class="mono">${esc(r.ts)}</td><td>${esc(r.expert||"—")}</td><td>${esc(r.q)}</td><td>${r.type==="drug"?"Dori":r.type==="iso"?"ISO 13485":"Jihoz"}</td>
+    <td class="mono" style="color:${koefRang(r.koef||0)};font-weight:600">${r.koef==null?"—":r.koef+"%"}</td>
+    <td class="mono" style="font-size:11.5px">${Object.entries(r.marks).map(([k,v])=>k.toUpperCase()+": "+LBL[v]).join("<br>")}</td>
+    <td>${r.verdict?`<b>${VD[r.verdict]}</b><br>`:""}${esc(r.concl||"—")}</td></tr>`).join("")}</tbody></table>`;
+}
+
+
+/* ============ AVTOMATIK SAQLASH ============
+   Arxiv brauzer xotirasida saqlanadi va sahifa ochilganda o'zi tiklanadi.
+   Xotira mavjud bo'lmasa (masalan oldindan ko'rish oynasida) tizim
+   qo'lda saqlashga o'tadi va buni ekranda aytadi. */
+const KALIT="tjq_arxiv_v2";
+let AVTO=true;
+function saqla(){
+  try{ localStorage.setItem(KALIT, JSON.stringify(ARCH)); }
+  catch(e){ AVTO=false; }
+  holat();
+}
+function tikla(){
+  try{ const v=localStorage.getItem(KALIT); if(v){ const j=JSON.parse(v); if(Array.isArray(j)) ARCH=j; } }
+  catch(e){ AVTO=false; }
+  holat();
+}
+function holat(){
+  const el=$("avto"); if(!el) return;
+  el.className="avtobar "+(AVTO?"on":"off");
+  el.innerHTML = AVTO
+    ? `<b>Avtomatik saqlash yoqilgan.</b>`
+    : `<b>Avtomatik saqlash ishlamayapti.</b> Bu oyna brauzer xotirasiga ruxsat bermayapti. Faylni kompyuteringizga yuklab olib, to'g'ridan-to'g'ri oching — o'shanda avtomatik saqlash ishlaydi. Hozircha «Arxivni saqlash» tugmasidan foydalaning.`;
+}
+
+/* ============ STATISTIKA ============ */
+function paintStats(){
+  if(!ARCH.length){ $("stats").innerHTML='<div class="empty">Tekshiruv saqlangandan keyin statistika shu yerda chiqadi.</div>'; $("scount").textContent=""; return; }
+  const mine=ARCH.filter(r=>r.expert===EXPERT.nm);
+  const avg=a=>a.length?Math.round(a.reduce((x,y)=>x+y,0)/a.length):0;
+  const K=r=>koef(r);
+  const mk=mine.map(r=>K(r));
+  const kpi=[
+    ["Mening tekshiruvlarim", mine.length, ""],
+    ["O'rtacha koeffitsient", avg(mk.map(x=>x.k)), "%"],
+    ["Jami yozuvlar", ARCH.length, ""],
+    ["Ekspertlar", new Set(ARCH.map(r=>r.expert||"—")).size, ""]
+  ];
+  const comp=[["Manbalarni qamrash",avg(mk.map(x=>x.A))],
+              ["Manba ochib ko'rilgan",avg(mk.map(x=>x.B))],
+              ["Izoh yozilgan",avg(mk.map(x=>x.C))],
+              ["Sarflangan vaqt",avg(mk.map(x=>x.D))]];
+
+  /* ekspertlar kesimi */
+  const by={};
+  ARCH.forEach(r=>{ const e=r.expert||"—"; (by[e]=by[e]||{pos:r.pos||"—",n:0,ks:[],last:r.ts}).n++;
+                    by[e].ks.push(K(r).k); if(r.ts>by[e].last) by[e].last=r.ts; });
+  const rows=Object.entries(by).sort((a,b)=>b[1].n-a[1].n);
+
+  $("scount").textContent=ARCH.length+" yozuv · "+rows.length+" ekspert";
+  $("stats").innerHTML=
+    `<div class="kpis">${kpi.map(x=>`<div class="kpi"><div class="lb">${x[0]}</div><div class="vl">${x[1]}<small>${x[2]}</small></div></div>`).join("")}</div>
+     <div class="mtr">${comp.map(c=>`<div class="rw"><span class="nmm">${c[0]}</span>
+        <span class="br"><i style="width:${c[1]}%"></i></span><span class="pc">${c[1]}%</span></div>`).join("")}</div>
+     <table><thead><tr><th>Ekspert</th><th>Lavozim</th><th>Tekshiruvlar</th><th>O'rtacha koef.</th><th>Oxirgi faoliyat</th></tr></thead><tbody>
+     ${rows.map(([e,v])=>`<tr><td>${esc(e)}</td><td>${esc(v.pos)}</td><td class="mono">${v.n}</td>
+        <td class="mono" style="color:${koefRang(avg(v.ks))};font-weight:600">${avg(v.ks)}%</td>
+        <td class="mono">${esc(v.last)}</td></tr>`).join("")}</tbody></table>`;
+}
+
+$("find").addEventListener("input",e=>paintArch(e.target.value));
+let DL=null;
+(async()=>{ try{ if(window.claude&&window.claude.use) DL=await window.claude.use("downloads"); }catch(e){} })();
+async function download(n,t,m){
+  const blob=new Blob(["\ufeff"+t],{type:m});
+  if(!DL && window.claude && window.claude.use){ try{ DL=await window.claude.use("downloads"); }catch(e){} }
+  if(DL){ try{ await DL.save({filename:n,data:blob}); }catch(e){ if(e&&e.code!=="declined"&&e.code!=="cancelled") alert("Faylni saqlab bo'lmadi: "+(e.message||e.code)); } return; }
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=n;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+$("exp").addEventListener("click",()=>{ if(!ARCH.length){alert("Arxiv bo'sh.");return;}
+  download(`arxiv-${new Date().toISOString().slice(0,10)}.json`,JSON.stringify(ARCH,null,2),"application/json"); });
+$("csv").addEventListener("click",()=>{ if(!ARCH.length){alert("Arxiv bo'sh.");return;}
+  const head=["Sana","Ekspert","Lavozim","So'rov","Turi","Koeffitsient %","Belgilangan","Ochilgan manbalar","Sarflangan soniya","Natijalar","Izohlar","Xulosa turi","Amal qilish muddati","Xulosa"];
+  const body=ARCH.map(r=>[r.ts,r.expert||"",r.pos||"",r.q,r.type==="drug"?"Dori":r.type==="iso"?"ISO 13485":"Jihoz",
+    r.koef??"", Object.keys(r.marks||{}).filter(k=>k!=="fda").length, Object.keys(r.opened||{}).length, r.secs??"",
+    Object.entries(r.marks).map(([k,v])=>k+"="+LBL[v]).join("; "),
+    Object.entries(r.notes||{}).map(([k,v])=>k+": "+v).join(" | "),VD[r.verdict]||"",r.exp||"",r.concl||""]);
+  download(`arxiv-${new Date().toISOString().slice(0,10)}.csv`,
+    [head,...body].map(r=>r.map(c=>`"${String(c??"").replace(/"/g,'""')}"`).join(",")).join("\n"),"text/csv;charset=utf-8"); });
+$("imp").addEventListener("click",()=>$("file").click());
+$("file").addEventListener("change",e=>{ const f=e.target.files[0]; if(!f)return;
+  const rd=new FileReader();
+  rd.onload=()=>{try{const j=JSON.parse(rd.result); if(!Array.isArray(j))throw new Error("noto'g'ri fayl");
+    const kal=r=>r.id||(r.ts+"|"+(r.expert||"")+"|"+r.q);
+    const bor=new Set(ARCH.map(kal)); const yangi=j.filter(r=>r&&r.q&&!bor.has(kal(r)));
+    ARCH=[...yangi,...ARCH].sort((a,b)=>String(b.ts).localeCompare(String(a.ts)));
+    paintArch(); paintStats(); saqla();
+    alert(yangi.length+" ta yangi yozuv yuklandi."+(j.length-yangi.length?" "+(j.length-yangi.length)+" tasi arxivda allaqachon bor edi.":""));}catch(err){alert("Faylni o'qib bo'lmadi: "+err.message);}};
+  rd.readAsText(f); e.target.value=""; });
+tikla();
+
+paintSources("");
+$("s2").querySelector(".sub").innerHTML=flag("us")+"AQSH · FDA";
+
+/* ============ AMAL QILISH MUDDATI ============ */
+function expInfo(v){
+  if(!v) return null;
+  const d=new Date(v+"T00:00:00"), t=new Date(); t.setHours(0,0,0,0);
+  const n=Math.round((d-t)/86400000);
+  if(isNaN(n)) return null;
+  if(n<0)   return {c:"stop",t:`Muddati o'tgan — ${-n} kun oldin`};
+  if(n<=180) return {c:"warn",t:`Amal qiladi, lekin ${n} kun qoldi`};
+  return {c:"ok",t:`Amal qiladi · ${n} kun qoldi`};
+}
+function expCheck(){
+  const e=expInfo($("expd").value), el=$("expmsg");
+  el.className="expmsg"+(e?" "+e.c:""); el.textContent=e?e.t:"";
+}
+$("expd").addEventListener("change",()=>{ if(CUR) CUR.exp=$("expd").value||""; expCheck(); });
+
+/* ============ XULOSA TURI ============ */
+const VD={ok:"Tasdiqlandi",more:"Qo'shimcha hujjat talab qilinadi",no:"Rad etiladi"};
+const SHABLON={
+  ok:"Hujjat tegishli rasmiy manbada tasdiqlandi. Manbadagi ma'lumotlar taqdim etilgan hujjatga mos keladi.",
+  more:"Hujjatni rasmiy manbada to'liq tasdiqlab bo'lmadi. Ariza beruvchidan quyidagi hujjat talab qilinadi: ",
+  no:"Hujjat ma'lumotlari rasmiy manbadagi ma'lumotlarga mos kelmaydi. Hujjat qabul qilinmaydi. Asos: "};
+function setVerdict(v){
+  document.querySelectorAll(".verd button").forEach(x=>x.setAttribute("aria-pressed",String(x.dataset.vd===v)));
+  if(CUR) CUR.verdict=v;
+}
+document.querySelectorAll(".verd button").forEach(b=>b.addEventListener("click",()=>{
+  if(!CUR) return;
+  const v=b.dataset.vd, c=$("concl").value.trim();
+  setVerdict(v);
+  if(!c || Object.values(SHABLON).some(t=>t.trim()===c)){ $("concl").value=SHABLON[v]; }
+  $("concl").focus();
+}));
+
+/* ============ BAYONNOMA ============ */
+const TUR={drug:"Dori vositasi",dev:"Tibbiy jihoz",iso:"ISO 13485 sertifikati"};
+function buildBayon(){
+  const el=$("bayon");
+  if(!CUR){ el.innerHTML="<p>Faol tekshiruv yo'q. Avval hujjatni tekshiring.</p>"; return; }
+  CUR.concl=$("concl").value; CUR.exp=$("expd").value||"";
+  const d=decode(CUR.q)||{}, ex=expInfo(CUR.exp);
+  const mins=Math.max(1,Math.round((Date.now()-CUR.t0)/60000));
+  const info=[
+    ["Ekspert",CUR.expert],["Lavozim",CUR.pos],["Mahsulot turi",TUR[CUR.type]],
+    ["Tekshirilgan hujjat raqami",CUR.q],
+    ["Aniqlangan manba",(d.s||"aniqlanmadi")+(d.k?" — "+d.k:"")],
+    ["Amal qilish muddati",CUR.exp?CUR.exp+(ex?" ("+ex.t+")":""):"ko'rsatilmagan"],
+    ["Tekshiruv davomiyligi",mins+" daqiqa"]];
+  const fdaRow = CUR.type==="iso" ? "" :
+    `<h4>2. FDA ochiq bazasi (avtomatik so'rov)</h4>
+     <table><tr><td class="k">Natija</td><td>${CUR.marks.fda?LBL[CUR.marks.fda]:"so'rov yuborilmagan"}</td></tr>
+     ${(CUR.fda||[]).map(x=>`<tr><td class="k">${esc(x[0])}</td><td>${esc(x[1])}</td></tr>`).join("")}</table>`;
+  const n0 = CUR.type==="iso" ? 2 : 3;
+  const rows=SRCLIST.filter(s=>(CUR.reqk||[]).includes(s.k)||CUR.marks[s.k]);
+  const pfCol = CUR.type!=="iso";
+  el.innerHTML=`
+    <p class="b-org">Tibbiy jihozlar qo'mitasi</p>
+    <p class="b-tt">Xorijiy hujjatni tekshirish bayonnomasi</p>
+    <div class="b-no"><span>№ ____________</span><span>Sana: ${esc(CUR.ts)}</span></div>
+    <h4>1. Umumiy ma'lumot</h4>
+    <table>${info.map(x=>`<tr><td class="k">${x[0]}</td><td>${esc(x[1])}</td></tr>`).join("")}</table>
+    ${fdaRow}
+    <h4>${n0}. Manbalar bo'yicha tekshiruv natijalari</h4>
+    <table><thead><tr><th>№</th><th>Manba</th><th>Davlat / tizim</th>${pfCol?"<th>PF-6221</th>":""}<th>Natija</th><th>Izoh</th></tr></thead><tbody>
+    ${rows.map((s,i)=>`<tr><td>${i+1}</td><td>${esc(s.nm)}</td><td>${esc(s.cn)}</td>
+      ${pfCol?`<td>${s.pf?"tan olinadi":s.cat==="iso"?"ISO bazasi":"ma'lumot uchun"}</td>`:""}
+      <td>${CUR.marks[s.k]?LBL[CUR.marks[s.k]]:"belgilanmagan"}</td><td>${esc(CUR.notes[s.k]||"")}</td></tr>`).join("")}
+    </tbody></table>
+    <h4>${n0+1}. Xulosa</h4>
+    <p class="b-vd">${CUR.verdict?VD[CUR.verdict]:"Xulosa turi tanlanmagan"}</p>
+    <div class="b-txt">${esc(CUR.concl||"")}</div>
+    <p class="b-note">Manbada yozuv topilmasligi hujjat haqiqiy emasligini bildirmaydi. Yakuniy tasdiq — vakolatli organ javobi.</p>
+    <div class="b-sig">
+      <div>Ekspert: ${esc(CUR.expert)}<br>(imzo)</div>
+      <div>Tasdiqlovchi: ______________________<br>(F.I.Sh., imzo)</div>
+    </div>`;
+}
+
+/* Arxiv va statistika boshqaruv paroli bilan ochiladi */
+function arxivniOch(){
+  const pw=$("apw"), err=$("aerr");
+  if(pw.value!==BOSHQARUV){ err.textContent="Parol noto'g'ri."; pw.value=""; pw.focus(); return; }
+  $("lock").remove();
+  $("s5").style.display=""; $("s6").style.display="";
+  paintArch(); paintStats();
+  $("s5").scrollIntoView({behavior:"smooth",block:"start"});
+}
+$("abtn").addEventListener("click",arxivniOch);
+$("apw").addEventListener("keydown",e=>{ if(e.key==="Enter") arxivniOch(); });
+
+$("tozala").addEventListener("click",()=>{
+  if(!ARCH.length){ alert("Arxiv allaqachon bo'sh."); return; }
+  if(!confirm("Arxivdagi "+ARCH.length+" ta yozuv butunlay o'chiriladi. Avval «Arxivni saqlash» orqali nusxa oldingizmi?\n\nDavom etilsinmi?")) return;
+  ARCH=[]; saqla(); paintArch(); paintStats();
+});
+
+/* Saqlanmagan tekshiruv bo'lsa, sahifa yopilishidan oldin ogohlantiramiz */
+window.addEventListener("beforeunload",e=>{
+  if(CUR && !CUR.saqlandi && Object.keys(CUR.marks||{}).filter(k=>k!=="fda").length){
+    e.preventDefault(); e.returnValue="";
+  }
+});
+</script>
+</body>
+</html>
