@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Boshqaruv paneli — tekshiruv konsoli</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0A0E22; --panel:rgba(255,255,255,.045); --head:rgba(255,255,255,.03); --chip:rgba(255,255,255,.05); --field:rgba(255,255,255,.05);
+  --fg:#E7EAF6; --dim:#98A1C4; --faint:#66709A;
+  --line:rgba(255,255,255,.10); --linehi:rgba(94,234,212,.45);
+  --accent:#5EEAD4; --onaccent:#062229; --accentbg:rgba(94,234,212,.08); --ring:rgba(94,234,212,.20);
+  --ok:#A78BFA; --onok:#140A2E; --okbg:rgba(167,139,250,.12);
+  --warn:#FBBF6E; --warnbg:rgba(251,191,110,.10);
+  --stop:#FB7B8E; --stopbg:rgba(251,123,142,.10);
+  --display:"Space Grotesk",system-ui,sans-serif; --body:"Space Grotesk",system-ui,sans-serif; --mono:"Space Mono",monospace;
+  --h1w:700; --h1ls:-.035em; --h1tt:none; --h2w:600; --h2ls:-.01em; --h2tt:none;
+  --btntt:none; --btnls:.01em;
+  --r:14px; --rpill:999px; --rnum:9px;
+  --pborder:1px solid rgba(255,255,255,.10); --shadow:0 30px 70px -40px rgba(0,0,0,.9);
+  --numbg:linear-gradient(135deg,#5EEAD4,#A78BFA); --numfg:#0A0E22; --numbd:0;
+  --hdrule:1px solid rgba(255,255,255,.10); --blur:blur(16px);
+  --gatebg:radial-gradient(900px 600px at 30% 20%, #1B2150, #070A1A 70%);
+  --gateshadow:0 40px 100px -40px rgba(0,0,0,1);
+  }
+*{box-sizing:border-box} html,body{margin:0}
+:root{color-scheme:dark;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{background:radial-gradient(1100px 700px at 10% -10%,#1B2150 0%,transparent 60%),radial-gradient(900px 600px at 110% 10%,#251A4E 0%,transparent 55%),var(--bg);
+  color:var(--fg);font:15px/1.55 var(--body);min-height:100vh}
+button{font:inherit;cursor:pointer}
+.gate{position:fixed;inset:0;display:grid;place-items:center;padding:20px;background:var(--gatebg);z-index:5}
+.card{width:min(440px,100%);background:var(--panel);border:var(--pborder);border-radius:20px;padding:34px 30px;box-shadow:var(--gateshadow);backdrop-filter:var(--blur)}
+.eb{color:var(--accent);font-size:14px;font-weight:500;margin:0 0 10px}
+.card h2{margin:0 0 10px;font-size:26px;letter-spacing:-.02em}
+.d{color:var(--dim);font-size:14px;margin:0 0 14px}
+.d b{color:var(--fg)}
+.err{color:var(--stop);font-size:13.5px;min-height:1em;margin:10px 0 0}
+.big,.btn{background:var(--accent);color:var(--onaccent);border:0;border-radius:12px;padding:12px 20px;font-weight:600}
+.big{width:100%;margin-top:6px}
+.btn:hover,.big:hover{filter:brightness(1.08)}
+.btn.ghost{background:transparent;color:var(--fg);border:1px solid var(--line)}
+.mini{background:var(--chip);color:var(--fg);border:1px solid var(--line);border-radius:var(--rpill);padding:6px 13px;font:600 11px var(--mono);letter-spacing:.06em;text-transform:uppercase}
+.mini:hover{border-color:var(--accent)}
+.mini.stop{color:var(--stop);border-color:rgba(251,123,142,.4)} .mini.ok{color:var(--accent);border-color:var(--linehi)}
+.mini:disabled{opacity:.5;cursor:default}
+.top{max-width:1240px;margin:0 auto;padding:30px 24px 10px;display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap}
+.eyebrow{font:500 12px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:0 0 8px}
+h1{margin:0;font-size:clamp(30px,4vw,44px);letter-spacing:-.035em;line-height:1.05}
+.me{display:flex;gap:12px;align-items:center;color:var(--dim);font-size:13px}
+.tabs{max-width:1240px;margin:18px auto 0;padding:0 24px;display:flex;gap:6px;flex-wrap:wrap;border-bottom:1px solid var(--line)}
+.tabs button{background:none;border:0;color:var(--dim);padding:12px 14px;border-bottom:2px solid transparent;font-weight:500}
+.tabs button[aria-selected="true"]{color:var(--fg);border-bottom-color:var(--accent)}
+.cnt{display:inline-block;min-width:20px;padding:0 6px;border-radius:99px;background:var(--stop);color:#1b0006;font:700 11px/20px var(--mono);margin-left:4px}
+.cnt:empty{display:none}
+main{max-width:1240px;margin:0 auto;padding:22px 24px 60px}
+.bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:0 0 14px}
+.panel{background:var(--panel);border:var(--pborder);border-radius:var(--r);padding:18px 20px;margin:0 0 16px}
+.panel h3{margin:0 0 8px;font-size:17px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:12px}
+label{display:flex;flex-direction:column;gap:6px;font-size:12.5px;color:var(--dim)}
+label.chk{flex-direction:row;align-items:center;gap:8px;font-size:13.5px}
+input,select{font:inherit;color:var(--fg);background:var(--field);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+select option{background:#151a36}
+input:focus,select:focus{outline:0;border-color:var(--accent);box-shadow:0 0 0 3px var(--ring)}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:18px}
+.kpi{background:var(--panel);border:var(--pborder);border-radius:var(--r);padding:16px 18px}
+.kpi b{display:block;font-size:30px;letter-spacing:-.03em;line-height:1.1}
+.kpi span{color:var(--dim);font-size:13px}
+.kpi.al b{color:var(--stop)} .kpi.on b{color:var(--accent)}
+.alert{display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap;border:1px solid var(--line);border-left:3px solid var(--warn);background:var(--warnbg);border-radius:12px;padding:12px 16px;margin:0 0 10px}
+.alert.stop{border-left-color:var(--stop);background:var(--stopbg)}
+.alert p{margin:0;font-size:14px} .alert small{color:var(--dim)}
+.acts{display:flex;gap:6px;flex-wrap:wrap}
+.tw{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r)}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th{text-align:left;font:600 10.5px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--dim);background:var(--head);padding:10px 12px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+tr:last-child td{border-bottom:0}
+td small{color:var(--dim);display:block}
+.mono{font-family:var(--mono);font-size:12px}
+.pill{display:inline-block;padding:2px 10px;border-radius:99px;font:600 11px var(--mono);border:1px solid currentColor;white-space:nowrap}
+.pill.ok{color:var(--accent)} .pill.stop{color:var(--stop)} .pill.warn{color:var(--warn)} .pill.dim{color:var(--faint)}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--faint);margin-right:6px}
+.dot.on{background:var(--accent);box-shadow:0 0 10px var(--accent)}
+.empty{color:var(--dim);padding:22px;text-align:center;border:1px dashed var(--line);border-radius:var(--r)}
+h4{margin:22px 0 10px;font-size:15px}
+.modal{position:fixed;inset:0;background:rgba(3,5,15,.7);display:grid;place-items:center;padding:20px;z-index:10}
+.modal[hidden]{display:none}
+.mbox{position:relative;width:min(720px,100%);max-height:88vh;overflow:auto;background:#121733;border:var(--pborder);border-radius:18px;padding:26px 24px}
+.mbox h3{margin:0 0 4px;font-size:20px}
+.x{position:absolute;top:14px;right:14px;background:none;border:0;color:var(--dim);font-size:18px}
+.devrow{display:flex;justify-content:space-between;gap:12px;align-items:center;border:1px solid var(--line);border-radius:12px;padding:10px 14px;margin:0 0 8px}
+.devrow.pend{border-color:rgba(251,191,110,.5);background:var(--warnbg)}
+@media(max-width:620px){.top{padding-top:22px}.tabs button{padding:10px 8px;font-size:13.5px}}
+
+</style>
+</head>
+<body>
+<div id="login" class="gate">
+  <div class="card">
+    <p class="eb">Shahzodbek O'roqov</p>
+    <h2>Boshqaruv paneli</h2>
+    <div id="lbox">
+      <p class="d">Bu sahifa faqat administrator uchun. Google akkauntingiz bilan kiring.</p>
+      <button id="gbtn" class="big">Google bilan kirish</button>
+    </div>
+    <p class="err" id="lerr"></p>
+  </div>
+</div>
+
+<div id="app" style="display:none">
+  <header class="top">
+    <div>
+      <p class="eyebrow">Tibbiy jihozlar qo'mitasi · Xorijiy hujjatni tekshirish</p>
+      <h1>Boshqaruv paneli</h1>
+    </div>
+    <div class="me"><span id="me"></span><button class="mini" id="out">Chiqish</button></div>
+  </header>
+  <nav class="tabs" role="tablist">
+    <button data-tab="umumiy" aria-selected="true">Umumiy holat <span class="cnt" id="t-alert"></span></button>
+    <button data-tab="xodimlar" aria-selected="false">Xodimlar</button>
+    <button data-tab="kirishlar" aria-selected="false">Kirishlar jurnali</button>
+    <button data-tab="tekshiruvlar" aria-selected="false">Tekshiruvlar</button>
+    <button data-tab="sozlash" aria-selected="false">Ro'yxatni yuklash</button>
+  </nav>
+  <main>
+    <section data-pane="umumiy"><div id="p-umumiy"></div></section>
+    <section data-pane="xodimlar" hidden>
+      <div class="bar"><button class="btn" id="addbtn">+ Xodim qo'shish</button></div>
+      <div id="addform" class="panel" hidden>
+        <div class="grid">
+          <label>F.I.Sh.<input id="a-nm" placeholder="Familiya Ism Otasining ismi"></label>
+          <label>Lavozim<select id="a-pos">
+            <option>Bo'lim boshlig'i</option><option>Bosh mutaxassis</option><option selected>Yetakchi mutaxassis</option>
+            <option>1-toifali mutaxassis</option><option>2-toifali mutaxassis</option></select></label>
+          <label>Parol<input id="a-pw" placeholder="Masalan: Ism112"></label>
+          <label>Qurilmalar soni<select id="a-max"><option>1</option><option>2</option><option>3</option></select></label>
+        </div>
+        <label class="chk"><input type="checkbox" id="a-rah"> Barcha ekspertlarning arxivi va statistikasini ko'radi (rahbar)</label>
+        <div class="bar"><button class="btn" id="a-save">Saqlash</button><span class="err" id="a-err"></span></div>
+      </div>
+      <div id="p-xodimlar"></div>
+    </section>
+    <section data-pane="kirishlar" hidden>
+      <div class="bar"><select id="lf"><option value="">Barcha xodimlar</option></select>
+        <label class="chk"><input type="checkbox" id="lfx"> Faqat rad etilganlar</label></div>
+      <div id="p-kirishlar"></div>
+    </section>
+    <section data-pane="tekshiruvlar" hidden>
+      <div class="bar"><button class="mini" id="csv">CSV yuklab olish</button><button class="mini" id="json">JSON yuklab olish</button></div>
+      <div id="p-tekshiruvlar"></div>
+    </section>
+    <section data-pane="sozlash" hidden>
+      <div class="panel">
+        <h3>Xodimlar ro'yxatini Exceldan yuklash</h3>
+        <p class="d">Ustunlar: <b>F.I.Sh.</b>, <b>Lavozim</b>, <b>Parol</b> (sarlavha nomlari shunday bo'lishi kerak). Ro'yxatda bor xodimning ismi, lavozimi va paroli yangilanadi, qurilmalari va blok holati saqlanib qoladi. Yangi ism bo'lsa — yangi xodim qo'shiladi.</p>
+        <input type="file" id="xl" accept=".xlsx,.xls">
+        <div id="xlprev"></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div id="modal" class="modal" hidden><div class="mbox"><button class="x" id="mx" aria-label="Yopish">✕</button><div id="mbody"></div></div></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+/* ============ FIREBASE SOZLAMALARI ============ */
+const FB_CONFIG={
+  apiKey:"AIzaSyBeZKgyvUInhF0K4xw4amfP1echBlu0wl0",
+  authDomain:"tekshiruv-88c03.firebaseapp.com",
+  projectId:"tekshiruv-88c03",
+  storageBucket:"tekshiruv-88c03.firebasestorage.app",
+  messagingSenderId:"989419587759",
+  appId:"1:989419587759:web:052e115735c4ff6d86ac5a"
+};
+
+/* ---- SHA-256: parollarni ochiq saqlamaslik uchun ---- */
+function sha256(str){
+  const K=[0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2];
+  const b=Array.from(new TextEncoder().encode(str)), l=b.length*8;
+  b.push(0x80); while(b.length%64!==56) b.push(0);
+  for(let i=7;i>=0;i--) b.push(i>3?0:(l>>>(i*8))&255);
+  let H=[0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19];
+  const r=(x,n)=>(x>>>n)|(x<<(32-n));
+  for(let o=0;o<b.length;o+=64){
+    const w=new Array(64);
+    for(let i=0;i<16;i++) w[i]=(b[o+4*i]<<24)|(b[o+4*i+1]<<16)|(b[o+4*i+2]<<8)|b[o+4*i+3];
+    for(let i=16;i<64;i++){ const s0=r(w[i-15],7)^r(w[i-15],18)^(w[i-15]>>>3), s1=r(w[i-2],17)^r(w[i-2],19)^(w[i-2]>>>10); w[i]=(w[i-16]+s0+w[i-7]+s1)|0; }
+    let [a,bb,c,d,e,f,g,h]=H;
+    for(let i=0;i<64;i++){
+      const t1=(h+(r(e,6)^r(e,11)^r(e,25))+((e&f)^(~e&g))+K[i]+w[i])|0;
+      const t2=((r(a,2)^r(a,13)^r(a,22))+((a&bb)^(a&c)^(bb&c)))|0;
+      h=g; g=f; f=e; e=(d+t1)|0; d=c; c=bb; bb=a; a=(t1+t2)|0;
+    }
+    H=[H[0]+a,H[1]+bb,H[2]+c,H[3]+d,H[4]+e,H[5]+f,H[6]+g,H[7]+h].map(x=>x|0);
+  }
+  return H.map(x=>(x>>>0).toString(16).padStart(8,"0")).join("");
+}
+
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+firebase.initializeApp(FB_CONFIG);
+const AUTH=firebase.auth(), DB=firebase.firestore(), FV=firebase.firestore.FieldValue, FP=firebase.firestore.FieldPath;
+const S={dir:[],staff:{},sess:[],logins:[],checks:[]};
+let ADMIN=null, TAB="umumiy", MODAL=null, SUBS=[];
+const VD={ok:"Tasdiqlandi",more:"Qo'shimcha hujjat",no:"Rad etildi"};
+const ONLINE_MS=5*60000;
+
+/* ---------- vaqt ---------- */
+const ms=t=>!t?0:typeof t==="number"?t:t.toMillis?t.toMillis():0;
+const p2=n=>String(n).padStart(2,"0");
+function vaqt(t){ const m=ms(t); if(!m) return "—"; const d=new Date(m);
+  return `${d.getFullYear()}-${p2(d.getMonth()+1)}-${p2(d.getDate())} ${p2(d.getHours())}:${p2(d.getMinutes())}`; }
+function oldin(t){ const m=ms(t); if(!m) return "—"; const s=(Date.now()-m)/1000;
+  if(s<90) return "hozirgina"; if(s<3600) return Math.round(s/60)+" daqiqa oldin";
+  if(s<86400) return Math.round(s/3600)+" soat oldin"; return Math.round(s/86400)+" kun oldin"; }
+const onlayn=s=>Date.now()-ms(s.seen)<ONLINE_MS;
+const ism=code=>(S.dir.find(d=>d.code===code)||{}).name||(S.staff[code]||{}).name||code;
+const tuz=()=>Array.from(crypto.getRandomValues(new Uint8Array(4)),x=>x.toString(16).padStart(2,"0")).join("");
+const parolXesh=(salt,pw)=>sha256(salt+":"+String(pw).trim().toLowerCase());
+
+/* ---------- kirish ---------- */
+$("gbtn").addEventListener("click",async()=>{
+  $("lerr").textContent="";
+  const pr=new firebase.auth.GoogleAuthProvider(); pr.setCustomParameters({prompt:"select_account"});
+  try{ await AUTH.signInWithPopup(pr); }
+  catch(e){ if(e.code==="auth/popup-blocked"||e.code==="auth/operation-not-supported-in-this-environment") AUTH.signInWithRedirect(pr);
+    else if(e.code!=="auth/popup-closed-by-user") $("lerr").textContent="Kirib bo'lmadi: "+(e.message||e.code); }
+});
+$("out").addEventListener("click",()=>AUTH.signOut().then(()=>location.reload()));
+AUTH.onAuthStateChanged(u=>{ if(!u||u.isAnonymous){ $("login").style.display=""; $("app").style.display="none"; return; } adminTekshir(u); });
+
+async function adminTekshir(u){
+  let d; try{ d=await DB.doc("config/admin").get(); }
+  catch(e){ $("lerr").textContent="Bazaga ulanib bo'lmadi: "+(e.message||e); return; }
+  if(!d.exists){
+    $("lbox").innerHTML=`<p class="d">Tizimda hali administrator yo'q.</p>
+      <p class="d"><b>${esc(u.email)}</b> akkauntini administrator qilib belgilaysizmi? Keyin buni o'zgartirib bo'lmaydi.</p>
+      <button class="big" id="boot">Ha, administrator bo'laman</button>
+      <button class="btn ghost" style="width:100%;margin-top:8px" onclick="AUTH.signOut().then(()=>location.reload())">Boshqa akkaunt</button>`;
+    $("boot").onclick=async()=>{ try{ await DB.doc("config/admin").set({uid:u.uid,email:u.email,ts:FV.serverTimestamp()}); adminTekshir(u); }
+      catch(e){ $("lerr").textContent="Saqlab bo'lmadi: "+(e.message||e); } };
+    return;
+  }
+  if(d.data().uid!==u.uid){ $("lerr").textContent=`${u.email} — administrator emas.`; await AUTH.signOut(); return; }
+  ADMIN=u; $("login").style.display="none"; $("app").style.display=""; $("me").textContent=u.email;
+  boshla();
+}
+
+function boshla(){
+  const er=e=>console.error(e);
+  SUBS.push(DB.doc("dir/list").onSnapshot(s=>{ S.dir=(s.exists&&s.data().items)||[]; chiz(); },er));
+  SUBS.push(DB.collection("staff").onSnapshot(q=>{ S.staff={}; q.forEach(d=>S.staff[d.id]=d.data()); chiz(); },er));
+  SUBS.push(DB.collection("sessions").onSnapshot(q=>{ S.sess=q.docs.map(d=>Object.assign({id:d.id},d.data())); chiz(); },er));
+  SUBS.push(DB.collection("logins").orderBy("ts","desc").limit(500).onSnapshot(q=>{ S.logins=q.docs.map(d=>d.data()); chiz(); },er));
+  SUBS.push(DB.collection("checks").orderBy("sts","desc").limit(2000).onSnapshot(q=>{ S.checks=q.docs.map(d=>d.data()); chiz(); },er));
+  setInterval(chiz,30000);
+}
+
+/* ---------- yorliqlar ---------- */
+document.querySelectorAll(".tabs button").forEach(b=>b.addEventListener("click",()=>{
+  TAB=b.dataset.tab; document.querySelectorAll(".tabs button").forEach(x=>x.setAttribute("aria-selected",String(x===b)));
+  document.querySelectorAll("[data-pane]").forEach(p=>p.hidden=p.dataset.pane!==TAB); chiz();
+}));
+
+/* ---------- ogohlantirishlar ---------- */
+function ogohlantirishlar(){
+  const A=[], now=Date.now();
+  for(const [code,st] of Object.entries(S.staff)){
+    for(const [dev,p] of Object.entries(st.pending||{}))
+      A.push({c:"warn",t:`<b>${esc(ism(code))}</b> yangi qurilmadan kirmoqchi`,
+        s:`${esc(p.label)} · ${esc(p.city||"joy noma'lum")} · ${esc(p.ip||"")} · ${oldin(p.ts)}`,
+        a:`<button class="mini ok" data-act="ok" data-code="${code}" data-dev="${esc(dev)}">Tasdiqlash</button><button class="mini stop" data-act="rad" data-code="${code}" data-dev="${esc(dev)}">Rad etish</button>`});
+  }
+  const by={}; S.sess.filter(onlayn).forEach(s=>{ (by[s.code]=by[s.code]||new Set()).add(s.dev); });
+  for(const [code,set] of Object.entries(by)) if(set.size>1)
+    A.push({c:"stop",t:`<b>${esc(ism(code))}</b> bir vaqtda ${set.size} ta qurilmadan ishlayapti`,
+      s:"Login va parol boshqa odamga berilgan bo'lishi mumkin.",
+      a:`<button class="mini stop" data-act="kick" data-code="${code}">Hammasini chiqarish</button><button class="mini" data-act="dev" data-code="${code}">Qurilmalar</button>`});
+  const day=S.logins.filter(l=>now-ms(l.ts)<86400000);
+  const fail={}; day.filter(l=>!l.ok&&/parol/.test(l.reason||"")).forEach(l=>fail[l.code]=(fail[l.code]||0)+1);
+  for(const [code,n] of Object.entries(fail)) if(n>=3)
+    A.push({c:"stop",t:`<b>${esc(ism(code))}</b>: 24 soatda ${n} marta noto'g'ri parol`,s:"Kimdir parolni topishga urinayotgan bo'lishi mumkin.",
+      a:`<button class="mini" data-act="pw" data-code="${code}">Parolni almashtirish</button>`});
+  const cities={}; day.filter(l=>l.ok&&l.city).forEach(l=>(cities[l.code]=cities[l.code]||new Set()).add(l.city));
+  for(const [code,set] of Object.entries(cities)) if(set.size>1)
+    A.push({c:"warn",t:`<b>${esc(ism(code))}</b> 24 soatda turli shaharlardan kirgan`,s:[...set].map(esc).join(", "),a:""});
+  S.logins.filter(l=>now-ms(l.ts)<7*86400000 && l.country && l.country!=="UZ").forEach(l=>
+    A.push({c:"warn",t:`<b>${esc(l.name||ism(l.code))}</b> O'zbekistondan tashqaridan kirgan`,s:`${esc(l.country)} · ${esc(l.city)} · ${vaqt(l.ts)}`,a:""}));
+  return A;
+}
+
+/* ---------- chizish ---------- */
+function chiz(){
+  if(!ADMIN) return;
+  const A=ogohlantirishlar(); $("t-alert").textContent=A.length||"";
+  if(TAB==="umumiy") umumiy(A);
+  if(TAB==="xodimlar") xodimlar();
+  if(TAB==="kirishlar") kirishlar();
+  if(TAB==="tekshiruvlar") tekshiruvlar();
+  if(MODAL) qurilmaOyna(MODAL);
+}
+function umumiy(A){
+  const on=S.sess.filter(onlayn), onCodes=new Set(on.map(s=>s.code));
+  const t0=new Date(); t0.setHours(0,0,0,0);
+  const bugun=S.checks.filter(c=>ms(c.sts)>=t0.getTime()).length;
+  const blok=Object.values(S.staff).filter(s=>s.blocked).length;
+  $("p-umumiy").innerHTML=`
+   <div class="kpis">
+     <div class="kpi"><b>${S.dir.length}</b><span>xodim${blok?` · ${blok} tasi bloklangan`:""}</span></div>
+     <div class="kpi on"><b>${onCodes.size}</b><span>hozir onlayn</span></div>
+     <div class="kpi"><b>${bugun}</b><span>bugungi tekshiruv</span></div>
+     <div class="kpi ${A.length?"al":""}"><b>${A.length}</b><span>ogohlantirish</span></div>
+   </div>
+   <h4>Ogohlantirishlar</h4>
+   ${A.length?A.map(a=>`<div class="alert ${a.c}"><div><p>${a.t}</p><small>${a.s}</small></div><div class="acts">${a.a}</div></div>`).join("")
+     :`<div class="empty">Hammasi joyida — shubhali holat yo'q.</div>`}
+   <h4>Hozir onlayn</h4>
+   ${on.length?`<div class="tw"><table><thead><tr><th>Xodim</th><th>Qurilma</th><th>Joy</th><th>Kirgan</th><th>Oxirgi faollik</th><th></th></tr></thead><tbody>
+     ${on.map(s=>`<tr><td><span class="dot on"></span>${esc(ism(s.code))}</td><td>${esc(s.ua)}</td><td>${esc(s.city||"—")}<small class="mono">${esc(s.ip||"")}</small></td>
+       <td class="mono">${vaqt(s.ts)}</td><td>${oldin(s.seen)}</td><td><button class="mini stop" data-act="kickone" data-id="${s.id}">Chiqarish</button></td></tr>`).join("")}
+     </tbody></table></div>`:`<div class="empty">Hozir hech kim ishlamayapti.</div>`}`;
+  bogla($("p-umumiy"));
+}
+function xodimlar(){
+  if(!S.dir.length){ $("p-xodimlar").innerHTML=`<div class="empty">Ro'yxat bo'sh. «Ro'yxatni yuklash» bo'limidan Excel faylni yuklang yoki xodim qo'shing.</div>`; return; }
+  const cnt={}; S.checks.forEach(c=>cnt[c.code]=(cnt[c.code]||0)+1);
+  $("p-xodimlar").innerHTML=`<div class="tw"><table><thead><tr><th>Xodim</th><th>Holat</th><th>Qurilmalar</th><th>Oxirgi kirish</th><th>Tekshiruv</th><th>Amallar</th></tr></thead><tbody>
+   ${S.dir.map(d=>{ const st=S.staff[d.code]||{}; const on=S.sess.some(s=>s.code===d.code&&onlayn(s));
+     const last=S.logins.find(l=>l.code===d.code&&l.ok); const nA=Object.keys(st.approved||{}).length, nP=Object.keys(st.pending||{}).length;
+     return `<tr><td><span class="dot ${on?"on":""}"></span><b>${esc(d.name)}</b><small>${esc(d.pos)}${st.role==="rahbar"?" · arxivni ko'radi":""}</small></td>
+       <td>${st.blocked?'<span class="pill stop">bloklangan</span>':'<span class="pill ok">faol</span>'}</td>
+       <td>${nA} / ${st.maxDev||1}${nP?` <span class="pill warn">${nP} so'rov</span>`:""}</td>
+       <td>${last?`${vaqt(last.ts)}<small>${esc(last.city||"")} · ${esc(last.ua||"")}</small>`:"—"}</td>
+       <td class="mono">${cnt[d.code]||0}</td>
+       <td><div class="acts">
+         <button class="mini" data-act="dev" data-code="${d.code}">Qurilmalar</button>
+         <button class="mini" data-act="pw" data-code="${d.code}">Parol</button>
+         ${st.blocked?`<button class="mini ok" data-act="unblock" data-code="${d.code}">Ochish</button>`:`<button class="mini stop" data-act="block" data-code="${d.code}">Bloklash</button>`}
+         ${on?`<button class="mini" data-act="kick" data-code="${d.code}">Chiqarish</button>`:""}
+         <button class="mini stop" data-act="del" data-code="${d.code}">O'chirish</button></div></td></tr>`; }).join("")}
+   </tbody></table></div>`;
+  bogla($("p-xodimlar"));
+}
+function kirishlar(){
+  const f=$("lf"), cur=f.value;
+  f.innerHTML=`<option value="">Barcha xodimlar</option>`+S.dir.map(d=>`<option value="${d.code}">${esc(d.name)}</option>`).join(""); f.value=cur;
+  const L=S.logins.filter(l=>(!cur||l.code===cur)&&(!$("lfx").checked||!l.ok)).slice(0,300);
+  $("p-kirishlar").innerHTML=L.length?`<div class="tw"><table><thead><tr><th>Vaqt</th><th>Xodim</th><th>Natija</th><th>Izoh</th><th>Qurilma</th><th>Joy</th></tr></thead><tbody>
+    ${L.map(l=>`<tr><td class="mono">${vaqt(l.ts)}</td><td>${esc(l.name||ism(l.code))}</td>
+      <td>${l.ok?'<span class="pill ok">kirdi</span>':'<span class="pill stop">rad etildi</span>'}</td>
+      <td>${esc(l.reason||"")}</td><td>${esc(l.ua||"")}</td>
+      <td>${esc([l.city,l.country].filter(Boolean).join(", ")||"—")}<small class="mono">${esc(l.ip||"")}</small></td></tr>`).join("")}
+    </tbody></table></div>`:`<div class="empty">Yozuv yo'q.</div>`;
+}
+$("lf").addEventListener("change",kirishlar); $("lfx").addEventListener("change",kirishlar);
+function tekshiruvlar(){
+  const G={}; const now=Date.now();
+  S.checks.forEach(c=>{ const g=G[c.code]=G[c.code]||{n:0,w:0,k:[],ok:0,more:0,no:0,secs:[],last:0,name:c.expert};
+    g.n++; if(now-ms(c.sts)<7*86400000) g.w++; if(c.koef!=null) g.k.push(c.koef); if(c.secs) g.secs.push(c.secs);
+    if(c.verdict) g[c.verdict]=(g[c.verdict]||0)+1; g.last=Math.max(g.last,ms(c.sts)); });
+  const avg=a=>a.length?Math.round(a.reduce((x,y)=>x+y,0)/a.length):null;
+  const rows=Object.entries(G).sort((a,b)=>b[1].n-a[1].n);
+  $("p-tekshiruvlar").innerHTML=!S.checks.length?`<div class="empty">Hali tekshiruv saqlanmagan.</div>`:`
+   <h4 style="margin-top:0">Ekspertlar kesimida</h4>
+   <div class="tw"><table><thead><tr><th>Ekspert</th><th>Jami</th><th>7 kunda</th><th>O'rtacha koef.</th><th>Tasdiqlandi</th><th>Qo'shimcha</th><th>Rad</th><th>O'rtacha vaqt</th><th>Oxirgisi</th></tr></thead><tbody>
+   ${rows.map(([code,g])=>{ const k=avg(g.k), s=avg(g.secs);
+     return `<tr><td>${esc(ism(code)||g.name)}</td><td class="mono">${g.n}</td><td class="mono">${g.w}</td>
+     <td class="mono" style="color:${k==null?"inherit":k>=75?"var(--accent)":k>=50?"var(--warn)":"var(--stop)"}">${k==null?"—":k+"%"}</td>
+     <td class="mono">${g.ok||0}</td><td class="mono">${g.more||0}</td><td class="mono">${g.no||0}</td>
+     <td class="mono">${s==null?"—":Math.round(s/60)+" daq"}</td><td class="mono">${vaqt(g.last)}</td></tr>`; }).join("")}
+   </tbody></table></div>
+   <h4>Oxirgi tekshiruvlar</h4>
+   <div class="tw"><table><thead><tr><th>Sana</th><th>Ekspert</th><th>Hujjat raqami</th><th>Koef.</th><th>Xulosa</th></tr></thead><tbody>
+   ${S.checks.slice(0,150).map(c=>`<tr><td class="mono">${esc(c.ts||vaqt(c.sts))}</td><td>${esc(c.expert||ism(c.code))}</td><td class="mono">${esc(c.q)}</td>
+     <td class="mono">${c.koef==null?"—":c.koef+"%"}</td><td>${c.verdict?`<b>${VD[c.verdict]||c.verdict}</b><small>${esc((c.concl||"").slice(0,140))}</small>`:esc(c.concl||"—")}</td></tr>`).join("")}
+   </tbody></table></div>`;
+}
+function yukla(n,t,m){ const a=document.createElement("a"); a.href=URL.createObjectURL(new Blob(["\ufeff"+t],{type:m})); a.download=n; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),1500); }
+const bugunS=()=>new Date().toISOString().slice(0,10);
+$("json").addEventListener("click",()=>yukla(`tekshiruvlar-${bugunS()}.json`,JSON.stringify(S.checks,null,2),"application/json"));
+$("csv").addEventListener("click",()=>{
+  const H=["Sana","Ekspert","Lavozim","Hujjat raqami","Koeffitsient %","Sarflangan soniya","Xulosa turi","Amal qilish muddati","Xulosa"];
+  const B=S.checks.map(c=>[c.ts||vaqt(c.sts),c.expert||ism(c.code),c.pos||"",c.q,c.koef??"",c.secs??"",VD[c.verdict]||"",c.exp||"",c.concl||""]);
+  yukla(`tekshiruvlar-${bugunS()}.csv`,[H,...B].map(r=>r.map(x=>`"${String(x??"").replace(/"/g,'""')}"`).join(",")).join("\n"),"text/csv;charset=utf-8");
+});
+
+/* ---------- amallar ---------- */
+function bogla(root){ root.querySelectorAll("[data-act]").forEach(b=>b.addEventListener("click",()=>amal(b.dataset,b))); }
+async function amal(d,b){
+  const c=d.code; b.disabled=true;
+  try{
+    if(d.act==="dev"){ MODAL=c; qurilmaOyna(c); }
+    else if(d.act==="ok"){ const p=(S.staff[c].pending||{})[d.dev]; await DB.doc("staff/"+c).update(new FP("approved",d.dev),p,new FP("pending",d.dev),FV.delete()); }
+    else if(d.act==="rad"){ await DB.doc("staff/"+c).update(new FP("pending",d.dev),FV.delete()); }
+    else if(d.act==="devdel"){ if(!confirm("Bu qurilmaning ruxsati bekor qilinsinmi? Xodim undan kira olmaydi.")) return;
+      await DB.doc("staff/"+c).update(new FP("approved",d.dev),FV.delete()); await chiqar(c,d.dev); }
+    else if(d.act==="block"){ if(!confirm(ism(c)+" — kirish yopilsinmi? U darhol tizimdan chiqariladi.")) return;
+      await DB.doc("staff/"+c).update({blocked:true}); await chiqar(c); }
+    else if(d.act==="unblock"){ await DB.doc("staff/"+c).update({blocked:false}); }
+    else if(d.act==="kick"){ await chiqar(c); }
+    else if(d.act==="kickone"){ await DB.doc("sessions/"+d.id).delete(); }
+    else if(d.act==="pw"){ const p=prompt(ism(c)+" uchun yangi parol (kamida 3 belgi):"); if(!p) return;
+      if(p.trim().length<3){ alert("Parol juda qisqa."); return; }
+      await parolOrnat(c,p); alert("Parol o'zgartirildi. "+ism(c)+" yangi parol bilan qayta kirishi kerak."); }
+    else if(d.act==="del"){ if(!confirm(ism(c)+" ro'yxatdan butunlay o'chirilsinmi? Uning tekshiruvlari arxivda qoladi.")) return;
+      const b2=DB.batch(); b2.delete(DB.doc("staff/"+c)); b2.delete(DB.doc("secrets/"+c));
+      b2.set(DB.doc("dir/list"),{items:S.dir.filter(x=>x.code!==c),upd:FV.serverTimestamp()}); await b2.commit(); await chiqar(c); }
+    else if(d.act==="max"){ await DB.doc("staff/"+c).update({maxDev:+d.n}); }
+  }catch(e){ alert("Bajarilmadi: "+(e.message||e)); }
+  finally{ b.disabled=false; }
+}
+async function chiqar(code,dev){
+  await Promise.all(S.sess.filter(s=>s.code===code&&(!dev||s.dev===dev)).map(s=>DB.doc("sessions/"+s.id).delete().catch(()=>{})));
+}
+async function parolOrnat(code,pw){
+  const salt=tuz(), b=DB.batch();
+  b.set(DB.doc("secrets/"+code),{ph:parolXesh(salt,pw)});
+  b.set(DB.doc("dir/list"),{items:S.dir.map(x=>x.code===code?Object.assign({},x,{salt}):x),upd:FV.serverTimestamp()});
+  await b.commit(); await chiqar(code);
+}
+function qurilmaOyna(code){
+  const st=S.staff[code]; if(!st){ MODAL=null; $("modal").hidden=true; return; }
+  const A=Object.entries(st.approved||{}), P=Object.entries(st.pending||{}), mx=st.maxDev||1;
+  $("mbody").innerHTML=`<h3>${esc(ism(code))}</h3><p class="d">Tasdiqlangan qurilmalar: ${A.length} / ${mx}</p>
+   <div class="bar"><span class="d" style="margin:0">Ruxsat etilgan soni:</span>
+     ${[1,2,3].map(n=>`<button class="mini ${n===mx?"ok":""}" data-act="max" data-code="${code}" data-n="${n}">${n}</button>`).join("")}</div>
+   ${P.map(([dev,p])=>`<div class="devrow pend"><div><b>Yangi so'rov:</b> ${esc(p.label)}<small class="d" style="display:block;margin:0">${esc(p.city||"joy noma'lum")} · ${esc(p.ip||"")} · ${oldin(p.ts)}</small></div>
+     <div class="acts"><button class="mini ok" data-act="ok" data-code="${code}" data-dev="${esc(dev)}">Tasdiqlash</button><button class="mini stop" data-act="rad" data-code="${code}" data-dev="${esc(dev)}">Rad etish</button></div></div>`).join("")}
+   ${A.length?A.map(([dev,p])=>{ const on=S.sess.some(s=>s.code===code&&s.dev===dev&&onlayn(s));
+     return `<div class="devrow"><div><span class="dot ${on?"on":""}"></span>${esc(p.label)}<small class="d" style="display:block;margin:0">${esc(p.city||"joy noma'lum")} · ${esc(p.ip||"")} · qo'shilgan: ${vaqt(p.ts)}</small></div>
+     <button class="mini stop" data-act="devdel" data-code="${code}" data-dev="${esc(dev)}">Ruxsatni bekor qilish</button></div>`; }).join("")
+     :`<div class="empty">Hali qurilma yo'q. Xodim birinchi marta kirganda qurilmasi avtomatik qo'shiladi.</div>`}`;
+  $("modal").hidden=false; bogla($("mbody"));
+}
+$("mx").addEventListener("click",()=>{ MODAL=null; $("modal").hidden=true; });
+$("modal").addEventListener("click",e=>{ if(e.target.id==="modal"){ MODAL=null; $("modal").hidden=true; } });
+
+/* ---------- xodim qo'shish ---------- */
+function keyingiKod(band){ const n=[...S.dir.map(d=>d.code),...Object.keys(S.staff),...(band||[])].map(c=>+String(c).replace(/\D/g,"")||0);
+  return "e"+p2(Math.max(0,...n)+1); }
+const norm=s=>String(s||"").toLowerCase().replace(/[ʻʼ‘’'`]/g,"").replace(/\s+/g," ").trim();
+async function xodimlarniYoz(rows){
+  const items=S.dir.slice(), band=[], b=DB.batch();
+  for(const r of rows){
+    let it=items.find(x=>norm(x.name)===norm(r.name));
+    const salt=tuz();
+    if(!it){ it={code:keyingiKod(band),name:r.name,pos:r.pos,salt}; band.push(it.code); items.push(it); }
+    else Object.assign(it,{name:r.name,pos:r.pos,salt});
+    const ex=S.staff[it.code];
+    b.set(DB.doc("staff/"+it.code), ex?{name:r.name,pos:r.pos,role:r.role}
+      :{name:r.name,pos:r.pos,role:r.role,blocked:false,maxDev:r.maxDev||1,approved:{},pending:{},created:FV.serverTimestamp()},{merge:true});
+    b.set(DB.doc("secrets/"+it.code),{ph:parolXesh(salt,r.pw)});
+  }
+  b.set(DB.doc("dir/list"),{items,upd:FV.serverTimestamp()});
+  await b.commit();
+  for(const it of items) if(rows.some(r=>norm(r.name)===norm(it.name))) await chiqar(it.code);
+}
+$("addbtn").addEventListener("click",()=>{ $("addform").hidden=!$("addform").hidden; });
+$("a-pos").addEventListener("change",()=>{ $("a-rah").checked=/boshlig/i.test($("a-pos").value); });
+$("a-save").addEventListener("click",async()=>{
+  const name=$("a-nm").value.replace(/\s+/g," ").trim(), pw=$("a-pw").value.trim();
+  if(name.split(" ").length<2){ $("a-err").textContent="F.I.Sh.ni to'liq yozing."; return; }
+  if(pw.length<3){ $("a-err").textContent="Parol kamida 3 belgi bo'lsin."; return; }
+  if(S.dir.some(x=>norm(x.name)===norm(name))&&!confirm("Bu xodim ro'yxatda bor. Lavozimi va paroli yangilansinmi?")) return;
+  $("a-err").textContent="";
+  try{ await xodimlarniYoz([{name,pos:$("a-pos").value,pw,role:$("a-rah").checked?"rahbar":"expert",maxDev:+$("a-max").value}]);
+    $("a-nm").value=""; $("a-pw").value=""; $("addform").hidden=true; }
+  catch(e){ $("a-err").textContent="Saqlab bo'lmadi: "+(e.message||e); }
+});
+
+/* ---------- Exceldan yuklash ---------- */
+$("xl").addEventListener("change",async e=>{
+  const f=e.target.files[0]; if(!f) return;
+  try{
+    const wb=XLSX.read(await f.arrayBuffer()), ws=wb.Sheets[wb.SheetNames[0]];
+    const rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:""});
+    const hi=rows.findIndex(r=>r.some(c=>/f\.?\s*i\.?\s*sh/i.test(String(c)))); if(hi<0) throw new Error("«F.I.Sh.» ustuni topilmadi");
+    const H=rows[hi].map(c=>String(c).toLowerCase());
+    const ci=H.findIndex(c=>/f\.?\s*i\.?\s*sh/.test(c)), cp=H.findIndex(c=>/lavozim/.test(c)), cw=H.findIndex(c=>/parol/.test(c));
+    if(cp<0||cw<0) throw new Error("«Lavozim» yoki «Parol» ustuni topilmadi");
+    const R=rows.slice(hi+1).filter(r=>String(r[ci]).trim()&&String(r[cw]).trim()).map(r=>{
+      const pos=String(r[cp]).trim(); return {name:String(r[ci]).replace(/\s+/g," ").trim(),pos,pw:String(r[cw]).trim(),role:/boshlig/i.test(pos)?"rahbar":"expert",maxDev:1}; });
+    if(!R.length) throw new Error("Faylda xodim topilmadi");
+    $("xlprev").innerHTML=`<p class="d" style="margin-top:14px">${R.length} ta xodim topildi. Tekshirib, «Bazaga yozish»ni bosing.</p>
+      <div class="tw"><table><thead><tr><th>F.I.Sh.</th><th>Lavozim</th><th>Parol</th><th>Holat</th></tr></thead><tbody>
+      ${R.map(r=>`<tr><td>${esc(r.name)}</td><td>${esc(r.pos)}${r.role==="rahbar"?"<small>arxivni ko'radi</small>":""}</td><td class="mono">${esc(r.pw)}</td>
+        <td>${S.dir.some(x=>norm(x.name)===norm(r.name))?'<span class="pill warn">yangilanadi</span>':'<span class="pill ok">yangi</span>'}</td></tr>`).join("")}
+      </tbody></table></div><div class="bar" style="margin-top:12px"><button class="btn" id="xlgo">Bazaga yozish</button><span class="err" id="xlerr"></span></div>`;
+    $("xlgo").onclick=async()=>{ $("xlgo").disabled=true; $("xlgo").textContent="Yozilmoqda…";
+      try{ await xodimlarniYoz(R); $("xlprev").innerHTML=`<p class="d" style="margin-top:14px;color:var(--accent)">Tayyor: ${R.length} ta xodim bazaga yozildi.</p>`; }
+      catch(err){ $("xlerr").textContent="Xato: "+(err.message||err); $("xlgo").disabled=false; $("xlgo").textContent="Bazaga yozish"; } };
+  }catch(err){ $("xlprev").innerHTML=`<p class="err">Faylni o'qib bo'lmadi: ${esc(err.message||err)}</p>`; }
+  e.target.value="";
+});
+
+</script>
+</body>
+</html>

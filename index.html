@@ -131,6 +131,7 @@ footer{margin-top:44px;font-size:12.5px;color:var(--dim);border-top:1px solid va
 
 #gate{position:fixed;inset:0;background:var(--gatebg);z-index:999;display:flex;align-items:center;justify-content:center;padding:22px}
 #gate .card{background:var(--panel);max-width:430px;width:100%;padding:38px 34px;border:var(--pborder);border-radius:var(--r);box-shadow:var(--gateshadow);backdrop-filter:var(--blur)}
+#gate #gwait .d b{color:var(--fg)}
 #gate .eb{font-family:var(--body);font-size:14px;font-weight:500;letter-spacing:.01em;text-transform:none;color:var(--accent);margin:0 0 12px}
 #gate h2{font-family:var(--display);font-weight:var(--h1w);text-transform:var(--h1tt);font-size:23px;letter-spacing:var(--h1ls);margin:0 0 8px;line-height:1.15;color:var(--fg)}
 #gate p.d{font-size:13px;color:var(--dim);margin:0 0 22px;line-height:1.55}
@@ -256,31 +257,21 @@ input[type=date]:focus{outline:0;border-color:var(--accent);box-shadow:0 0 0 3px
 </head>
 <body class="locked">
 
-<!-- ==========================================================
-     PAROLLAR
-     Har bir xodimning shaxsiy paroli pastdagi XODIMLAR ro'yxatida
-     shifrlangan (SHA-256) holda saqlanadi — kodni ochgan odam parolni ko'rmaydi.
-     Parolni almashtirish: konsolni oching (F12 → Console), yozing:
-         parolXesh("yangiparol")
-     chiqqan ikki qiymatni (tuz va xesh) o'sha xodim qatoriga qo'ying.
-     Arxiv paroli — pastdagi BOSHQARUV qatorida.
-     ========================================================== -->
-<script>
-const BOSHQARUV = "Shahzod_arxiv";  /* arxiv va statistikani ochish paroli */
-</script>
-
 <div id="gate">
   <div class="card">
     <p class="eb">Shahzodbek O'roqov</p>
-    <h2>Ekspert ma'lumotlari</h2>
-    <p class="d">Ro'yxatdan o'zingizni tanlang va shaxsiy parolingizni kiriting. Bu ma'lumot har bir tekshiruv yozuviga va bayonnomaga tushadi.</p>
+    <h2 id="gtt">Ekspert ma'lumotlari</h2>
+    <div id="gform">
+    <p class="d">Ro'yxatdan o'zingizni tanlang va shaxsiy parolingizni kiriting.</p>
     <label for="gnm">Familiya, ism, otasining ismi</label>
-    <select id="gnm" autofocus><option value="">— ro'yxatdan tanlang —</option></select>
+    <select id="gnm" disabled><option value="">Ro'yxat yuklanmoqda…</option></select>
     <label for="gpw">Shaxsiy parol</label>
     <input type="password" id="gpw" autocomplete="off" placeholder="Parol">
     <label for="gpos">Lavozim</label>
     <input type="text" id="gpos" readonly tabindex="-1">
-    <button id="gbtn">Ishni boshlash</button>
+    <button id="gbtn" disabled>Ishni boshlash</button>
+    </div>
+    <div id="gwait" style="display:none"></div>
     <p class="err" id="gerr"></p>
   </div>
 </div>
@@ -288,7 +279,7 @@ const BOSHQARUV = "Shahzod_arxiv";  /* arxiv va statistikani ochish paroli */
 <div class="wrap">
 
 <header>
-  <p class="who" id="who"></p>
+  <p class="who" id="who"></p> <button class="mini noprint" id="chiq" style="vertical-align:top;margin-left:6px;display:none">Chiqish</button>
   <p class="eyebrow">Tibbiy jihozlar qo'mitasi · Shahzodbek O'roqov · 3-nashr</p>
   <h1>Xorijiy hujjatni tekshirish
     <span class="thin">PF-6221 bo'yicha tan olinadigan olti vakolatli organ — FDA, EMA, CE sertifikatini beruvchi organlar, PMDA, MFDS, MHRA — hamda ma'lumot uchun boshqa davlatlar reestrlari va ISO 13485 sertifikatlari. Har bir manba uchun aniq maydon nomi va ma'lum tuzoqlar ko'rsatilgan.</span>
@@ -354,28 +345,14 @@ const BOSHQARUV = "Shahzod_arxiv";  /* arxiv va statistikani ochish paroli */
   </div>
 </section>
 
-<section class="step" id="lock">
-  <div class="sh"><span class="num">A</span><h2>Arxiv va statistika</h2><span class="sub">yopiq bo'lim</span></div>
-  <div class="sb">
-    <p class="tip" style="margin:0 0 14px">Bu bo'lim faqat bo'lim boshlig'i uchun. Arxiv va statistikani ochish uchun boshqaruv paroli talab etiladi.</p>
-    <div class="row">
-      <input type="password" id="apw" autocomplete="off" placeholder="Boshqaruv paroli" style="flex:1 1 240px">
-      <button class="btn" id="abtn">Ochish</button>
-    </div>
-    <p class="err2" id="aerr"></p>
-  </div>
-</section>
 <section class="step" id="s5" style="display:none">
   <div class="sh"><span class="num">A</span><h2>Arxiv</h2><span class="sub" id="acount">0 ta yozuv</span></div>
   <div class="sb">
     <div class="avtobar on noprint" id="avto"></div>
     <div class="bar noprint">
       <input type="text" id="find" placeholder="Arxivdan qidirish: raqam yoki ekspert">
-      <button class="mini" id="exp">Arxivni saqlash</button>
-      <button class="mini" id="imp">Arxivni yuklash</button>
+      <button class="mini" id="exp">JSON yuklab olish</button>
       <button class="mini" id="csv">CSV</button>
-      <button class="mini" id="tozala">Arxivni tozalash</button>
-      <input type="file" id="file" accept=".json" style="display:none">
     </div>
     <div id="arch"><div class="empty">Hali yozuv yo'q.</div></div>
   </div>
@@ -423,45 +400,7 @@ function sha256(str){
   }
   return H.map(x=>(x>>>0).toString(16).padStart(8,"0")).join("");
 }
-/* Yangi parol uchun: konsolda parolXesh("yangiparol") */
-function parolXesh(p){ const t=Array.from(crypto.getRandomValues(new Uint8Array(4)),x=>x.toString(16).padStart(2,"0")).join("");
-  const r={tuz:t,xesh:sha256(t+":"+String(p).trim().toLowerCase())}; console.log(JSON.stringify([r.tuz,r.xesh])); return r; }
 
-/* ---- XODIMLAR RO'YXATI (Excel asosida): [F.I.Sh., lavozim, tuz, parol xeshi] ---- */
-const XODIMLAR=[
-  ["Temirov Umid Maxmatkobilovich", "Bo'lim boshlig'i", "b48089f1", "e5ff095c90657584049a63d9c9cebde8e0107c73376b289b4281d766d2d765f7"],
-  ["Hamroyeva Safura Qobilovna", "Bosh mutaxassis", "5e108a5d", "cd1e1a85e50ba1d4661a24c2e6426416922ad38a802a764fbb0159fc69c90332"],
-  ["Aymurzayeva Bibizoda Kurbanbayevna", "Yetakchi mutaxassis", "219e18b9", "82bfaf9439d498c324e12ff6dbe31cb6052c7849618e49c038bf1b3e85d7fd3d"],
-  ["Alimova Saodat Taxirovna", "Yetakchi mutaxassis", "64a9d095", "bbd1eeb99879fae951b9cd4f655524744fbf9b8bbc62c204c35c8632490595fa"],
-  ["Karimova Madina Ulugʻbek qizi", "Yetakchi mutaxassis", "29788df1", "6491f33075778f4765c46a2c5a0aeb207cd11d39c197d4a58989a4e72c1fd6e3"],
-  ["Normatova Kamola Baxtiyor qizi", "Yetakchi mutaxassis", "a818e2df", "d8e1f7dcb5d21e56eb2aeb7754ad25e74fa41ddeee45ec5d72ad1701528ef75b"],
-  ["Noʻmonov Xasan Otabek oʻgʻli", "Yetakchi mutaxassis", "ca84e201", "f1ef27165629a3e14600a3ff137c99a80b8bd55986ef794b3c1a14c7954f4176"],
-  ["Podgornov Vyacheslav Vladimirovich", "Yetakchi mutaxassis", "fbd4d68d", "82373dc266bf8b4cbedfb261478b3a180bf9ed6eee1a7561f031c261077ce7c2"],
-  ["Rozikova Surayyo Hamidullayevna", "1-toifali mutaxassis", "2829ead3", "359b005d7acdc89c5be6ceb3f1f97c0464f2b7b2d8d3a36fe94c68e9de6b0a3f"],
-  ["Xojiboyev Azizjon Xabibulla oʻgʻli", "1-toifali mutaxassis", "6c4d77d7", "39ff8cf7639582bf08150ac3101fd0f98fc2c15fa6d83976c88451b2426aea4a"],
-  ["Bokiyeva Iroda Toxir qizi", "Yetakchi mutaxassis", "abe7aa62", "d9862b897e7f53139742bc9a0795f53c3ab11f855945e1c9fb340d00088cf41c"],
-  ["Sodikova Gulrux", "1-toifali mutaxassis", "6864bd7d", "d51e8e3a229dc3f3939b60ba74a6a5560f0a1706f94dbc80cfb8caefe4001962"]
-];
-const RAHBAR="Bo'lim boshlig'i";   /* arxiv va statistika faqat shu lavozimga ko'rinadi */
-
-/* ---- kirish oynasi ---- */
-(function(){
-  const g=$("gate"), pw=$("gpw"), nm=$("gnm"), pos=$("gpos"), err=$("gerr");
-  nm.insertAdjacentHTML("beforeend", XODIMLAR.map((x,i)=>`<option value="${i}">${x[0]}</option>`).join(""));
-  nm.addEventListener("change",()=>{ pos.value = nm.value==="" ? "" : XODIMLAR[+nm.value][1]; err.textContent=""; if(nm.value!=="") pw.focus(); });
-  function kirish(){
-    if(nm.value===""){ err.textContent="Ro'yxatdan familiya va ismingizni tanlang."; nm.focus(); return; }
-    const x=XODIMLAR[+nm.value];
-    if(sha256(x[2]+":"+pw.value.trim().toLowerCase())!==x[3]){ err.textContent="Parol noto'g'ri."; pw.value=""; pw.focus(); return; }
-    EXPERT={nm:x[0], pos:x[1]};
-    $("who").innerHTML=`Ekspert: <b>${EXPERT.nm}</b> · ${EXPERT.pos}`;
-    /* arxiv va statistika faqat bo'lim boshlig'iga */
-    if(EXPERT.pos!==RAHBAR){ ["lock","s5","s6"].forEach(id=>{ const e=$(id); if(e) e.style.display="none"; }); }
-    g.remove(); document.body.classList.remove("locked"); $("q").focus();
-  }
-  $("gbtn").addEventListener("click",kirish);
-  [pw,nm,pos].forEach(i=>i.addEventListener("keydown",e=>{ if(e.key==="Enter") kirish(); }));
-})();
 
 const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const enc=encodeURIComponent;
@@ -1054,11 +993,11 @@ $("save").addEventListener("click",()=>{
   CUR.secs=Math.round((Date.now()-CUR.t0)/1000);
   CUR.koef=koef(CUR).k;
   const nus=JSON.parse(JSON.stringify(CUR)); delete nus.saqlandi;
-  const i=ARCH.findIndex(r=>r.id && r.id===CUR.id);
-  if(i>=0) ARCH[i]=nus; else ARCH.unshift(nus);
-  saqla(); CUR.saqlandi=true;
-  if($("s5") && $("s5").style.display!=="none"){ paintArch(); paintStats(); }
-  $("save").textContent="Saqlandi"; setTimeout(()=>$("save").textContent="Arxivga saqlash",1600);
+  const b=$("save"); b.disabled=true; b.textContent="Saqlanmoqda…";
+  bulutSaqla(nus).then(()=>{
+    CUR.saqlandi=true; b.textContent="Saqlandi"; setTimeout(()=>{b.textContent="Arxivga saqlash";b.disabled=false;},1600);
+  }).catch(e=>{ b.textContent="Arxivga saqlash"; b.disabled=false;
+    alert("Saqlab bo'lmadi. Internet aloqasini tekshirib, qayta urinib ko'ring.\n\n"+(e&&e.message||e)); });
 });
 $("print").addEventListener("click",()=>{ buildBayon(); window.print(); });
 window.addEventListener("beforeprint",buildBayon);
@@ -1078,29 +1017,9 @@ function paintArch(f){
 }
 
 
-/* ============ AVTOMATIK SAQLASH ============
-   Arxiv brauzer xotirasida saqlanadi va sahifa ochilganda o'zi tiklanadi.
-   Xotira mavjud bo'lmasa (masalan oldindan ko'rish oynasida) tizim
-   qo'lda saqlashga o'tadi va buni ekranda aytadi. */
-const KALIT="tjq_arxiv_v2";
-let AVTO=true;
-function saqla(){
-  try{ localStorage.setItem(KALIT, JSON.stringify(ARCH)); }
-  catch(e){ AVTO=false; }
-  holat();
-}
-function tikla(){
-  try{ const v=localStorage.getItem(KALIT); if(v){ const j=JSON.parse(v); if(Array.isArray(j)) ARCH=j; } }
-  catch(e){ AVTO=false; }
-  holat();
-}
-function holat(){
-  const el=$("avto"); if(!el) return;
-  el.className="avtobar "+(AVTO?"on":"off");
-  el.innerHTML = AVTO
-    ? `<b>Avtomatik saqlash yoqilgan.</b>`
-    : `<b>Avtomatik saqlash ishlamayapti.</b> Bu oyna brauzer xotirasiga ruxsat bermayapti. Faylni kompyuteringizga yuklab olib, to'g'ridan-to'g'ri oching — o'shanda avtomatik saqlash ishlaydi. Hozircha «Arxivni saqlash» tugmasidan foydalaning.`;
-}
+/* ============ ARXIV HOLATI ============ */
+function holat(t){ const el=$("avto"); if(!el) return; el.className="avtobar on";
+  el.innerHTML=t||`<b>Markaziy baza.</b> Barcha ekspertlarning tekshiruvlari shu yerga avtomatik tushadi.`; }
 
 /* ============ STATISTIKA ============ */
 function paintStats(){
@@ -1156,17 +1075,6 @@ $("csv").addEventListener("click",()=>{ if(!ARCH.length){alert("Arxiv bo'sh.");r
     Object.entries(r.notes||{}).map(([k,v])=>k+": "+v).join(" | "),VD[r.verdict]||"",r.exp||"",r.concl||""]);
   download(`arxiv-${new Date().toISOString().slice(0,10)}.csv`,
     [head,...body].map(r=>r.map(c=>`"${String(c??"").replace(/"/g,'""')}"`).join(",")).join("\n"),"text/csv;charset=utf-8"); });
-$("imp").addEventListener("click",()=>$("file").click());
-$("file").addEventListener("change",e=>{ const f=e.target.files[0]; if(!f)return;
-  const rd=new FileReader();
-  rd.onload=()=>{try{const j=JSON.parse(rd.result); if(!Array.isArray(j))throw new Error("noto'g'ri fayl");
-    const kal=r=>r.id||(r.ts+"|"+(r.expert||"")+"|"+r.q);
-    const bor=new Set(ARCH.map(kal)); const yangi=j.filter(r=>r&&r.q&&!bor.has(kal(r)));
-    ARCH=[...yangi,...ARCH].sort((a,b)=>String(b.ts).localeCompare(String(a.ts)));
-    paintArch(); paintStats(); saqla();
-    alert(yangi.length+" ta yangi yozuv yuklandi."+(j.length-yangi.length?" "+(j.length-yangi.length)+" tasi arxivda allaqachon bor edi.":""));}catch(err){alert("Faylni o'qib bo'lmadi: "+err.message);}};
-  rd.readAsText(f); e.target.value=""; });
-tikla();
 
 paintSources("");
 $("s2").querySelector(".sub").innerHTML=flag("us")+"AQSH · FDA";
@@ -1249,30 +1157,183 @@ function buildBayon(){
     </div>`;
 }
 
-/* Arxiv va statistika boshqaruv paroli bilan ochiladi */
-function arxivniOch(){
-  const pw=$("apw"), err=$("aerr");
-  if(pw.value!==BOSHQARUV){ err.textContent="Parol noto'g'ri."; pw.value=""; pw.focus(); return; }
-  $("lock").remove();
-  $("s5").style.display=""; $("s6").style.display="";
-  paintArch(); paintStats();
-  $("s5").scrollIntoView({behavior:"smooth",block:"start"});
-}
-$("abtn").addEventListener("click",arxivniOch);
-$("apw").addEventListener("keydown",e=>{ if(e.key==="Enter") arxivniOch(); });
-
-$("tozala").addEventListener("click",()=>{
-  if(!ARCH.length){ alert("Arxiv allaqachon bo'sh."); return; }
-  if(!confirm("Arxivdagi "+ARCH.length+" ta yozuv butunlay o'chiriladi. Avval «Arxivni saqlash» orqali nusxa oldingizmi?\n\nDavom etilsinmi?")) return;
-  ARCH=[]; saqla(); paintArch(); paintStats();
-});
-
 /* Saqlanmagan tekshiruv bo'lsa, sahifa yopilishidan oldin ogohlantiramiz */
 window.addEventListener("beforeunload",e=>{
   if(CUR && !CUR.saqlandi && Object.keys(CUR.marks||{}).filter(k=>k!=="fda").length){
     e.preventDefault(); e.returnValue="";
   }
 });
+</script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script>
+/* ============ FIREBASE SOZLAMALARI ============ */
+const FB_CONFIG={
+  apiKey:"AIzaSyBeZKgyvUInhF0K4xw4amfP1echBlu0wl0",
+  authDomain:"tekshiruv-88c03.firebaseapp.com",
+  projectId:"tekshiruv-88c03",
+  storageBucket:"tekshiruv-88c03.firebasestorage.app",
+  messagingSenderId:"989419587759",
+  appId:"1:989419587759:web:052e115735c4ff6d86ac5a"
+};
+/* ============ MARKAZIY BAZA: KIRISH, QURILMA NAZORATI, ARXIV ============ */
+let AUTH=null, DB=null, FV=null, SESS=null, DIR=[], UNSUB=[], HB=null;
+const QKALIT="tk_qurilma";
+function qurilmaId(){
+  try{ let d=localStorage.getItem(QKALIT);
+    if(!d){ d=(crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2)).replace(/-/g,"");
+      localStorage.setItem(QKALIT,d); }
+    return d; }catch(e){ return "vaqtinchalik"+Math.random().toString(36).slice(2,10); }
+}
+function qurilmaInfo(){
+  const u=navigator.userAgent;
+  const br=/Edg\//.test(u)?"Edge":/YaBrowser/.test(u)?"Yandex":/OPR\//.test(u)?"Opera":/Firefox\//.test(u)?"Firefox":/Chrome\//.test(u)?"Chrome":/Safari\//.test(u)?"Safari":"Brauzer";
+  const os=/Windows/.test(u)?"Windows":/Android/.test(u)?"Android":/iPhone|iPad/.test(u)?"iOS":/Mac OS/.test(u)?"macOS":/Linux/.test(u)?"Linux":"OS";
+  return br+" · "+os+" · "+screen.width+"×"+screen.height;
+}
+let GEO=null;
+async function joylashuv(){
+  if(GEO) return GEO;
+  try{ const c=new AbortController(), t=setTimeout(()=>c.abort(),3500);
+    const r=await fetch("https://ipapi.co/json/",{signal:c.signal}); clearTimeout(t);
+    const j=await r.json(); GEO={ip:String(j.ip||""),city:String(j.city||""),country:String(j.country_code||"")};
+  }catch(e){ GEO={ip:"",city:"",country:""}; }
+  return GEO;
+}
+function gateXabar(html,tt){
+  $("gform").style.display=html?"none":""; const w=$("gwait"); w.style.display=html?"":"none"; w.innerHTML=html||"";
+  if(tt) $("gtt").textContent=tt;
+}
+function kirishJurnali(uid,x,ok,sabab,dev,g){
+  return DB.collection("logins").add({uid,code:x.code,name:x.name,ok,reason:sabab,dev,ua:qurilmaInfo(),
+    ip:g.ip,city:g.city,country:g.country,ts:FV.serverTimestamp()}).catch(()=>{});
+}
+
+async function bulutStart(){
+  const nm=$("gnm"), pw=$("gpw"), pos=$("gpos"), err=$("gerr"), btn=$("gbtn");
+  if(!window.firebase){ err.textContent="Tizimga ulanib bo'lmadi. Internet aloqasini tekshirib, sahifani yangilang."; return; }
+  firebase.initializeApp(FB_CONFIG);
+  AUTH=firebase.auth(); DB=firebase.firestore(); FV=firebase.firestore.FieldValue;
+  try{
+    const d=await DB.doc("dir/list").get();
+    DIR=(d.exists&&d.data().items)||[];
+  }catch(e){ err.textContent="Ro'yxatni yuklab bo'lmadi: "+(e.message||e); return; }
+  if(!DIR.length){ nm.innerHTML=`<option value="">Ro'yxat bo'sh</option>`; err.textContent="Tizim hali sozlanmagan: administrator xodimlar ro'yxatini yuklashi kerak."; return; }
+  nm.innerHTML=`<option value="">— ro'yxatdan tanlang —</option>`+DIR.map(x=>`<option value="${esc(x.code)}">${esc(x.name)}</option>`).join("");
+  nm.disabled=false; btn.disabled=false; nm.focus();
+  nm.addEventListener("change",()=>{ const x=DIR.find(d=>d.code===nm.value); pos.value=x?x.pos:""; err.textContent=""; if(x) pw.focus(); });
+  btn.addEventListener("click",kirish);
+  pw.addEventListener("keydown",e=>{ if(e.key==="Enter") kirish(); });
+  joylashuv();
+}
+
+async function kirish(){
+  const nm=$("gnm"), pw=$("gpw"), err=$("gerr"), btn=$("gbtn");
+  const x=DIR.find(d=>d.code===nm.value);
+  if(!x){ err.textContent="Ro'yxatdan familiya va ismingizni tanlang."; nm.focus(); return; }
+  if(!pw.value.trim()){ err.textContent="Parolni kiriting."; pw.focus(); return; }
+  btn.disabled=true; btn.textContent="Tekshirilmoqda…"; err.textContent="";
+  try{
+    let u=AUTH.currentUser;
+    if(!u || !u.isAnonymous){ if(u) await AUTH.signOut(); u=(await AUTH.signInAnonymously()).user; }
+    const dev=qurilmaId(), g=await joylashuv();
+    const ph=sha256(x.salt+":"+pw.value.trim().toLowerCase());
+    const sref=DB.doc("sessions/"+u.uid);
+    try{ await sref.delete(); }catch(e){}
+    try{
+      await sref.set({code:x.code,ph,dev,ua:qurilmaInfo(),ip:g.ip,city:g.city,ts:FV.serverTimestamp(),seen:FV.serverTimestamp()});
+    }catch(e){
+      await kirishJurnali(u.uid,x,false,"noto'g'ri parol yoki yopiq kirish",dev,g);
+      err.textContent="Parol noto'g'ri yoki sizga kirish yopilgan."; pw.value=""; pw.focus(); return;
+    }
+    const sref2=DB.doc("staff/"+x.code);
+    const st=(await sref2.get()).data()||{};
+    const ap=st.approved||{};
+    const info={label:qurilmaInfo(),ts:Date.now(),ip:g.ip,city:g.city};
+    if(!ap[dev]){
+      if(Object.keys(ap).length < (st.maxDev||1)){
+        await sref2.update(new firebase.firestore.FieldPath("approved",dev),info);
+        await kirishJurnali(u.uid,x,true,"yangi qurilma avtomatik qo'shildi",dev,g);
+      } else {
+        await sref2.update(new firebase.firestore.FieldPath("pending",dev),info);
+        await kirishJurnali(u.uid,x,false,"tasdiqlanmagan qurilma",dev,g);
+        kutish(x,dev,u.uid); return;
+      }
+    } else await kirishJurnali(u.uid,x,true,"",dev,g);
+    ichkari(x,st,dev,u.uid);
+  }catch(e){
+    err.textContent="Ulanishda xato: "+(e.message||e);
+  }finally{ btn.disabled=false; btn.textContent="Ishni boshlash"; }
+}
+
+function kutish(x,dev,uid){
+  gateXabar(`<p class="d"><b>${esc(x.name)}</b>, bu qurilma hali tasdiqlanmagan.</p>
+    <p class="d">Administratorga so'rov yuborildi. U tasdiqlashi bilan sahifa o'zi ochiladi — oynani yopmang.</p>
+    <p class="d" style="font-family:var(--mono);font-size:12px">Qurilma: ${esc(qurilmaInfo())}</p>
+    <button onclick="location.reload()" style="margin-top:10px">Bekor qilish</button>`,"Qurilma tasdiqlanmagan");
+  const un=DB.doc("staff/"+x.code).onSnapshot(s=>{
+    const d=s.data()||{};
+    if(d.blocked){ un(); chetlatish("Sizga kirish yopilgan."); return; }
+    if((d.approved||{})[dev]){ un(); DB.collection("logins").add({uid,code:x.code,name:x.name,ok:true,reason:"qurilma administrator tomonidan tasdiqlandi",dev,ua:qurilmaInfo(),ip:(GEO||{}).ip||"",city:(GEO||{}).city||"",country:(GEO||{}).country||"",ts:FV.serverTimestamp()}).catch(()=>{}); ichkari(x,d,dev,uid); }
+  },()=>{ un(); chetlatish("Kirish rad etildi."); });
+}
+
+function ichkari(x,st,dev,uid){
+  SESS={code:x.code,name:x.name,pos:x.pos,role:st.role||"expert",dev,uid};
+  EXPERT={nm:x.name,pos:x.pos};
+  $("who").innerHTML=`Ekspert: <b>${esc(x.name)}</b> · ${esc(x.pos)}`;
+  $("chiq").style.display="";
+  $("gate").remove(); document.body.classList.remove("locked"); $("q").focus();
+  HB=setInterval(()=>DB.doc("sessions/"+uid).update({seen:FV.serverTimestamp()}).catch(()=>{}),120000);
+  UNSUB.push(DB.doc("staff/"+x.code).onSnapshot(s=>{
+    const d=s.data();
+    if(!d||d.blocked) chetlatish("Administrator sizga kirishni yopdi.");
+    else if(!(d.approved||{})[dev]) chetlatish("Bu qurilmaning ruxsati bekor qilindi.");
+  },()=>chetlatish("Sessiya yaroqsiz: parol o'zgartirilgan yoki kirish yopilgan.")));
+  UNSUB.push(DB.doc("sessions/"+uid).onSnapshot(s=>{ if(!s.exists) chetlatish("Administrator sessiyangizni yakunladi."); },()=>{}));
+  if(SESS.role==="rahbar") arxivniOch();
+}
+
+function chetlatish(sabab){
+  UNSUB.forEach(f=>{try{f();}catch(e){}}); UNSUB=[]; clearInterval(HB);
+  if(CUR) CUR.saqlandi=true;
+  document.body.classList.add("locked");
+  let g=$("gate");
+  if(!g){ g=document.createElement("div"); g.id="gate"; document.body.prepend(g); }
+  g.innerHTML=`<div class="card"><p class="eb">Shahzodbek O'roqov</p><h2>Kirish yopildi</h2>
+    <p class="d">${esc(sabab)}</p><p class="d">Savol bo'lsa, administratorga murojaat qiling.</p>
+    <button onclick="location.reload()">Qayta kirish</button></div>`;
+}
+
+$("chiq").addEventListener("click",async()=>{
+  if(CUR && !CUR.saqlandi && !confirm("Joriy tekshiruv saqlanmagan. Baribir chiqasizmi?")) return;
+  if(CUR) CUR.saqlandi=true;
+  try{ await DB.doc("sessions/"+SESS.uid).delete(); }catch(e){}
+  location.reload();
+});
+
+/* Firestore ichma-ich massivni qabul qilmaydi: [[a,b]] → [{k:a,v:b}] */
+function bazaUchun(v){
+  if(Array.isArray(v)) return v.map(x=>Array.isArray(x)?{k:x[0],v:x[1]}:bazaUchun(x));
+  if(v&&typeof v==="object"){ const o={}; for(const k in v) if(v[k]!==undefined) o[k]=bazaUchun(v[k]); return o; }
+  return v;
+}
+function bulutSaqla(nus){
+  return DB.doc("checks/"+nus.id).set(Object.assign(bazaUchun(nus),
+    {code:SESS.code,uid:SESS.uid,dev:SESS.dev,sts:FV.serverTimestamp()}));
+}
+
+/* Bo'lim boshlig'i: barcha ekspertlar arxivi va statistikasi */
+function arxivniOch(){
+  $("s5").style.display=""; $("s6").style.display="";
+  holat(`<b>Markaziy baza.</b> Ma'lumotlar yuklanmoqda…`);
+  UNSUB.push(DB.collection("checks").orderBy("sts","desc").limit(1000).onSnapshot(q=>{
+    ARCH=q.docs.map(d=>d.data()); holat(); paintArch($("find").value); paintStats();
+  },e=>holat(`<b>Arxivni yuklab bo'lmadi.</b> ${esc(e.message||e)}`)));
+}
+
+bulutStart();
 </script>
 </body>
 </html>
