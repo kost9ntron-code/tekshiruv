@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Vakolatli organlar va ma’lumotnoma</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F3F5FB; --panel:#FFFFFF; --chip:#EEF1F8; --field:#FFFFFF;
+  --fg:#141A33; --dim:#4D5677; --faint:#7C84A3;
+  --line:rgba(20,26,51,.12); --accent:#0E8F80; --onaccent:#FFFFFF; --accentbg:rgba(14,143,128,.09); --ring:rgba(14,143,128,.22);
+  --warn:#A8620A; --warnbg:rgba(168,98,10,.10); --ok:#6D4FD6;
+  --barbg:rgba(243,245,251,.86); --shadow:0 18px 40px -30px rgba(20,26,51,.45);
+  --body:"Space Grotesk",system-ui,-apple-system,"Segoe UI",sans-serif; --mono:"Space Mono",ui-monospace,Consolas,monospace;
+  --r:14px;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0A0E22; --panel:rgba(255,255,255,.045); --chip:rgba(255,255,255,.05); --field:rgba(255,255,255,.05);
+    --fg:#E7EAF6; --dim:#98A1C4; --faint:#66709A;
+    --line:rgba(255,255,255,.10); --accent:#5EEAD4; --onaccent:#062229; --accentbg:rgba(94,234,212,.08); --ring:rgba(94,234,212,.20);
+    --warn:#FBBF6E; --warnbg:rgba(251,191,110,.10); --ok:#A78BFA;
+    --barbg:rgba(10,14,34,.82); --shadow:0 30px 70px -40px rgba(0,0,0,.9);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0A0E22; --panel:rgba(255,255,255,.045); --chip:rgba(255,255,255,.05); --field:rgba(255,255,255,.05);
+  --fg:#E7EAF6; --dim:#98A1C4; --faint:#66709A;
+  --line:rgba(255,255,255,.10); --accent:#5EEAD4; --onaccent:#062229; --accentbg:rgba(94,234,212,.08); --ring:rgba(94,234,212,.20);
+  --warn:#FBBF6E; --warnbg:rgba(251,191,110,.10); --ok:#A78BFA;
+  --barbg:rgba(10,14,34,.82); --shadow:0 30px 70px -40px rgba(0,0,0,.9);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 150px)}
+html,body{margin:0}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--barbg);backdrop-filter:blur(14px)}
+.sup{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px 16px;margin:0 0 22px;padding:9px 14px;border:1px solid var(--line);border-radius:12px;background:var(--panel);font-size:13px;color:var(--dim)}
+.sup b{color:var(--fg);font-weight:600}
+.sup a{display:inline-flex;align-items:center;gap:7px;font-weight:600;color:var(--accent);text-decoration:none}
+.sup a:hover{text-decoration:underline;text-underline-offset:3px}
+.sup a:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+.sup svg{width:16px;height:16px;flex:none}
+.wrap{max-width:1040px;margin:0 auto;padding:34px 20px 80px}
+
+header{margin-bottom:22px}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--accent);margin:0 0 10px}
+h1{font-weight:700;font-size:clamp(28px,4.4vw,42px);line-height:1.05;letter-spacing:-.03em;margin:0}
+.lead{color:var(--dim);margin:12px 0 0;max-width:66ch}
+.lead b{color:var(--fg);font-weight:600}
+
+/* yopishqoq qidiruv paneli */
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;margin:0 -20px;padding:14px 20px 12px;
+  background:var(--barbg);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.fields{display:grid;grid-template-columns:1.25fr 1fr;gap:10px}
+.fld{position:relative}
+.fld label{display:block;font-size:12px;color:var(--dim);margin:0 0 5px}
+.fld input{width:100%;font:500 15px var(--body);padding:12px 38px 12px 14px;border:1px solid var(--line);background:var(--field);color:var(--fg);border-radius:11px}
+#cert{font-family:var(--mono);font-size:14.5px}
+.fld input:focus{outline:0;border-color:var(--accent);box-shadow:0 0 0 3px var(--ring)}
+.fld input::placeholder{color:var(--faint)}
+.clr{position:absolute;right:6px;bottom:6px;width:30px;height:30px;border:0;border-radius:8px;background:transparent;color:var(--faint);font-size:18px;cursor:pointer;display:none}
+.clr:hover{color:var(--fg);background:var(--chip)}
+.fld.has .clr{display:block}
+.hint{margin:9px 0 0;font-size:13px;color:var(--dim);min-height:20px}
+.hint b{color:var(--fg)}
+.hint button{font:600 13px var(--body);color:var(--accent);background:none;border:0;padding:0;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+
+/* bayroqlar */
+.flag{display:inline-block;flex:none;width:27px;height:18px;border-radius:3px;overflow:hidden;position:relative;box-shadow:0 0 0 1px var(--line),0 2px 6px -2px rgba(0,0,0,.4)}
+.flag>svg{width:100%;height:100%;display:block}
+.flag.lg{width:45px;height:30px;border-radius:5px}
+.flag.sm{width:21px;height:14px;border-radius:2px}
+
+.tabs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:0 0 14px}
+.tabs button{text-align:left;padding:14px 16px;border:1px solid var(--line);border-radius:var(--r);background:var(--panel);color:var(--fg);cursor:pointer;font-family:var(--body)}
+.tabs button b{display:block;font-size:16px;font-weight:700;letter-spacing:-.01em}
+.tabs button span{display:block;font-size:12.5px;color:var(--dim);margin-top:2px}
+.tabs button[aria-selected="true"]{border-color:var(--accent);box-shadow:inset 0 -3px 0 var(--accent);background:var(--accentbg)}
+.tabs button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.rail{display:flex;flex-wrap:wrap;gap:8px;margin:20px 0 26px}
+.chip{display:inline-flex;align-items:center;gap:9px;padding:5px 11px 5px 6px;border:1px solid var(--line);border-radius:999px;background:var(--chip);
+  color:var(--fg);font:500 13.5px var(--body);cursor:pointer;transition:border-color .15s,background .15s}
+.chip:hover{border-color:var(--accent)}
+.chip:focus-visible,.btn:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.chip .ct{font:700 11px var(--mono);color:var(--faint)}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--onaccent)}
+.chip[aria-pressed="true"] .ct{color:var(--onaccent);opacity:.75}
+
+.rh{display:flex;align-items:center;gap:14px;margin:0 0 6px}
+.rh h2{font-size:24px;letter-spacing:-.02em;margin:0;font-weight:700}
+.rh .n{font:400 13px var(--mono);color:var(--faint);margin-left:auto}
+
+.grp{margin:26px 0 0}
+.gh{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin:0 0 4px}
+.gh h3{font-size:15.5px;margin:0;font-weight:600}
+.gh .n{font:700 11.5px var(--mono);color:var(--accent)}
+.gd{font-size:13px;color:var(--dim);margin:0 0 12px;max-width:80ch}
+
+.list{border:1px solid var(--line);border-radius:var(--r);background:var(--panel);box-shadow:var(--shadow);overflow:hidden}
+.org{display:grid;grid-template-columns:auto 1fr auto;gap:4px 14px;align-items:center;padding:13px 16px;border-top:1px solid var(--line)}
+.org:first-child{border-top:0}
+.org .nm{font-weight:600;font-size:15px;line-height:1.35}
+.org .mt{grid-column:2;font-size:12.5px;color:var(--dim);display:flex;flex-wrap:wrap;gap:4px 12px}
+.org .mt .no{font:700 12px var(--mono);color:var(--fg)}
+.org .nt{grid-column:2;font-size:12.5px;color:var(--warn)}
+.org .acts{grid-column:3;grid-row:1 / span 3;display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end}
+.org.flash{animation:flash 1.8s ease-out}
+@keyframes flash{0%{box-shadow:inset 0 0 0 2px var(--accent);background:var(--accentbg)}100%{box-shadow:inset 0 0 0 0 transparent}}
+.tag{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:600;padding:1px 8px;border-radius:999px;white-space:nowrap}
+.tag.db{color:var(--accent);background:var(--accentbg)}
+.tag.eu{color:var(--warn);background:var(--warnbg)}
+.tag.site,.tag.none{color:var(--dim);background:var(--chip)}
+
+.btn{display:inline-flex;align-items:center;gap:6px;font:600 13px var(--body);padding:8px 13px;border-radius:9px;text-decoration:none;white-space:nowrap;
+  border:1px solid var(--line);color:var(--fg);background:transparent;cursor:pointer}
+.btn:hover{border-color:var(--accent);color:var(--accent)}
+.btn.pr{background:var(--accent);border-color:var(--accent);color:var(--onaccent)}
+.btn.pr:hover{filter:brightness(1.08);color:var(--onaccent)}
+.btn svg{width:13px;height:13px}
+
+details.sub{border-top:1px solid var(--line)}
+details.sub:first-child{border-top:0}
+details.sub>summary{list-style:none;display:flex;align-items:center;gap:11px;padding:12px 16px;cursor:pointer;font-weight:600;font-size:14.5px}
+details.sub>summary::-webkit-details-marker{display:none}
+details.sub>summary .n{font:700 11.5px var(--mono);color:var(--faint);margin-left:auto}
+details.sub>summary .ch{width:16px;height:16px;color:var(--faint);transition:transform .18s}
+details.sub[open]>summary .ch{transform:rotate(90deg)}
+details.sub[open]>summary{background:var(--accentbg)}
+details.sub .org{padding-left:30px}
+
+.empty{padding:28px;text-align:center;color:var(--dim);border:1px dashed var(--line);border-radius:var(--r)}
+.foot{margin-top:40px;font-size:12.5px;color:var(--faint);max-width:80ch}
+
+#toast{position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);opacity:0;pointer-events:none;
+  background:var(--fg);color:var(--bg);font:500 13.5px var(--body);padding:11px 18px;border-radius:11px;transition:.22s;z-index:20;max-width:92vw}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+
+@media (max-width:720px){
+  .fields{grid-template-columns:1fr}
+  .org{grid-template-columns:auto 1fr}
+  .org .acts{grid-column:1 / -1;grid-row:auto;justify-content:flex-start;margin-top:6px;order:5}
+  .bar{position:static;margin:0;padding:0 0 4px;background:none;backdrop-filter:none;border:0}
+  .tabs{grid-template-columns:1fr}
+  details.sub .org{padding-left:16px}
+}
+@media (prefers-reduced-motion:reduce){.org.flash{animation:none}*{transition:none!important}}
+/* ===== Ma'lumotnoma ===== */
+:root{--c1:#2F7D4F;--c1bg:rgba(47,125,79,.11);--c2a:#2563B8;--c2abg:rgba(37,99,184,.10);--c2b:#B26A00;--c2bbg:rgba(178,106,0,.11);--c3:#C2352B;--c3bg:rgba(194,53,43,.10);
+  --yes:#1D7A4A;--yesbg:rgba(29,122,74,.08);--yesln:rgba(29,122,74,.35);--no:#B4452A;--nobg:rgba(180,69,42,.07);--noln:rgba(180,69,42,.35)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--c1:#6EE7A0;--c1bg:rgba(110,231,160,.10);--c2a:#7FB2FF;--c2abg:rgba(127,178,255,.10);--c2b:#FFC266;--c2bbg:rgba(255,194,102,.10);--c3:#FF8A7A;--c3bg:rgba(255,138,122,.10);
+  --yes:#6EE7A0;--yesbg:rgba(110,231,160,.07);--yesln:rgba(110,231,160,.30);--no:#FF9C80;--nobg:rgba(255,156,128,.07);--noln:rgba(255,156,128,.30)}}
+:root[data-theme="dark"]{--c1:#6EE7A0;--c1bg:rgba(110,231,160,.10);--c2a:#7FB2FF;--c2abg:rgba(127,178,255,.10);--c2b:#FFC266;--c2bbg:rgba(255,194,102,.10);--c3:#FF8A7A;--c3bg:rgba(255,138,122,.10);
+  --yes:#6EE7A0;--yesbg:rgba(110,231,160,.07);--yesln:rgba(110,231,160,.30);--no:#FF9C80;--nobg:rgba(255,156,128,.07);--noln:rgba(255,156,128,.30)}
+[hidden]{display:none!important}
+#nom .bar{margin-bottom:18px}
+#nq{font-size:16px}
+input[type=search]::-webkit-search-cancel-button{-webkit-appearance:none;display:none}
+.cls{display:inline-flex;align-items:center;justify-content:center;min-width:40px;font:700 12px var(--mono);padding:2px 8px;border-radius:999px;white-space:nowrap}
+.cls.k1{color:var(--c1);background:var(--c1bg)}.cls.k2a{color:var(--c2a);background:var(--c2abg)}.cls.k2b{color:var(--c2b);background:var(--c2bbg)}.cls.k3{color:var(--c3);background:var(--c3bg)}
+.nl{border:1px solid var(--line);border-radius:var(--r);background:var(--panel);box-shadow:var(--shadow);overflow:hidden}
+.ni{display:grid;grid-template-columns:76px 1fr auto;gap:2px 14px;align-items:center;width:100%;text-align:left;padding:11px 16px;border:0;border-top:1px solid var(--line);background:none;color:var(--fg);font-family:var(--body);cursor:pointer}
+.ni:first-child{border-top:0}
+.ni:hover{background:var(--accentbg)}
+.ni:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.ni[aria-current="true"]{background:var(--accentbg);box-shadow:inset 3px 0 0 var(--accent)}
+.ni .cd{font:700 13px var(--mono);color:var(--accent);grid-row:1 / span 2}
+.ni .u{font-weight:600;font-size:14.5px;line-height:1.35}
+.ni .o{grid-column:2;font-size:12.5px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ni .bx{grid-column:3;grid-row:1 / span 2;display:flex;gap:6px;align-items:center}
+.ni.obs .u,.ni.obs .cd{opacity:.62}
+.rg{font:700 11px var(--body);padding:2px 8px;border-radius:999px;white-space:nowrap}
+.rg.y{color:var(--yes);background:var(--yesbg)}.rg.n{color:var(--no);background:var(--nobg)}
+.nmore{padding:12px 16px;font-size:13px;color:var(--dim);border-top:1px solid var(--line)}
+/* karta */
+.card{border:1px solid var(--line);border-radius:18px;background:var(--panel);box-shadow:var(--shadow);padding:22px 24px;margin:0 0 26px;scroll-margin-top:calc(env(safe-area-inset-top,0px) + 120px)}
+.ctop{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 14px}
+.code{font:700 15px var(--mono);letter-spacing:.02em;padding:4px 10px;border-radius:8px;background:var(--chip);border:1px solid var(--line)}
+.st{font-size:12px;font-weight:600;padding:3px 10px;border-radius:999px;display:inline-flex;align-items:center;gap:6px}
+.st::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.st.on{color:var(--yes);background:var(--yesbg)}.st.off{color:var(--warn);background:var(--warnbg)}
+.st.iv{color:var(--dim);background:var(--chip)}.st.iv::before{display:none}
+.ctop .btn{margin-left:auto}
+.nm3{display:grid;gap:8px;margin:0 0 20px}
+.nm3 .r{display:grid;grid-template-columns:34px 1fr;gap:10px;align-items:baseline}
+.nm3 .lg{font:700 10.5px var(--mono);color:var(--faint);letter-spacing:.08em}
+.nm3 .r:first-child .v{font-size:clamp(20px,2.6vw,25px);font-weight:700;letter-spacing:-.015em;line-height:1.2}
+.nm3 .v{font-size:15px;line-height:1.4}
+.cgrid{display:grid;grid-template-columns:180px 1fr;gap:14px;margin:0 0 18px}
+.box{border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:var(--chip)}
+.box .k{font-size:11.5px;color:var(--dim);margin:0 0 4px;font-weight:600;letter-spacing:.02em}
+.big{font:700 30px var(--mono);line-height:1.1;letter-spacing:-.02em}
+.big.k1{color:var(--c1)}.big.k2a{color:var(--c2a)}.big.k2b{color:var(--c2b)}.big.k3{color:var(--c3)}
+.box .t{font-size:14px;line-height:1.45}
+.defh{display:flex;align-items:center;gap:6px;margin:0 0 8px;flex-wrap:wrap}
+.defh .k{font-size:11.5px;color:var(--dim);font-weight:600;margin-right:6px}
+.lt{font:600 12px var(--body);padding:4px 10px;border-radius:8px;border:1px solid var(--line);background:transparent;color:var(--dim);cursor:pointer}
+.lt[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.lt:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.def{font-size:14.5px;line-height:1.6;margin:0 0 22px;max-width:82ch;min-height:2.6em}
+.def.wait{color:var(--faint);font-style:italic}
+.regp{border:1px solid;border-radius:14px;padding:16px 18px;display:grid;grid-template-columns:44px 1fr;gap:4px 14px}
+.regp.y{border-color:var(--yesln);background:var(--yesbg)}.regp.n{border-color:var(--noln);background:var(--nobg)}
+.regp .ic{grid-row:1 / span 3;width:44px;height:44px;border-radius:50%;display:grid;place-items:center}
+.regp.y .ic{background:var(--yes);color:var(--bg)}.regp.n .ic{background:var(--no);color:var(--bg)}
+.regp .ic svg{width:22px;height:22px}
+.regp h3{margin:0;font-size:18px;font-weight:700;letter-spacing:-.01em;line-height:1.3}
+.regp.y h3{color:var(--yes)}.regp.n h3{color:var(--no)}
+.regp .why{font-size:14px;line-height:1.5}
+.regp .why b{font-weight:600}
+.regp .bd{grid-column:2;font-size:12.5px;color:var(--dim);line-height:1.5}
+.regp .bd p{margin:6px 0 0}
+.edge{grid-column:1 / -1;margin-top:10px;padding:10px 12px;border-radius:10px;background:var(--warnbg);color:var(--fg);font-size:13.5px;line-height:1.45;border-left:3px solid var(--warn)}
+.edge b{color:var(--warn)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:4px 0 22px}
+.stats .box .big{font-size:24px}
+.ex{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 0}
+.ex button{font:500 13px var(--body);padding:6px 11px;border-radius:999px;border:1px solid var(--line);background:var(--chip);color:var(--fg);cursor:pointer}
+.ex button:hover{border-color:var(--accent)}
+.load{padding:40px 20px;text-align:center;color:var(--dim)}
+.load .bar2{height:4px;border-radius:4px;background:var(--chip);overflow:hidden;max-width:280px;margin:14px auto 0}
+.load .bar2 i{display:block;height:100%;width:35%;background:var(--accent);border-radius:4px;animation:ld 1.1s ease-in-out infinite}
+@keyframes ld{0%{transform:translateX(-100%)}100%{transform:translateX(300%)}}
+@media (max-width:720px){
+  .tabs{grid-template-columns:1fr!important}
+  .card{padding:18px 16px}
+  .cgrid{grid-template-columns:1fr}
+  .stats{grid-template-columns:1fr 1fr}
+  .ni{grid-template-columns:62px 1fr;padding:11px 12px}
+  .ni .bx{grid-column:2;grid-row:auto;margin-top:4px}
+  .ni .o{white-space:normal}
+  .ctop .btn{margin-left:0}
+}
+/* ===== Konsol ichida (iframe) ===== */
+html.emb .wrap>header,html.emb .sup{display:none}
+html.emb .wrap{padding:8px 14px 60px}
+html.emb .bar{margin-left:-14px;margin-right:-14px;padding-left:14px;padding-right:14px}
+html.emb #tabs button[data-t="nom"]{display:none}
+html.emb .tabs{grid-template-columns:1fr 1fr}
+html.emb[data-mode="nom"] #tabs{display:none}
+.solo{max-width:460px;margin:18vh auto;padding:30px;text-align:center;border:1px solid var(--line);border-radius:16px;background:var(--panel);color:var(--dim);font:15px/1.6 var(--body)}
+.solo a{color:var(--accent);font-weight:600}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="sup">
+    <span>Yaratuvchi: <b>Shahzodbek O’roqov</b></span>
+    <a href="https://t.me/bek_shoh07" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M21.5 3.5L2.5 11l6.5 2.5 2.5 6.5 3.5-4.5 5 4z"/><path d="M9 13.5l12.5-10"/></svg>Yordam (support): Telegram @bek_shoh07</a>
+  </div>
+  <header>
+    <p class="eyebrow">Tibbiy jihozlar qo’mitasi</p>
+    <h1>Vakolatli organlar va reestrlar</h1>
+    <p class="lead" id="lead"></p>
+  </header>
+
+  <div class="tabs" role="tablist" id="tabs">
+    <button role="tab" type="button" data-t="reg" aria-selected="true"><b>Ro’yxatdan o’tkazganlik guvohnomasi</b><span>Davlat reestrlari, CE / UKCA sertifikatlari</span></button>
+    <button role="tab" type="button" data-t="iso" aria-selected="false"><b>ISO 13485 sertifikati</b><span>Sertifikatlash organlari, MDSAP, akkreditatsiya</span></button>
+    <button role="tab" type="button" data-t="nom" aria-selected="false"><b>Tibbiy jihoz haqida ma’lumotnoma</b><span>GMDN kodi yoki nomi: sinf, holat, ro’yxatdan o’tishi</span></button>
+  </div>
+  <div class="bar" data-src>
+    <div class="fields">
+      <div class="fld" id="fq">
+        <label for="q">Qidiruv: organ nomi, NB raqami yoki davlat</label>
+        <input id="q" type="search" autocomplete="off" placeholder="masalan: TÜV, 0123, Italiya">
+        <button class="clr" type="button" data-for="q" aria-label="Tozalash">×</button>
+      </div>
+      <div class="fld" id="fc">
+        <label for="cert" id="certLbl">Guvohnoma raqami (ixtiyoriy)</label>
+        <input id="cert" type="text" autocomplete="off" spellcheck="false" placeholder="masalan: K231234">
+        <button class="clr" type="button" data-for="cert" aria-label="Tozalash">×</button>
+      </div>
+    </div>
+    <p class="hint" id="hint" aria-live="polite"></p>
+  </div>
+
+  <section id="nom" hidden aria-label="Tibbiy jihoz haqida ma’lumotnoma">
+    <div class="bar">
+      <div class="fld" id="fn">
+        <label for="nq">GMDN kodi yoki tibbiy jihoz nomi — o’zbek, rus yoki ingliz tilida</label>
+        <input id="nq" type="search" autocomplete="off" spellcheck="false" placeholder="masalan: 35983 yoki insulin nasosi">
+        <button class="clr" type="button" data-for="nq" aria-label="Tozalash">×</button>
+      </div>
+      <p class="hint" id="nhint" aria-live="polite"></p>
+    </div>
+    <div id="nres"></div>
+  </section>
+  <nav class="rail" data-src id="rail" aria-label="Davlatlar"></nav>
+  <main id="main" data-src></main>
+
+  <p class="foot" data-src>Havolalar bosh sahifaga emas, imkon qadar to’g’ridan-to’g’ri qidiruv sahifasiga olib boradi. Sertifikat raqami kiritilgan bo’lsa, «Tekshirish» bosilganda raqam avtomatik nusxalanadi — ochilgan sahifadagi qidiruv maydoniga Ctrl+V bilan qo’ying. Vakolatli organlar ro’yxati: Yevropa Komissiyasi so’rovnomasi (2026-yil fevral), MHRA (2026-yil iyul), FDA MDSAP ro’yxati va Yaponiya MHLW ma’lumotlari asosida.</p>
+</div>
+<div id="toast" role="status"></div>
+
+<script>
+
+/* ============ BAYROQLAR (inline SVG, internetsiz ishlaydi) ============ */
+let FLID=0;
+function starPts(cx,cy,r,rot){ rot=rot==null?-90:rot; const p=[];
+  for(let i=0;i<10;i++){ const a=(rot+i*36)*Math.PI/180, rr=i%2?r*0.382:r; p.push((cx+rr*Math.cos(a)).toFixed(2)+","+(cy+rr*Math.sin(a)).toFixed(2)); }
+  return p.join(" "); }
+const st=(cx,cy,r,f,rot)=>`<polygon points="${starPts(cx,cy,r,rot)}" fill="${f}"/>`;
+function ujack(x,y,w,h){ const id="uj"+(++FLID);
+  return `<svg x="${x}" y="${y}" width="${w}" height="${h}" viewBox="0 0 60 30" preserveAspectRatio="none">
+  <clipPath id="${id}"><path d="M30,15h30v15zv15h-30zh-30v-15zv-15h30z"/></clipPath>
+  <rect width="60" height="30" fill="#012169"/>
+  <path d="M0,0L60,30M60,0L0,30" stroke="#fff" stroke-width="6"/>
+  <path d="M0,0L60,30M60,0L0,30" clip-path="url(#${id})" stroke="#C8102E" stroke-width="4"/>
+  <path d="M30,0v30M0,15h60" stroke="#fff" stroke-width="10"/>
+  <path d="M30,0v30M0,15h60" stroke="#C8102E" stroke-width="6"/></svg>`; }
+function trigram(cx,cy,ang,pat){
+  return `<g transform="translate(${cx} ${cy}) rotate(${ang})">${pat.map((solid,i)=>{
+    const y=(i-1)*0.95-0.25;
+    return solid?`<rect x="-1.9" y="${y}" width="3.8" height="0.5"/>`
+                :`<rect x="-1.9" y="${y}" width="1.65" height="0.5"/><rect x="0.25" y="${y}" width="1.65" height="0.5"/>`;}).join("")}</g>`; }
+const FLAGS={
+  us:()=>{ let s=`<rect width="30" height="20" fill="#B22234"/>`;
+    for(let i=1;i<13;i+=2) s+=`<rect y="${(i*20/13).toFixed(3)}" width="30" height="${(20/13).toFixed(3)}" fill="#fff"/>`;
+    s+=`<rect width="12" height="${(7*20/13).toFixed(3)}" fill="#3C3B6E"/>`;
+    for(let r=0;r<9;r++) for(let c=0;c<(r%2?5:6);c++) s+=`<circle cx="${(1+c*2+(r%2)).toFixed(2)}" cy="${(0.75+r*1.17).toFixed(2)}" r="0.36" fill="#fff"/>`;
+    return s; },
+  eu:()=>{ let s=`<rect width="30" height="20" fill="#003399"/>`;
+    for(let i=0;i<12;i++){ const a=i*30*Math.PI/180; s+=st(15+6*Math.sin(a),10-6*Math.cos(a),1.05,"#FFCC00"); } return s; },
+  gb:()=>ujack(0,0,30,20),
+  kr:()=>`<rect width="30" height="20" fill="#fff"/>
+    <g transform="rotate(33.69 15 10)"><circle cx="15" cy="10" r="5" fill="#0047A0"/>
+    <path d="M10,10A5,5 0 0 1 20,10A2.5,2.5 0 0 0 15,10A2.5,2.5 0 0 1 10,10z" fill="#CD2E3A"/></g>
+    <g fill="#000">${trigram(9.1,6.05,-56.31,[1,1,1])}${trigram(20.9,6.05,56.31,[0,1,0])}${trigram(20.9,13.95,-56.31,[0,0,0])}${trigram(9.1,13.95,56.31,[1,0,1])}</g>`,
+  jp:()=>`<rect width="30" height="20" fill="#fff"/><circle cx="15" cy="10" r="6" fill="#BC002D"/>`,
+  ca:()=>`<rect width="30" height="20" fill="#fff"/><rect width="7.5" height="20" fill="#D52B1E"/><rect x="22.5" width="7.5" height="20" fill="#D52B1E"/>
+    <path fill="#D52B1E" d="M15,3.6l1.15,2.15c.13.23.36.21.6.08l.83-.43-.62,3.27c-.13.6.29.6.5.34l1.45-1.53.38.87c.13.26.32.22.58.17l1.5-.31-.5,1.7v.04c-.06.22-.16.4.1.5l.53.25-3.08,2.6c-.31.32-.2.42-.09.77l.29.88-2.86-.51c-.35-.09-.6-.09-.6.19l.12,3.27h-.58l.12-3.27c0-.28-.25-.28-.6-.19l-2.86.51.29-.88c.11-.35.22-.45-.09-.77l-3.08-2.6.53-.25c.26-.1.16-.28.1-.5v-.04l-.5-1.7,1.5.31c.26.05.45.09.58-.17l.38-.87,1.45,1.53c.21.26.63.26.5-.34l-.62-3.27.83.43c.24.13.47.15.6-.08z"/>`,
+  au:()=>`<rect width="30" height="20" fill="#012169"/>${ujack(0,0,15,10)}
+    ${st(7.5,15,2.4,"#fff")}${st(22.5,16.8,1.25,"#fff")}${st(18.2,9.4,1.25,"#fff")}${st(22.5,4,1.25,"#fff")}${st(26.4,8.2,1.25,"#fff")}${st(24.4,11.6,.7,"#fff")}`,
+  ch:()=>`<rect width="30" height="20" fill="#DA291C"/><rect x="13.2" y="4.6" width="3.6" height="10.8" fill="#fff"/><rect x="9.6" y="8.2" width="10.8" height="3.6" fill="#fff"/>`,
+  il:()=>`<rect width="30" height="20" fill="#fff"/><rect y="2" width="30" height="3" fill="#0038B8"/><rect y="15" width="30" height="3" fill="#0038B8"/>
+    <g fill="none" stroke="#0038B8" stroke-width=".7"><polygon points="15,6.4 18.1,11.8 11.9,11.8"/><polygon points="15,13.6 11.9,8.2 18.1,8.2"/></g>`,
+  ru:()=>`<rect width="30" height="20" fill="#fff"/><rect y="6.67" width="30" height="6.67" fill="#0039A6"/><rect y="13.33" width="30" height="6.67" fill="#D52B1E"/>`,
+  tr:()=>`<rect width="30" height="20" fill="#E30A17"/><circle cx="11.25" cy="10" r="5" fill="#fff"/><circle cx="12.5" cy="10" r="4" fill="#E30A17"/>${st(17.3,10,2.5,"#fff",180)}`,
+  in:()=>{ let s=`<rect width="30" height="20" fill="#fff"/><rect width="30" height="6.67" fill="#FF9933"/><rect y="13.33" width="30" height="6.67" fill="#138808"/>
+    <circle cx="15" cy="10" r="2.6" fill="none" stroke="#000080" stroke-width=".4"/>`;
+    for(let i=0;i<12;i++){ const a=i*15*Math.PI/180; s+=`<line x1="${(15-2.5*Math.cos(a)).toFixed(2)}" y1="${(10-2.5*Math.sin(a)).toFixed(2)}" x2="${(15+2.5*Math.cos(a)).toFixed(2)}" y2="${(10+2.5*Math.sin(a)).toFixed(2)}" stroke="#000080" stroke-width=".18"/>`; }
+    return s; },
+  by:()=>{ let s=`<rect width="30" height="20" fill="#C8313E"/><rect y="13.33" width="30" height="6.67" fill="#4AA657"/><rect width="3.2" height="20" fill="#fff"/>`;
+    for(let i=0;i<5;i++){ const y=2+i*4; s+=`<polygon points="1.6,${y-1.6} 3,${y} 1.6,${y+1.6} .2,${y}" fill="#C8313E"/><polygon points="1.6,${y-.6} 2.2,${y} 1.6,${y+.6} 1,${y}" fill="#fff"/>`; }
+    return s; },
+  cn:()=>`<rect width="30" height="20" fill="#EE1C25"/>${st(5,5,3,"#FFFF00")}${st(10,2,1,"#FFFF00",-36)}${st(12,4,1,"#FFFF00",-70)}${st(12,7,1,"#FFFF00",-108)}${st(10,9,1,"#FFFF00",-140)}`,
+  de:()=>`<rect width="30" height="6.67" fill="#000"/><rect y="6.67" width="30" height="6.67" fill="#DD0000"/><rect y="13.33" width="30" height="6.67" fill="#FFCE00"/>`,
+  un:()=>`<rect width="30" height="20" fill="#14324F"/><g fill="none" stroke="#7FE7D6" stroke-width=".7"><circle cx="15" cy="10" r="6.2"/><ellipse cx="15" cy="10" rx="2.8" ry="6.2"/><path d="M8.8,10h12.4M9.7,7h10.6M9.7,13h10.6"/></g>`
+};
+
+/* ---- qo'shimcha bayroqlar ---- */
+const H3=(a,b,c)=>`<rect width="30" height="6.67" fill="${a}"/><rect y="6.67" width="30" height="6.67" fill="${b}"/><rect y="13.33" width="30" height="6.67" fill="${c}"/>`;
+const V3=(a,b,c)=>`<rect width="10" height="20" fill="${a}"/><rect x="10" width="10" height="20" fill="${b}"/><rect x="20" width="10" height="20" fill="${c}"/>`;
+const NORD=(bg,cr,inner)=>`<rect width="30" height="20" fill="${bg}"/><rect x="8" width="5" height="20" fill="${cr}"/><rect y="7.5" width="30" height="5" fill="${cr}"/>`+
+  (inner?`<rect x="9.25" width="2.5" height="20" fill="${inner}"/><rect y="8.75" width="30" height="2.5" fill="${inner}"/>`:"");
+Object.assign(FLAGS,{
+  nl:()=>H3("#AE1C28","#fff","#21468B"),
+  it:()=>V3("#009246","#fff","#CE2B37"),
+  fr:()=>V3("#0055A4","#fff","#EF4135"),
+  be:()=>V3("#000","#FDDA24","#EF3340"),
+  ie:()=>V3("#169B62","#fff","#FF883E"),
+  at:()=>H3("#C8102E","#fff","#C8102E"),
+  hu:()=>H3("#CE2939","#fff","#477050"),
+  sk:()=>H3("#fff","#0B4EA2","#EE1C25")+`<path d="M7.6,4.6h6.2v6.4c0,2.6-3.1,4-3.1,4s-3.1-1.4-3.1-4z" fill="#EE1C25" stroke="#fff" stroke-width=".6"/><path d="M10.7,6v7M9,8.2h3.4M8.4,10h4.6" stroke="#fff" stroke-width=".8"/>`,
+  si:()=>H3("#fff","#005CE5","#ED1C24")+`<path d="M6.4,3.6h4.8v4.4c0,2-2.4,3.1-2.4,3.1s-2.4-1.1-2.4-3.1z" fill="#005CE5" stroke="#ED1C24" stroke-width=".5"/><path d="M6.8,8.6l1.1-1.6 .9 1 .9-1 1.1 1.6" fill="#fff"/>`,
+  hr:()=>{ let s=H3("#FF0000","#fff","#171796"); s+=`<rect x="12" y="4.6" width="6" height="7" fill="#fff"/>`;
+    for(let r=0;r<5;r++) for(let c=0;c<5;c++) if((r+c)%2===0) s+=`<rect x="${12+c*1.2}" y="${4.6+r*1.2}" width="1.2" height="1.2" fill="#FF0000"/>`;
+    return s+`<path d="M12,10.6h6c0,1.9-1.4,3-3,3.4-1.6-.4-3-1.5-3-3.4z" fill="#FF0000"/><path d="M12,10.6h6" stroke="#fff" stroke-width=".3"/>`; },
+  es:()=>`<rect width="30" height="20" fill="#AA151B"/><rect y="5" width="30" height="10" fill="#F1BF00"/><rect x="7" y="7.3" width="3" height="5" rx=".6" fill="#AA151B" opacity=".85"/>`,
+  pl:()=>`<rect width="30" height="10" fill="#fff"/><rect y="10" width="30" height="10" fill="#DC143C"/>`,
+  cz:()=>`<rect width="30" height="10" fill="#fff"/><rect y="10" width="30" height="10" fill="#D7141A"/><path d="M0,0L15,10L0,20z" fill="#11457E"/>`,
+  dk:()=>`<rect width="30" height="20" fill="#C8102E"/><rect x="9" width="3" height="20" fill="#fff"/><rect y="8.5" width="30" height="3" fill="#fff"/>`,
+  se:()=>NORD("#006AA7","#FECC02"),
+  fi:()=>NORD("#fff","#002F6C"),
+  no:()=>NORD("#BA0C2F","#fff","#00205B"),
+  mt:()=>`<rect width="15" height="20" fill="#fff"/><rect x="15" width="15" height="20" fill="#CF142B"/><rect x="2" y="2" width="3.4" height="3.4" fill="#A0A0A0" stroke="#CF142B" stroke-width=".3"/>`,
+  cy:()=>`<rect width="30" height="20" fill="#fff"/><path d="M7.5,8.2c2-1.4,5.5-1.9,8.2-1.6 2.6.3 4.8-.6 6.6-1.4-.6 1.5-1.9 2.5-3.3 3-1.5.5-2.4 1.6-3.7 2.1-1.9.8-4.1.2-5.4-.5-.9-.5-1.9-.8-2.4-1.6z" fill="#D57800"/>
+    <path d="M11,14.2c1.6.9 3.4 1.2 4,1.2M19,14.2c-1.6.9-3.4 1.2-4,1.2" fill="none" stroke="#4E5B31" stroke-width=".8" stroke-linecap="round"/>`,
+  br:()=>`<rect width="30" height="20" fill="#009C3B"/><path d="M15,2.2L27.6,10L15,17.8L2.4,10z" fill="#FFDF00"/><circle cx="15" cy="10" r="4.4" fill="#002776"/><path d="M10.8,9.1c2.9-.6 6-.1 8.4 1.5" fill="none" stroke="#fff" stroke-width=".7"/>`,
+  sa:()=>`<rect width="30" height="20" fill="#006C35"/><path d="M8,8.4c1.6-.6 3.4.4 5-.2s3.2.5 4.6 0 2.8.3 4.4-.2" fill="none" stroke="#fff" stroke-width=".9" stroke-linecap="round"/>
+    <path d="M9,13.4h12M20.4,12.7l1.4.7-1.4.7" fill="none" stroke="#fff" stroke-width=".7" stroke-linecap="round"/>`,
+  sg:()=>{ let s=`<rect width="30" height="10" fill="#EF3340"/><rect y="10" width="30" height="10" fill="#fff"/><circle cx="6.6" cy="5" r="3.3" fill="#fff"/><circle cx="7.8" cy="5" r="3.1" fill="#EF3340"/>`;
+    for(let i=0;i<5;i++){ const a=(-90+i*72)*Math.PI/180; s+=st(10.6+1.6*Math.cos(a),5+1.6*Math.sin(a),.62,"#fff"); } return s; },
+  kz:()=>{ let s=`<rect width="30" height="20" fill="#00AFCA"/><circle cx="15" cy="8.6" r="2.6" fill="#FEC50C"/>`;
+    for(let i=0;i<16;i++){ const a=i*22.5*Math.PI/180; s+=`<line x1="${(15+3.1*Math.cos(a)).toFixed(2)}" y1="${(8.6+3.1*Math.sin(a)).toFixed(2)}" x2="${(15+4*Math.cos(a)).toFixed(2)}" y2="${(8.6+4*Math.sin(a)).toFixed(2)}" stroke="#FEC50C" stroke-width=".55"/>`; }
+    return s+`<path d="M10.6,14.6c1.6,1.3 3,1 4.4.4 1.4.6 2.8.9 4.4-.4" fill="none" stroke="#FEC50C" stroke-width=".8"/><rect x="1.6" y="1" width="1.5" height="18" fill="#FEC50C" opacity=".85"/>`; },
+  mx:()=>V3("#006847","#fff","#CE1126")+`<circle cx="15" cy="10" r="2.4" fill="#8C6239"/><path d="M12.8,11.4c1.4,1.2 3,1.2 4.4,0" fill="none" stroke="#006847" stroke-width=".6"/>`,
+  ar:()=>`<rect width="30" height="20" fill="#74ACDF"/><rect y="6.67" width="30" height="6.67" fill="#fff"/><circle cx="15" cy="10" r="1.9" fill="#F6B40E" stroke="#85340A" stroke-width=".25"/>`,
+  za:()=>`<rect width="30" height="20" fill="#fff"/><rect width="30" height="8" fill="#E03C31"/><rect y="12" width="30" height="8" fill="#001489"/>
+    <path d="M0,0L13,10L0,20z" fill="#007749"/><path d="M0,1.8L10.6,10L0,18.2z" fill="#FFB81C"/><path d="M0,3.6L8.2,10L0,16.4z" fill="#000"/>
+    <path d="M13,10H30" stroke="#007749" stroke-width="4"/><path d="M0,0L13,10L0,20" fill="none" stroke="#fff" stroke-width=".9"/>`,
+  eg:()=>H3("#CE1126","#fff","#000")+`<path d="M15,7.6c-1,.2-1.4,1.2-1.4,2.2s.6,2 1.4,2.2c.8-.2 1.4-1.2 1.4-2.2s-.4-2-1.4-2.2z" fill="#C09300"/>`,
+  uz:()=>{ let s=`<rect width="30" height="20" fill="#fff"/><rect width="30" height="6.4" fill="#0099B5"/><rect y="13.6" width="30" height="6.4" fill="#1EB53A"/>
+    <rect y="6.4" width="30" height=".55" fill="#CE1126"/><rect y="13.05" width="30" height=".55" fill="#CE1126"/>
+    <circle cx="4.6" cy="3.2" r="2.1" fill="#fff"/><circle cx="5.4" cy="3.2" r="1.9" fill="#0099B5"/>`;
+    const rows=[[3],[2,3],[1,2,3]]; rows.forEach((cols,ri)=>cols.forEach(c=>{ s+=st(7.2+c*1.25,1.3+ri*1.25,.45,"#fff"); }));
+    return s; },
+});
+
+/* ================= MA'LUMOTLAR ================= */
+const EUDAMED="https://ec.europa.eu/tools/eudamed/#/screen/search-device";
+const EUDAMED_CERT="https://ec.europa.eu/tools/eudamed/#/screen/home";
+const NANDO="https://webgate.ec.europa.eu/single-market-compliance-space/#/notified-bodies/notified-body-list?filter=legislationId:34,notificationStatusId:1";
+const DB={
+  bsi:"https://www.bsigroup.com/en-GB/validate-bsi-issued-certificates/",
+  dekranl:"https://www.dekra-checkme.com/org",
+  dnv:"https://certificatechecker.dnv.com/",
+  dqs:"https://www.mydqs.com/en/customers/customer-database.html",
+  ecm:"http://entecerma.it/certificate.php",
+  htcert:"https://app.htcert.com/view/medical-device-directive-certified-clients/",
+  kiwatr:"https://www.kiwa.com/tr/en/certificate-search/",
+  mdc:"https://www.mdc-ce.de/en/service-portal/validity-check/",
+  nsai:"https://www.nsai.ie/certification/search-for-a-certified-company/",
+  sgs:"https://www.sgs.com/en/certified-clients-and-products/certified-client-directory",
+  siq:"https://www.siq.si/en/our-services/organization-certification/certificates-search/",
+  sqs:"https://www.sqs.ch/en/certified-organisations",
+  tuvnord:"https://www.tuev-nord.de/de/unternehmen/zertifizierung/zertifikatsdatenbank",
+  certipedia:"https://www.certipedia.com/",
+  tuvsud:"https://www.tuvsud.com/de-certificate-validity-check",
+  iaf:"https://www.iafcertsearch.org/",
+  cnca:"http://cx.cnca.cn/",
+};
+/* sertifikat raqamini to'g'ridan-to'g'ri havolaga qo'yish mumkin bo'lgan manbalar */
+const DEEP={
+  tuvsud:n=>"https://www.tuvsud.com/ps-cert?q=cert:"+encodeURIComponent(n.replace(/\s+/g," ").trim()),
+};
+const EUC=["de","nl","it","fr","es","at","be","fi","se","no","dk","ie","pl","cz","sk","hu","si","hr","cy","mt"];
+
+const SRC=[];
+let SID=0;
+function add(o){ o.id="s"+(++SID); o.t=["iso","mdsap","acc"].includes(o.g)?"iso":"reg"; if(!o.reg) o.reg=[EUC.includes(o.c)?"eu":o.c]; SRC.push(o); return o; }
+/* YeI vakolatli organi */
+function NB(n,c,no,d,db,note,extraReg){
+  return add({g:"nb",n,c,no,d,db,note,
+    k:db?"db":"eu",u:db?DB[db]:EUDAMED_CERT,reg:["eu"].concat(extraReg||[])});
+}
+
+/* ---------- YeI: reestrlar ---------- */
+add({g:"reg",c:"eu",n:"EUDAMED · jihoz qidiruvi",d:"Savdo nomi, UDI-DI yoki ishlab chiqaruvchi bo’yicha — CE sertifikati jihoz kartochkasida",k:"reg",u:EUDAMED});
+add({g:"reg",c:"eu",n:"EUDAMED · CE sertifikatlari moduli",d:"Vakolatli organ bergan MDR/IVDR sertifikatlari (Certificates bo’limi)",k:"reg",u:EUDAMED_CERT});
+add({g:"reg",c:"eu",n:"NANDO",d:"Vakolatli organlar rasmiy ro’yxati: raqami, vakolat doirasi, holati",k:"reg",u:NANDO});
+
+/* ---------- YeI: MDR/IVDR vakolatli organlari (53) ---------- */
+NB("TÜV SÜD Product Service GmbH","de","0123","MDR / IVDR","tuvsud");
+NB("TÜV Rheinland LGA Products GmbH","de","0197","MDR / IVDR","certipedia");
+NB("TÜV NORD CERT GmbH","de","0044","MDR","tuvnord","Bazada ISO 13485 sertifikatlari bor; MDR sertifikati — EUDAMED orqali");
+NB("DEKRA Certification GmbH","de","0124","MDR / IVDR",null,"Ochiq baza yo’q — EUDAMED yoki IAF CertSearch orqali");
+NB("mdc medical device certification GmbH","de","0483","MDR / IVDR","mdc");
+NB("DQS Medizinprodukte GmbH","de","0297","MDR","dqs");
+NB("DNV MEDCERT GmbH (Medcert)","de","0482","MDR","dnv");
+NB("Berlin Cert Prüf- und Zertifizierstelle für Medizinprodukte GmbH","de","0633","MDR");
+NB("SLG Prüf- und Zertifizierungs GmbH","de","0494","MDR");
+NB("SZUTEST Konformitätsbewertungsstelle GmbH","de","2975","MDR");
+NB("BSI Group The Netherlands B.V.","nl","2797","MDR / IVDR","bsi");
+NB("DEKRA Certification B.V.","nl","0344","MDR / IVDR","dekranl");
+NB("Kiwa Dare B.V.","nl","1912","MDR");
+NB("Scarlet NB B.V.","nl","3022","MDR",null,"Asosan dasturiy ta’minot va sun’iy intellekt");
+NB("IMQ S.p.A.","it","0051","MDR / IVDR");
+NB("Istituto Superiore di Sanità","it","0373","MDR / IVDR");
+NB("Bureau Veritas Italia S.p.A.","it","1370","MDR");
+NB("Certiquality S.r.l.","it","0546","MDR");
+NB("Ente Certificazione Macchine (ECM)","it","1282","MDR","ecm");
+NB("Eurofins Product Testing Italy S.r.l.","it","0477","MDR");
+NB("ICIM S.p.A.","it","0425","MDR");
+NB("Italcert S.r.l.","it","0426","MDR");
+NB("Kiwa Cermet Italia S.p.A.","it","0476","MDR");
+NB("MTIC InterCert S.r.l.","it","0068","MDR");
+NB("TÜV Rheinland Italia S.r.l.","it","1936","MDR","certipedia");
+NB("GMED SAS (LNE)","fr","0459","MDR / IVDR",null,"MDR sertifikati — EUDAMED orqali; ISO 13485 — lne-gmed.com saytida");
+NB("AFNOR Certification","fr","0333","MDR");
+NB("Centro Nacional de Certificación (AEMPS)","es","0318","MDR / IVDR");
+NB("QMD Services GmbH","at","2962","MDR / IVDR");
+NB("SGS Belgium NV","be","1639","MDR / IVDR","sgs");
+NB("SGS Fimko Oy","fi","0598","MDR / IVDR","sgs");
+NB("Eurofins Electric & Electronics Finland Oy","fi","0537","MDR / IVDR");
+NB("Sertio Oy","fi","3018","IVDR",null,"Faqat in vitro diagnostika");
+NB("Intertek Medical Notified Body AB","se","2862","MDR");
+NB("TÜV NORD Scandinavia MNB (sobiq RISE)","se","3033","MDR","tuvnord");
+NB("DNV Product Assurance AS","no","2460","MDR / IVDR","dnv");
+NB("TÜV SÜD Danmark","dk","2443","MDR","tuvsud");
+NB("National Standards Authority of Ireland (NSAI)","ie","0050","MDR / IVDR","nsai");
+NB("Polskie Centrum Badań i Certyfikacji (PCBC)","pl","1434","MDR / IVDR");
+NB("TÜV NORD Polska","pl","2274","MDR","tuvnord");
+NB("Czech Metrology Institute","cz","1383","MDR");
+NB("Institut pro testování a certifikaci, a.s.","cz","1023","MDR");
+NB("3EC International a.s.","sk","2265","MDR / IVDR");
+NB("CE Certiso","hu","2409","MDR");
+NB("Neoemki","hu","1011","MDR");
+NB("SIQ Ljubljana","si","1304","MDR","siq");
+NB("NOTICE d.o.o.","si","3121","MDR");
+NB("UDEM Adriatic","hr","2696","MDR");
+NB("HTCert (Health Technology Certification Ltd)","cy","2803","MDR","htcert");
+NB("Malta Conformity Assessment Ltd.","mt","3132","MDR");
+/* Turkiya organlari YeI ro'yxatida, lekin Turkiya bo'limida ham ko'rinadi */
+NB("Kiwa Belgelendirme Hizmetleri A.Ş.","tr","1984","MDR","kiwatr",null,["tr"]);
+NB("UDEM Uluslararası Belgelendirme","tr","2292","MDR",null,null,["tr"]);
+NB("Notice Belgelendirme, Muayene ve Denetim","tr","2764","MDR",null,null,["tr"]);
+
+/* ---------- Buyuk Britaniya ---------- */
+add({g:"reg",c:"gb",n:"MHRA · PARD",d:"Ro’yxatdan o’tgan ishlab chiqaruvchilar va jihozlar",k:"reg",u:"https://pard.mhra.gov.uk/manufacturer-search/"});
+add({g:"reg",c:"gb",n:"MHRA · UK Approved Bodies ro’yxati",d:"Tasdiqlangan organlar va vakolat doirasi (rasmiy)",k:"reg",
+  u:"https://www.gov.uk/government/publications/medical-devices-uk-approved-bodies/list-of-uk-approved-bodies-for-medical-devices"});
+const UKAB=(n,no,d,db,c,note)=>add({g:"ukab",c:c||"gb",reg:["gb"],n,no,d,db,note,k:db?"db":"site",bl:db?null:"MHRA ro’yxati",
+  u:db?DB[db]:"https://www.gov.uk/government/publications/medical-devices-uk-approved-bodies/list-of-uk-approved-bodies-for-medical-devices"});
+UKAB("BSI Assurance UK Ltd","0086","MD / AIMD / IVD","bsi");
+UKAB("SGS United Kingdom Ltd","0120","MD / IVD","sgs");
+UKAB("TÜV SÜD BABT Unlimited","0168","MD / AIMD / IVD","tuvsud");
+UKAB("TÜV Rheinland UK Ltd","2571","MD / IVD","certipedia");
+UKAB("UL International (UK) Ltd","0843","MD / IVD");
+UKAB("Intertek Medical Notified Body UK Ltd","8532","MD");
+UKAB("Scarlet NB UK Ltd","8536","MD");
+UKAB("Eurofins E&E CML Limited","2503","MD");
+UKAB("Therapeutic Goods Administration (TGA)","0805","MD · o’zaro tan olish bitimi",null,"au","Avstraliya regulyatori, UKCA sertifikatini MRA asosida beradi");
+
+/* ---------- AQSh ---------- */
+add({g:"reg",c:"us",n:"FDA · eksport sertifikatini tasdiqlash (FECV)",d:"CFG sertifikati haqiqiyligi",k:"reg",u:"https://www.access.fda.gov/fecv/CDRH"});
+add({g:"reg",c:"us",n:"FDA · 510(k) bazasi",d:"K raqami bo’yicha ruxsatlar",k:"reg",u:"https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfPMN/pmn.cfm",
+  deep:n=>{ const m=n.toUpperCase().match(/K\s?(\d{6})/); return m?"https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfPMN/pmn.cfm?ID=K"+m[1]:null; }});
+add({g:"reg",c:"us",n:"FDA · PMA bazasi",d:"P raqami bo’yicha ruxsatlar (yuqori xavfli)",k:"reg",u:"https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfPMA/pma.cfm",
+  deep:n=>{ const m=n.toUpperCase().match(/P\s?(\d{6})/); return m?"https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfPMA/pma.cfm?num=P"+m[1]:null; }});
+add({g:"reg",c:"us",n:"FDA · De Novo bazasi",d:"DEN raqami bo’yicha ruxsatlar",k:"reg",u:"https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfpmn/denovo.cfm"});
+add({g:"reg",c:"us",n:"FDA · Registration & Listing",d:"Korxona ro’yxatdan o’tganligi va jihozlar ro’yxati",k:"reg",u:"https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfRL/rl.cfm"});
+add({g:"reg",c:"us",n:"AccessGUDID",d:"UDI bo’yicha jihoz ma’lumotlari",k:"reg",u:"https://accessgudid.nlm.nih.gov/"});
+
+/* ---------- Yaponiya ---------- */
+add({g:"reg",c:"jp",n:"PMDA · tibbiy jihozlar qidiruvi",d:"Tasdiqlangan va sertifikatlangan jihozlar",k:"reg",u:"https://www.pmda.go.jp/PmdaSearch/kikiSearch/"});
+add({g:"reg",c:"jp",n:"MHLW · RCB rasmiy ro’yxati",d:"Sog’liqni saqlash vazirligi ro’yxatidagi 10 ta organ va vakolat doirasi",k:"reg",
+  u:"https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/kenkou_iryou/iyakuhin/touroku/index.html"});
+add({g:"reg",c:"jp",n:"PMDA · sertifikatlangan mahsulotlar ro’yxati",d:"RCB bergan sertifikatlar ro’yxati",k:"reg",
+  u:"https://www.pmda.go.jp/review-services/drug-reviews/about-reviews/devices/0025.html"});
+const MHLW="https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/kenkou_iryou/iyakuhin/touroku/index.html";
+const RCB=(n,db,site)=>add({g:"rcb",c:"jp",n,d:"Yaponiya PMD Act bo’yicha sertifikatlash",db,k:db?"db":"site",u:db?DB[db]:(site||MHLW),
+  bl:(!db&&!site)?"MHLW ro’yxati":null, note:(!db&&!site)?"Manzil va vakolat doirasi — MHLW ro’yxatida":null});
+RCB("TÜV SÜD Japan Ltd.","tuvsud");
+RCB("TÜV Rheinland Japan Ltd.","certipedia");
+RCB("BSI Group Japan K.K.","bsi");
+RCB("SGS Japan Inc.","sgs");
+RCB("DQS Japan Inc.","dqs");
+RCB("Japan Quality Assurance Organization (JQA)",null,"https://www.jqa.jp/");
+RCB("Japan Electrical Safety & Environment Technology Laboratories (JET)",null,"https://www.jet.or.jp/");
+RCB("Japan Association for the Advancement of Medical Equipment (JAAME)",null,"https://www.jaame.or.jp/");
+RCB("Cosmos Corporation");
+RCB("Nanotec Spindler Corporation");
+
+/* ---------- Xitoy ---------- */
+add({g:"reg",c:"cn",n:"NMPA · tibbiy jihozlar bazasi",d:"Xitoyda ro’yxatdan o’tgan jihozlar",k:"reg",u:"https://www.nmpa.gov.cn/datasearch/home-index.html#category=ylqx"});
+add({g:"iso",c:"cn",n:"CNCA · sertifikatlar yagona qidiruv platformasi",d:"Xitoyda berilgan barcha ISO 13485 sertifikatlari — raqam yoki korxona nomi bo’yicha",k:"db",u:DB.cnca,
+  note:"Xitoy ishlab chiqaruvchilari uchun eng muhim manba"});
+add({g:"iso",c:"cn",n:"China Quality Certification Centre (CQC)",d:"Davlat sertifikatlash markazi",k:"site",u:"https://www.cqc.com.cn/"});
+add({g:"acc",c:"cn",n:"CNAS",d:"Xitoy milliy akkreditatsiya xizmati",k:"site",u:"https://www.cnas.org.cn/"});
+
+/* ---------- Koreya ---------- */
+add({g:"reg",c:"kr",n:"MFDS · tibbiy jihozlar bazasi",d:"Koreyada ro’yxatdan o’tgan jihozlar",k:"reg",u:"https://emedi.mfds.go.kr"});
+add({g:"reg",c:"kr",n:"MFDS · hujjat haqiqiyligini tekshirish",d:"MFDS bergan hujjatni raqami bo’yicha tekshirish",k:"reg",u:"https://emedi.mfds.go.kr/msismext/emd/uif/issuDocTruflsEngView.do"});
+add({g:"acc",c:"kr",n:"Korea Accreditation Board (KAB)",d:"Koreya akkreditatsiya kengashi",k:"site",u:"https://www.kab.or.kr/"});
+
+/* ---------- Kanada, Avstraliya, Shveytsariya ---------- */
+add({g:"reg",c:"ca",n:"Health Canada · MDALL",d:"Litsenziyalangan tibbiy jihozlar",k:"reg",u:"https://health-products.canada.ca/mdall-limh/index-eng.jsp"});
+add({g:"acc",c:"ca",n:"Standards Council of Canada (SCC)",d:"Kanada akkreditatsiya organi",k:"site",u:"https://www.scc.ca/"});
+add({g:"reg",c:"au",n:"TGA · ARTG qidiruvi",d:"ARTG raqami, nom yoki homiy bo’yicha",k:"reg",u:"https://www.tga.gov.au/resources/artg"});
+add({g:"acc",c:"au",reg:["au"],n:"JAS-ANZ",d:"Avstraliya va Yangi Zelandiya akkreditatsiya organi",k:"site",u:"https://www.jas-anz.org/"});
+add({g:"reg",c:"ch",n:"swissdamed",d:"Shveytsariya tibbiy jihozlar bazasi",k:"reg",u:"https://swissdamed.ch/"});
+add({g:"iso",c:"ch",n:"SQS (Swiss Association for Quality)",d:"Sertifikatlangan tashkilotlar bazasi",k:"db",u:DB.sqs});
+add({g:"acc",c:"ch",n:"Swiss Accreditation Service (SAS)",d:"Shveytsariya akkreditatsiya xizmati",k:"site",u:"https://www.sas.admin.ch/"});
+
+/* ---------- MDH va YeOII ---------- */
+add({g:"reg",c:"ru",n:"Roszdravnadzor · tibbiy buyumlar reestri",d:"Rossiyada ro’yxatdan o’tgan jihozlar",k:"reg",u:"https://roszdravnadzor.gov.ru/services/misearch"});
+add({g:"reg",c:"ru",reg:["ru","by","kz"],n:"Yevroosiyo iqtisodiy komissiyasi (YeOII)",d:"YeOII tibbiy buyumlar yagona tizimi",k:"site",u:"https://eec.eaeunion.org/"});
+add({g:"reg",c:"by",n:"RCETH · tibbiy buyumlar reestri",d:"Belarusda ro’yxatdan o’tganlar",k:"reg",u:"https://www.rceth.by/Refbank/reestr_medicinskoy_tehniki"});
+add({g:"reg",c:"kz",n:"NCELS · davlat reestri",d:"Qozog’istonda ro’yxatdan o’tgan tibbiy buyumlar",k:"reg",u:"https://register.ndda.kz/register.php/mainpage/reestr/lang/ru"});
+
+/* ---------- boshqa davlatlar ---------- */
+add({g:"reg",c:"tr",n:"ÜTS · mahsulot qidiruvi",d:"Turkiya mahsulotlarni kuzatish tizimi",k:"reg",u:"https://utsuygulama.saglik.gov.tr/UTS/vatandas"});
+add({g:"acc",c:"tr",n:"TÜRKAK",d:"Turkiya akkreditatsiya agentligi",k:"site",u:"https://www.turkak.org.tr/"});
+add({g:"reg",c:"in",n:"CDSCO",d:"Hindiston regulyatori",k:"reg",u:"https://cdsco.gov.in/"});
+add({g:"acc",c:"in",n:"NABCB",d:"Hindiston sertifikatlash organlarini akkreditatsiyalash kengashi",k:"site",u:"https://nabcb.qci.org.in/"});
+add({g:"reg",c:"br",n:"ANVISA · tibbiy jihozlar qidiruvi",d:"Braziliyada ro’yxatdan o’tgan mahsulotlar",k:"reg",u:"https://consultas.anvisa.gov.br/#/saude/"});
+add({g:"reg",c:"il",n:"Isroil Sog’liqni saqlash vazirligi",d:"AMAR — tibbiy jihozlar bo’limi",k:"reg",u:"https://www.gov.il/en/departments/ministry_of_health"});
+add({g:"reg",c:"sa",n:"SFDA · MDMA ro’yxati",d:"Saudiya bozoriga ruxsat (MDMA)",k:"reg",u:"https://mdma.sfda.gov.sa/"});
+add({g:"reg",c:"sg",n:"HSA · SMDR reestri",d:"Singapur tibbiy jihozlar reestri",k:"reg",u:"https://eservice.hsa.gov.sg/medics/md/mdEnquiry.do?action=getAllDevices"});
+add({g:"reg",c:"mx",n:"COFEPRIS · registro sanitario qidiruvi",d:"Meksika sanitariya ro’yxati",k:"reg",u:"https://tramiteselectronicos02.cofepris.gob.mx/BuscadorPublicoRegistrosSanitarios/BusquedaRegistroSanitario.aspx"});
+add({g:"reg",c:"ar",n:"ANMAT · Argentina",d:"Dori, oziq-ovqat va tibbiy texnologiyalar boshqarmasi",k:"site",u:"https://www.argentina.gob.ar/anmat"});
+add({g:"reg",c:"za",n:"SAHPRA · JAR",d:"Janubiy Afrika sog’liqni saqlash mahsulotlari boshqarmasi",k:"site",u:"https://www.sahpra.org.za/"});
+add({g:"reg",c:"eg",n:"EDA · Misr",d:"Misr dori boshqarmasi",k:"site",u:"https://www.edaegypt.gov.eg/"});
+
+/* ---------- Xalqaro ---------- */
+add({g:"iso",c:"un",n:"IAF CertSearch",d:"Akkreditatsiyalangan ISO sertifikatlarining xalqaro bazasi",k:"db",u:DB.iaf,
+  note:"Aniq organi noma’lum bo’lgan har qanday ISO 13485 sertifikati uchun"});
+add({g:"mdsap",c:"un",n:"FDA · MDSAP auditorlar ro’yxati",d:"Tan olingan auditorlik tashkilotlari (rasmiy)",k:"reg",
+  u:"https://www.fda.gov/medical-devices/medical-device-single-audit-program-mdsap/auditing-organization-availability-conduct-mdsap-audits"});
+add({g:"acc",c:"un",n:"IAF · xalqaro akkreditatsiya forumi",d:"Akkreditatsiya organlari a’zoligini tekshirish",k:"site",u:"https://iaf.nu/"});
+const MD=(n,c,db,site,note)=>add({g:"mdsap",c,reg:["un"],n,d:"MDSAP: AQSh, Kanada, Braziliya, Avstraliya, Yaponiya",db,note,k:db?"db":"site",u:db?DB[db]:site});
+MD("BSI Group America Inc.","us","bsi");
+MD("DEKRA Certification B.V.","nl","dekranl");
+MD("DNV Product Assurance AS","no","dnv");
+MD("DNV MEDCERT GmbH","de","dnv");
+MD("DQS Medizinprodukte GmbH","de","dqs");
+MD("G-MED (LNE)","fr",null,"https://lne-gmed.com/");
+MD("IMQ S.p.A.","it",null,"https://www.imq.it/en","Avtorizatsiyalangan, to’liq tan olinish jarayonida");
+MD("Intertek Testing Services NA Inc.","us",null,"https://www.intertek.com/");
+MD("NCC Certificações do Brasil Ltda.","br",null,"https://www.nccgroup.com.br/en/atuacao/mdsap/","Avtorizatsiyalangan, to’liq tan olinish jarayonida");
+MD("National Standards Authority of Ireland (NSAI)","ie","nsai");
+MD("SGS United Kingdom Ltd.","gb","sgs");
+MD("TÜV Rheinland of North America, Inc.","us","certipedia");
+MD("TÜV SÜD America Inc.","us","tuvsud");
+MD("TUV USA, Inc. (TÜV NORD Group)","us","tuvnord");
+MD("UL Solutions (UL LLC)","us",null,"https://www.ul.com/");
+
+const ISO=(n,c,db,site,note)=>add({g:"iso",c,reg:["un"],n,d:"ISO 13485 sertifikatlari",db,note,k:db?"db":(site?"site":"none"),u:db?DB[db]:site});
+ISO("TÜV SÜD","de","tuvsud",null,"Q5 bilan boshlanadigan raqamlar");
+ISO("TÜV Rheinland · Certipedia","de","certipedia");
+ISO("TÜV NORD","de","tuvnord");
+ISO("BSI","gb","bsi",null,"MD / FM bilan boshlanadigan raqamlar");
+ISO("mdc medical device certification","de","mdc",null,"D bilan boshlanadigan raqamlar");
+ISO("DEKRA (Niderlandiya)","nl","dekranl");
+ISO("DNV","no","dnv");
+ISO("SGS","be","sgs");
+ISO("DQS","de","dqs");
+ISO("NSAI","ie","nsai");
+ISO("SIQ","si","siq");
+ISO("Bureau Veritas","fr");
+ISO("Intertek","gb");
+ISO("LRQA","gb");
+
+/* ---------- akkreditatsiya organlari ---------- */
+add({g:"acc",c:"de",n:"DAkkS",d:"Germaniya milliy akkreditatsiya organi",k:"site",u:"https://www.dakks.de/"});
+add({g:"acc",c:"fr",n:"COFRAC",d:"Fransiya akkreditatsiya qo’mitasi",k:"site",u:"https://www.cofrac.fr/"});
+add({g:"acc",c:"it",n:"ACCREDIA",d:"Italiya akkreditatsiya organi",k:"site",u:"https://www.accredia.it/"});
+add({g:"acc",c:"nl",n:"RvA",d:"Niderlandiya akkreditatsiya kengashi",k:"site",u:"https://www.rva.nl/"});
+add({g:"acc",c:"es",n:"ENAC",d:"Ispaniya milliy akkreditatsiya organi",k:"site",u:"https://www.enac.es/"});
+add({g:"acc",c:"gb",n:"UKAS",d:"Buyuk Britaniya akkreditatsiya xizmati",k:"site",u:"https://www.ukas.com/"});
+add({g:"acc",c:"us",n:"ANAB",d:"AQSh akkreditatsiya kengashi",k:"site",u:"https://anab.ansi.org/"});
+add({g:"acc",c:"jp",n:"JAB",d:"Yaponiya akkreditatsiya kengashi",k:"site",u:"https://www.jab.or.jp/"});
+
+/* ---------- mintaqalar ---------- */
+const REG=[
+  ["eu","Yevropa Ittifoqi"],["gb","Buyuk Britaniya"],["us","AQSh"],["jp","Yaponiya"],["cn","Xitoy"],["kr","Koreya"],
+  ["ca","Kanada"],["au","Avstraliya"],["ch","Shveytsariya"],["tr","Turkiya"],["ru","Rossiya"],["by","Belarus"],["kz","Qozog’iston"],
+  ["in","Hindiston"],["br","Braziliya"],["il","Isroil"],["sa","Saudiya Arabistoni"],["sg","Singapur"],["mx","Meksika"],
+  ["ar","Argentina"],["za","JAR"],["eg","Misr"],["un","Xalqaro"]];
+const CN={eu:"Yevropa Ittifoqi",gb:"Buyuk Britaniya",us:"AQSh",jp:"Yaponiya",cn:"Xitoy",kr:"Koreya",ca:"Kanada",au:"Avstraliya",
+  ch:"Shveytsariya",tr:"Turkiya",ru:"Rossiya",by:"Belarus",kz:"Qozog’iston",in:"Hindiston",br:"Braziliya",il:"Isroil",
+  sa:"Saudiya Arabistoni",sg:"Singapur",mx:"Meksika",ar:"Argentina",za:"JAR",eg:"Misr",uz:"O’zbekiston",un:"Xalqaro",
+  de:"Germaniya",nl:"Niderlandiya",it:"Italiya",fr:"Fransiya",es:"Ispaniya",at:"Avstriya",be:"Belgiya",fi:"Finlandiya",
+  se:"Shvetsiya",no:"Norvegiya",dk:"Daniya",ie:"Irlandiya",pl:"Polsha",cz:"Chexiya",sk:"Slovakiya",hu:"Vengriya",
+  si:"Sloveniya",hr:"Xorvatiya",cy:"Kipr",mt:"Malta"};
+const GRP=[
+  ["reg","Davlat reestri — guvohnoma qidiruvi"],
+  ["nb","Vakolatli organlar · MDR / IVDR"],
+  ["ukab","Tasdiqlangan organlar · UKCA"],
+  ["rcb","Ro’yxatdan o’tgan sertifikatlash organlari · RCB"],
+  ["mdsap","MDSAP auditorlik tashkilotlari"],
+  ["iso","ISO 13485 sertifikatlash organlari"],
+  ["acc","Akkreditatsiya organlari"]];
+const GHELP={
+  nb:"CE belgisini beradi. Har bir sertifikat NANDO raqami bilan chiqadi — raqam sertifikatdagi bilan mos kelishi kerak.",
+  ukab:"Buyuk Britaniya bozori uchun UKCA sertifikatini beradi.",
+  rcb:"Yaponiya sog’liqni saqlash vazirligi ro’yxatidan o’tgan; II–III sinf jihozlarni sertifikatlaydi.",
+  mdsap:"Bitta audit beshta davlat (AQSh, Kanada, Braziliya, Avstraliya, Yaponiya) uchun tan olinadi.",
+  iso:"Sifat menejmenti tizimi (ISO 13485) sertifikatini beradi.",
+  acc:"Sertifikat bergan organning o’zi akkreditatsiyalanganini tekshirish uchun."};
+
+/* sertifikat raqami ko'rinishidan organni taxmin qilish */
+const PAT=[
+  {re:/^Q5\s?\d{6}\s?\d{4}/i,nm:"TÜV SÜD",q:"TÜV SÜD Product Service GmbH",qi:"TÜV SÜD"},
+  {re:/^D\d{8,12}$/i,nm:"mdc medical device certification",q:"mdc medical device certification GmbH",qi:"mdc medical device certification"},
+  {re:/^(MD|FM|CE)\s?\d{5,7}$/i,nm:"BSI",q:"BSI Group The Netherlands B.V.",qi:"BSI"},
+  {re:/^\d{5}-\d{2}-\d{2}/,nm:"DEKRA (Germaniya)",q:"DEKRA Certification GmbH",qi:"IAF CertSearch"},
+  {re:/^(C\d{6}|\d{5,12}-(PA|\d{4})-)/i,nm:"DNV",q:"DNV Product Assurance AS",qi:"DNV"},
+  {re:/^44\s?\d{3}\s?\d{4,}/,nm:"TÜV NORD",q:"TÜV NORD CERT GmbH",qi:"TÜV NORD"},
+  {re:/^K\s?\d{6}$/i,nm:"FDA 510(k)",q:"FDA · 510(k) bazasi"},
+  {re:/^P\s?\d{6}$/i,nm:"FDA PMA",q:"FDA · PMA bazasi"}];
+
+
+/* ================= KO'RINISH ================= */
+const $=id=>document.getElementById(id);
+const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function flag(code,cls){ const f=FLAGS[code]; if(!f) return "";
+  return `<span class="flag ${cls||""}" aria-hidden="true"><svg viewBox="0 0 30 20" preserveAspectRatio="xMidYMid slice">${f()}</svg></span>`; }
+const ARROW=`<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 3h7v7M13 3L4 12"/></svg>`;
+const CHEV=`<svg class="ch" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 3l5 5-5 5"/></svg>`;
+
+const S={tab:"reg",region:{reg:"eu",iso:"un"},q:"",cert:{reg:"",iso:""}};
+const cur=()=>S.cert[S.tab];
+const inRegion=(o,r)=>o.t===S.tab&&o.reg.includes(r);
+const countIn=r=>SRC.filter(o=>inRegion(o,r)).length;
+
+function lead(){
+  const countries=new Set(SRC.map(o=>o.c).filter(c=>c!=="un"&&c!=="eu"));
+  $("lead").innerHTML=`<b>${SRC.length} ta manba</b>, <b>${countries.size} ta davlat</b>. Bayroqni tanlang — shu davlatning regulyatori, vakolatli organlari va ularning sertifikat bazalari chiqadi.`;
+}
+
+function rail(){
+  $("rail").innerHTML=REG.filter(([c])=>countIn(c)).map(([c,nm])=>`<button class="chip" type="button" data-r="${c}" aria-pressed="${!S.q&&S.region[S.tab]===c}">
+    ${flag(c,"sm")}<span>${nm}</span><span class="ct">${countIn(c)}</span></button>`).join("");
+}
+
+function linkFor(o){
+  let u=o.u;
+  if(cur()){
+    if(o.deep){ const d=o.deep(cur()); if(d) u=d; }
+    else if(o.db&&DEEP[o.db]) u=DEEP[o.db](cur());
+  }
+  return u;
+}
+const TAG={db:["db","Ochiq baza"],reg:["db","Rasmiy reestr"],eu:["eu","EUDAMED orqali"],site:["site","Rasmiy sayt"],none:["none","Ochiq baza yo’q"]};
+const BTN={db:"Tekshirish",reg:"Qidiruvni ochish",eu:"EUDAMED",site:"Saytga o’tish"};
+
+function row(o,showCountry){
+  const t=TAG[o.k]||TAG.site;
+  const meta=[];
+  if(o.no) meta.push(`<span class="no">${o.g==="nb"?"NB ":""}${esc(o.no)}</span>`);
+  if(o.d) meta.push(`<span>${esc(o.d)}</span>`);
+  if(showCountry||o.g!=="nb") meta.push(`<span>${esc(CN[o.c]||"")}</span>`);
+  const acts=[];
+  if(o.k!=="none") acts.push(`<a class="btn pr" data-id="${o.id}" href="${esc(linkFor(o))}" target="_blank" rel="noopener">${o.bl||BTN[o.k]||"Ochish"} ${ARROW}</a>`);
+  if(o.g==="nb"){
+    if(o.k!=="eu") acts.push(`<a class="btn" data-id="${o.id}" href="${EUDAMED_CERT}" target="_blank" rel="noopener">EUDAMED</a>`);
+    acts.push(`<a class="btn" href="${NANDO}" target="_blank" rel="noopener">NANDO</a>`);
+  }
+  if(o.k==="none"||(o.k==="site"&&!o.u)) acts.push(`<a class="btn" href="https://www.google.com/search?q=${encodeURIComponent(o.n+" certificate verification")}" target="_blank" rel="noopener">Saytini topish ${ARROW}</a>`);
+  return `<div class="org" id="${o.id}">
+    ${flag(o.c)}<div class="nm">${esc(o.n)} <span class="tag ${t[0]}">${t[1]}</span></div>
+    <div class="acts">${acts.join("")}</div>
+    <div class="mt">${meta.join("")}</div>
+    ${o.note?`<div class="nt">${esc(o.note)}</div>`:""}</div>`;
+}
+
+function region(){
+  const r=S.region[S.tab], items=SRC.filter(o=>inRegion(o,r));
+  let h=`<div class="rh">${flag(r,"lg")}<h2>${esc(CN[r])}</h2><span class="n">${items.length} ta manba</span></div>`;
+  GRP.forEach(([g,gn])=>{
+    const gi=items.filter(o=>o.g===g); if(!gi.length) return;
+    h+=`<section class="grp"><div class="gh"><h3>${gn}</h3><span class="n">${gi.length}</span></div>${GHELP[g]?`<p class="gd">${GHELP[g]}</p>`:""}`;
+    if(g==="nb"&&r==="eu"){
+      const by={}; gi.forEach(o=>(by[o.c]=by[o.c]||[]).push(o));
+      const order=Object.keys(by).sort((a,b)=>by[b].length-by[a].length||CN[a].localeCompare(CN[b]));
+      h+=`<div class="list">`+order.map(c=>`<details class="sub" data-c="${c}"><summary>${CHEV}${flag(c,"sm")}<span>${CN[c]}</span><span class="n">${by[c].length}</span></summary>
+        ${by[c].map(o=>row(o)).join("")}</details>`).join("")+`</div>`;
+    } else h+=`<div class="list">${gi.map(o=>row(o)).join("")}</div>`;
+    h+=`</section>`;
+  });
+  return h;
+}
+
+function norm(s){ return String(s||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[’'ʻ`]/g,""); }
+function search(){
+  const words=norm(S.q).split(/\s+/).filter(Boolean);
+  const hit=SRC.filter(o=>{ if(o.t!==S.tab) return false; const hay=norm([o.n,o.no,o.d,o.note,CN[o.c],...o.reg.map(x=>CN[x])].join(" ")); return words.every(w=>hay.includes(w)); });
+  let h=`<div class="rh"><h2>Qidiruv natijasi</h2><span class="n">${hit.length} ta</span></div>`;
+  if(!hit.length) return h+`<p class="empty">«${esc(S.q)}» bo’yicha hech narsa topilmadi. Boshqa yozilishini sinab ko’ring yoki bayroq orqali davlatni tanlang.</p>`;
+  GRP.forEach(([g,gn])=>{ const gi=hit.filter(o=>o.g===g); if(!gi.length) return;
+    h+=`<section class="grp"><div class="gh"><h3>${gn}</h3><span class="n">${gi.length}</span></div><div class="list">${gi.map(o=>row(o,true)).join("")}</div></section>`; });
+  return h;
+}
+
+function draw(){ rail(); $("main").innerHTML=S.q?search():region(); }
+
+function hint(){
+  const v=cur(); let h="";
+  if(v){
+    const p=PAT.find(x=>x.re.test(v));
+    h=p?`Raqam ko’rinishi bo’yicha organ: <b>${esc(p.nm)}</b> · <button type="button" id="goPat">ko’rsatish</button>`
+       :(S.tab==="iso"?`«Tekshirish» bosilganda raqam nusxalanadi. Organ noma’lum bo’lsa — <b>Xalqaro → IAF CertSearch</b>.`
+                       :`Tugma bosilganda raqam nusxalanadi — ochilgan qidiruv maydoniga Ctrl+V bilan qo’ying.`);
+    if(p) setTimeout(()=>{ const b=$("goPat"); if(b) b.onclick=()=>reveal(SRC.find(o=>o.n===p.q&&o.t===S.tab)||SRC.find(o=>o.n===p.q)); });
+  }
+  $("hint").innerHTML=h;
+}
+
+function reveal(o){
+  if(!o) return;
+  S.q=""; $("q").value=""; $("fq").classList.remove("has");
+  if(o.t!==S.tab) setTab(o.t,true);
+  if(!inRegion(o,S.region[S.tab])) S.region[S.tab]=o.reg[0];
+  draw();
+  const el=$(o.id); if(!el) return;
+  const d=el.closest("details"); if(d) d.open=true;
+  el.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"center"});
+  el.classList.remove("flash"); void el.offsetWidth; el.classList.add("flash");
+}
+
+let TT;
+function toast(m){ const t=$("toast"); t.textContent=m; t.classList.add("on"); clearTimeout(TT); TT=setTimeout(()=>t.classList.remove("on"),2600); }
+
+/* hodisalar */
+$("rail").addEventListener("click",e=>{ const b=e.target.closest(".chip"); if(!b) return;
+  S.region[S.tab]=b.dataset.r; S.q=""; $("q").value=""; $("fq").classList.remove("has"); draw();
+  $("main").scrollIntoView({behavior:"smooth",block:"start"}); });
+$("q").addEventListener("input",e=>{ S.q=e.target.value.trim(); $("fq").classList.toggle("has",!!e.target.value); draw(); });
+$("cert").addEventListener("input",e=>{ S.cert[S.tab]=e.target.value.trim(); $("fc").classList.toggle("has",!!e.target.value); hint(); draw(); });
+document.querySelectorAll(".clr").forEach(b=>b.onclick=()=>{ const i=$(b.dataset.for); i.value=""; i.dispatchEvent(new Event("input")); i.focus(); });
+$("main").addEventListener("click",e=>{
+  const a=e.target.closest("a[data-id]"); if(!a||!cur()) return;
+  const o=SRC.find(x=>x.id===a.dataset.id);
+  const deep=o&&(o.deep?o.deep(cur()):(o.db&&DEEP[o.db]));
+  try{ navigator.clipboard.writeText(cur()).then(
+      ()=>toast(deep?"Raqam havolaga qo’yildi va nusxalandi":"Raqam nusxalandi — ochilgan sahifada Ctrl+V bosing"),
+      ()=>toast("Raqamni qo’lda nusxalang: "+cur())); }
+  catch(_){ toast("Raqamni qo’lda nusxalang: "+cur()); }
+});
+
+function setTab(t,keep){
+  S.tab=t; document.querySelectorAll("#tabs button").forEach(b=>b.setAttribute("aria-selected",b.dataset.t===t));
+  $("certLbl").textContent=t==="reg"?"Guvohnoma raqami (ixtiyoriy)":"ISO 13485 sertifikat raqami (ixtiyoriy)";
+  $("cert").placeholder=t==="reg"?"masalan: K231234":"masalan: Q5 123456 0001";
+  $("cert").value=S.cert[t]; $("fc").classList.toggle("has",!!S.cert[t]);
+  if(!keep){ S.q=""; $("q").value=""; $("fq").classList.remove("has"); }
+  hint(); draw(); }
+$("tabs").addEventListener("click",e=>{ const b=e.target.closest("button[data-t]"); if(!b) return; if(b.dataset.t==="nom") showNom(true); else { showNom(false); setTab(b.dataset.t); } });
+/* ================= MA'LUMOTNOMA (GMDN) ================= */
+const NOM={key:"",st:0,I:null,D:null,nf:null,hay:null,sel:-1,lang:"uz",q:"",err:""};
+const NFILE={i:"nomenklatura_index.bin",d:"nomenklatura_tarif.bin"}; const NOMV="20260808";
+const nn=s=>String(s||"").toLowerCase().replace(/ё/g,"е").normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[’'ʻʼ‘`´]/g,"").replace(/\s+/g," ").trim();
+const fmt=n=>String(n).replace(/\B(?=(\d{3})+(?!\d))/g," ");
+const KC={"I":"k1","II a":"k2a","II b":"k2b","III":"k3"};
+const ICY=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>`;
+const ICN=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>`;
+const COPY=`<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><rect x="5" y="5" width="9" height="9" rx="2"/><path d="M11 5V3.5A1.5 1.5 0 009.5 2h-6A1.5 1.5 0 002 3.5v6A1.5 1.5 0 003.5 11H5"/></svg>`;
+async function unz(buf){
+  const u=new Uint8Array(buf); let t;
+  if(u[0]===0x1f&&u[1]===0x8b) t=await new Response(new Blob([u]).stream().pipeThrough(new DecompressionStream("gzip"))).text();
+  else t=new TextDecoder().decode(u);
+  return JSON.parse(t);
+}
+function embedded(id){
+  const el=document.getElementById(id); if(!el) return null;
+  const s=atob(el.textContent.trim()); el.remove();
+  const u=new Uint8Array(s.length); for(let i=0;i<s.length;i++) u[i]=s.charCodeAt(i); return u.buffer;
+}
+async function ochish(buf){
+  const u=new Uint8Array(buf);
+  if(!(u[0]===84&&u[1]===75&&u[2]===78&&u[3]===49)) return buf; /* "TKN1" — shifrlangan */
+  if(!NOM.key) throw new Error("kalit yo’q");
+  const raw=Uint8Array.from(atob(NOM.key),c=>c.charCodeAt(0));
+  const k=await crypto.subtle.importKey("raw",raw,"AES-GCM",false,["decrypt"]);
+  try{ return await crypto.subtle.decrypt({name:"AES-GCM",iv:u.slice(4,16)},k,u.slice(16)); }
+  catch(_){ throw new Error("kalit noto’g’ri"); }
+}
+async function getPart(id,file){
+  const b=embedded(id); if(b) return unz(b);
+  const r=await fetch(file+"?v="+NOMV); if(!r.ok) throw new Error(file+" — "+r.status);
+  return unz(await ochish(await r.arrayBuffer()));
+}
+async function nomLoad(){
+  if(NOM.st) return; NOM.st=1; nomDraw();
+  try{
+    const I=await getPart("nomIdx",NFILE.i);
+    NOM.I=I; NOM.nf=I.r.map(x=>[nn(x[1]),nn(x[2]),nn(x[3])]);
+    NOM.hay=I.r.map((x,i)=>x[0]+" "+NOM.nf[i].join(" "));
+    NOM.st=2; nomDraw();
+    const D=await getPart("nomDef",NFILE.d);
+    if(D.v!==I.v||D.n!==I.n) throw new Error("ta’rif fayli boshqa versiyada");
+    NOM.D=D.d; NOM.st=3; nomHint(); if(NOM.sel>=0) nomDraw();
+  }catch(e){ NOM.err=String(e.message||e); if(NOM.st<2) NOM.st=-1; nomDraw(); nomHint(); }
+}
+function nomFind(q){
+  const r=NOM.I.r, qn=nn(q);
+  if(/^\d+$/.test(qn)){
+    const out=[]; for(let i=0;i<r.length;i++) if(r[i][0].startsWith(qn)) out.push(i);
+    return out.sort((a,b)=>(r[a][0]!==qn)-(r[b][0]!==qn)||r[a][0].length-r[b][0].length||r[a][0].localeCompare(r[b][0]));
+  }
+  const w=qn.split(" ").filter(Boolean); if(!w.length) return [];
+  const sc=[];
+  for(let i=0;i<r.length;i++){
+    const h=NOM.hay[i]; if(!w.every(x=>h.includes(x))) continue;
+    const f=NOM.nf[i]; let s=4;
+    for(const v of f){ if(v===qn){s=0;break} if(v.startsWith(qn)) s=Math.min(s,1); else if((" "+v).includes(" "+qn)) s=Math.min(s,2); else if(v.includes(qn)) s=Math.min(s,3); }
+    sc.push([i,s*10+(r[i][4]?0:5),f[2].length||f[0].length]);
+  }
+  return sc.sort((a,b)=>a[1]-b[1]||a[2]-b[2]).map(x=>x[0]);
+}
+function regInfo(x){
+  if(x[8]) return {y:1,t:"Davlat ro’yxatidan o’tadi",
+    w:"Nizomning 1-bandiga ko’ra davlat ro’yxatidan o’tkazilishi shart bo’lgan tibbiy jihoz; GMDN’da amaldagi (Active) atama.",
+    e:"Tartibi: umumiy tartibda yoki tan olish yo’li bilan (FDA, CE sertifikati / EMA, PMDA, MFDS, MHRA)."};
+  if(!x[4]) return {y:0,t:"Davlat ro’yxatidan o’tmaydi",
+    w:"GMDN’da atama eskirgan (Obsolete) — yangi ro’yxatga olishda ishlatilmaydi, GMDN uni boshqa atama bilan almashtirgan. Bu huquqiy istisno emas, nomenklatura holati.",e:""};
+  return {y:0,t:"Davlat ro’yxatidan o’tmaydi",
+    w:"Nizomning 5-bandidagi istisno: mustaqil tashxis vositasi bo’la olmaydigan IVD reagentlar (control, calibrator, antitana, praymer, zond, antigen), individual buyurtma bo’yicha tayyorlanadigan jihozlar, ilmiy-tadqiqot va namoyish uchun mo’ljallanganlar.",e:""};
+}
+function nomCard(i){
+  const x=NOM.I.r[i], k=KC[x[6]]||"", R=regInfo(x), note=NOM.I.x[x[9]], basis=NOM.I.b[x[7]];
+  const L={uz:["O’zbekcha",2],ru:["Русский",1],en:["English",0]};
+  let def;
+  if(NOM.D){ const d=NOM.D[i][L[NOM.lang][1]]; def=d?`<p class="def">${esc(d)}</p>`:`<p class="def wait">Bu tilda ta’rif kiritilmagan.</p>`; }
+  else def=`<p class="def wait">${NOM.err?"Ta’riflarni yuklab bo’lmadi: "+esc(NOM.err):"Ta’rif yuklanmoqda…"}</p>`;
+  return `<article class="card" id="ncard" aria-label="GMDN ${esc(x[0])}">
+    <div class="ctop"><span class="code">GMDN ${esc(x[0])}</span>
+      <span class="st ${x[4]?"on":"off"}">${x[4]?"Faol (Active)":"Eskirgan (Obsolete)"}</span>
+      <span class="st iv">${x[5]?"IVD — in vitro tashxis":"IVD emas"}</span>
+      <button class="btn" type="button" id="ncopy">${COPY} Kodni nusxalash</button></div>
+    <div class="nm3">
+      <div class="r"><span class="lg">UZ</span><span class="v">${esc(x[3]||"—")}</span></div>
+      <div class="r"><span class="lg">RU</span><span class="v">${esc(x[2]||"—")}</span></div>
+      <div class="r"><span class="lg">EN</span><span class="v">${esc(x[1]||"—")}</span></div>
+    </div>
+    <div class="cgrid">
+      <div class="box"><p class="k">Xavf sinfi</p><div class="big ${k}">${esc(x[6]||"—")}</div></div>
+      <div class="box"><p class="k">Sinf asosi</p><div class="t">${esc(basis||"—")}</div></div>
+    </div>
+    <div class="defh"><span class="k">Ta’rifi</span>${Object.entries(L).map(([c,[n]])=>`<button class="lt" type="button" data-l="${c}" aria-pressed="${NOM.lang===c}">${n}</button>`).join("")}</div>
+    ${def}
+    <div class="regp ${R.y?"y":"n"}">
+      <span class="ic">${R.y?ICY:ICN}</span>
+      <h3>${R.t}</h3>
+      <div class="why"><b>Sabab:</b> ${R.w}</div>
+      <div class="bd">${R.e?`<p>${R.e}</p>`:""}<p>Asos: Vazirlar Mahkamasining 24.11.2025 y. 738-son qarori, 2-ilova (Nizom). Dastlabki saralash, yakuniy huquqiy xulosa emas: istisnolar jihoz turiga emas, aniq partiya holatiga bog’liq.</p></div>
+      ${note?`<div class="edge"><b>Chegaraviy holat:</b> ${esc(note)}</div>`:""}
+    </div>
+  </article>`;
+}
+function nomItem(i){
+  const x=NOM.I.r[i];
+  return `<button class="ni${x[4]?"":" obs"}" type="button" data-i="${i}" aria-current="${NOM.sel===i}">
+    <span class="cd">${esc(x[0])}</span><span class="u">${esc(x[3]||x[2]||x[1])}</span>
+    <span class="bx"><span class="cls ${KC[x[6]]||""}">${esc(x[6])}</span><span class="rg ${x[8]?"y":"n"}">${x[8]?"✓ Ro’yxatdan o’tadi":"✕ O’tmaydi"}</span></span>
+    <span class="o">${esc(x[1])}${x[2]?" · "+esc(x[2]):""}${x[4]?"":" · eskirgan"}</span></button>`;
+}
+function nomIntro(){
+  const r=NOM.I.r; let a=0,y=0,v=0; r.forEach(x=>{a+=x[4];y+=x[8];v+=x[5];});
+  return `<div class="stats">
+    <div class="box"><p class="k">Jami atamalar</p><div class="big">${fmt(r.length)}</div></div>
+    <div class="box"><p class="k">Faol (Active)</p><div class="big">${fmt(a)}</div></div>
+    <div class="box"><p class="k">Ro’yxatdan o’tadi</p><div class="big" style="color:var(--yes)">${fmt(y)}</div></div>
+    <div class="box"><p class="k">IVD</p><div class="big">${fmt(v)}</div></div></div>
+    <p class="gd">Kod yoki nomning bir qismini yozing — natijalar yozish davomida chiqadi. Masalan:</p>
+    <div class="ex">${["35983","Tonometr","катетер","infusion pump","Cup, denture"].map(s=>`<button type="button" data-q="${esc(s)}">${esc(s)}</button>`).join("")}</div>`;
+}
+const NMAX=60;
+function nomHint(){ if(NOM.st>=2) $("nhint").innerHTML=`<b>${fmt(NOM.I.n)}</b> ta GMDN atamasi · ma’lumot sanasi ${NOM.I.v.split("-").reverse().join(".")}${NOM.st<3?(NOM.err?" · ta’riflar yuklanmadi":" · ta’riflar yuklanmoqda…"):""}`; }
+function nomDraw(){
+  const out=$("nres"), q=NOM.q;
+  if(NOM.st===-1){ $("nhint").textContent=""; out.innerHTML=`<p class="empty">${/kalit/.test(NOM.err)?"Ma’lumotnoma kaliti "+(/yo’q/.test(NOM.err)?"o’rnatilmagan":"mos kelmadi")+". Administratorga murojaat qiling.":"Ma’lumotnomani yuklab bo’lmadi: "+esc(NOM.err)+". Sahifani yangilab ko’ring."}</p>`; return; }
+  if(NOM.st<2){ $("nhint").textContent="Ma’lumotnoma yuklanmoqda…"; out.innerHTML=`<div class="load">GMDN nomenklaturasi yuklanmoqda — bir necha soniya.<div class="bar2"><i></i></div></div>`; return; }
+  nomHint();
+  if(!q){ NOM.sel=-1; out.innerHTML=nomIntro(); return; }
+  const hit=nomFind(q);
+  if(!hit.length){ NOM.sel=-1; out.innerHTML=`<p class="empty">«${esc(q)}» bo’yicha hech narsa topilmadi. Boshqa tilda yoki qisqaroq yozib ko’ring.</p>`; return; }
+  if(hit.length===1||(/^\d+$/.test(nn(q))&&NOM.I.r[hit[0]][0]===nn(q))){ if(NOM.sel<0||!hit.includes(NOM.sel)) NOM.sel=hit[0]; }
+  else if(!hit.includes(NOM.sel)) NOM.sel=-1;
+  let h=NOM.sel>=0?nomCard(NOM.sel):"";
+  const show=hit.slice(0,NMAX);
+  if(!(hit.length===1&&NOM.sel===hit[0])){
+    h+=`<div class="rh"><h2 style="font-size:19px">${NOM.sel>=0?"Boshqa natijalar":"Natijalar"}</h2><span class="n">${fmt(hit.length)} ta</span></div><div class="nl">${show.map(nomItem).join("")}${hit.length>NMAX?`<div class="nmore">Birinchi ${NMAX} tasi ko’rsatildi. So’rovni aniqlashtiring.</div>`:""}</div>`;
+  }
+  out.innerHTML=h;
+}
+let NT;
+$("nq").addEventListener("input",e=>{ $("fn").classList.toggle("has",!!e.target.value); clearTimeout(NT); NT=setTimeout(()=>{ NOM.q=e.target.value.trim(); NOM.sel=-1; if(NOM.st>=2) nomDraw(); },110); });
+$("nres").addEventListener("click",e=>{
+  const it=e.target.closest(".ni"); if(it){ NOM.sel=+it.dataset.i; nomDraw(); const c=$("ncard"); if(c) c.scrollIntoView({behavior:"smooth",block:"start"}); return; }
+  const lt=e.target.closest(".lt"); if(lt){ NOM.lang=lt.dataset.l; nomDraw(); return; }
+  const ex=e.target.closest(".ex button"); if(ex){ $("nq").value=ex.dataset.q; $("fn").classList.add("has"); NOM.q=ex.dataset.q; NOM.sel=-1; nomDraw(); return; }
+  if(e.target.closest("#ncopy")){ const c=NOM.I.r[NOM.sel][0];
+    try{ navigator.clipboard.writeText(c).then(()=>toast("Nusxalandi: "+c),()=>toast("Kod: "+c)); }catch(_){ toast("Kod: "+c); } }
+});
+const H0={h:null};
+function showNom(on){
+  document.querySelectorAll("[data-src]").forEach(el=>el.hidden=on);
+  $("nom").hidden=!on;
+  if(H0.h===null) H0.h=document.querySelector("h1").textContent;
+  document.querySelector("h1").textContent=on?"Tibbiy jihoz haqida ma’lumotnoma":H0.h;
+  if(on){ document.querySelectorAll("#tabs button").forEach(b=>b.setAttribute("aria-selected",b.dataset.t==="nom"));
+    $("lead").innerHTML=`GMDN kodi yoki nom bo’yicha: tibbiy jihozning uch tildagi nomi va ta’rifi, <b>xavf sinfi</b>, kod holati va <b>davlat ro’yxatidan o’tishi</b>.`;
+    nomLoad(); setTimeout(()=>$("nq").focus(),30); }
+  else lead();
+}
+
+lead(); draw(); hint();
+/* ================= KONSOL ICHIDA ISHLASH ================= */
+const EMB=(()=>{ try{ return window.top!==window.self && window.parent.location.host===location.host; }catch(_){ return false; } })();
+if(!EMB){
+  document.body.innerHTML=`<div class="solo">Bu sahifa faqat tekshiruv konsoli ichida ochiladi.<br><a href="./">Konsolga o’tish</a></div>`;
+} else {
+  document.documentElement.dataset.theme="dark"; document.documentElement.classList.add("emb");
+  window.TK={
+    setKey(k){ NOM.key=k||""; if(NOM.st===-1&&k){ NOM.st=0; NOM.err=""; if(!$("nom").hidden) nomLoad(); } },
+    mode(m){ document.documentElement.dataset.mode=m;
+      if(m==="nom") showNom(true); else { showNom(false); setTab(S.tab==="nom"?"reg":S.tab,true); } }
+  };
+}
+</script>
+</body>
+</html>

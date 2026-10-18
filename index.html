@@ -232,6 +232,30 @@ input[type=date]:focus{outline:0;border-color:var(--accent);box-shadow:0 0 0 3px
 @media (prefers-reduced-motion:reduce){.rail.intro .chip,.src.flash{animation:none}}
 
 #bayon{display:none}
+
+/* ===== 4-nashr: qo'llab-quvvatlash, bo'limlar, ko'rinishlar, yangilash rejimi ===== */
+.sup{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:6px 16px;margin:0 0 22px;padding:9px 14px;border:1px solid var(--line);border-radius:12px;background:var(--panel);font-size:13px;color:var(--dim)}
+.sup b{color:var(--fg);font-weight:600}
+.sup a{display:inline-flex;align-items:center;gap:7px;font-weight:600;color:var(--accent);text-decoration:none}
+.sup a:hover{text-decoration:underline;text-underline-offset:3px}
+.sup svg{width:16px;height:16px;flex:none}
+#gate .gsup{font-size:12.5px;color:var(--dim);margin:16px 0 0;text-align:center}
+#gate .gsup a{color:var(--accent);font-weight:600;text-decoration:none}
+#gate .gmnt{border:1px solid rgba(251,191,110,.35);background:var(--warnbg);border-radius:12px;padding:16px 16px 14px;margin:0 0 6px}
+#gate .gmnt b{display:block;color:var(--warn);font-size:15px;margin:0 0 6px}
+#gate .gmnt p{margin:0;font-size:13.5px;line-height:1.55;color:var(--fg)}
+#gate .gmnt .lnk{display:inline-block;width:auto;margin:12px 0 0;padding:0;background:none;border:0;color:var(--dim);font:500 12.5px var(--body);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.vnav{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:0 -20px 18px;padding:10px 20px;background:rgba(10,14,34,.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.vnav[hidden]{display:none}
+.vnav button{font:600 14px var(--body);color:var(--dim);background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:11px 10px;cursor:pointer;line-height:1.25}
+.vnav button:hover{color:var(--fg);border-color:var(--linehi)}
+.vnav button[aria-selected="true"]{color:var(--onaccent);background:var(--accent);border-color:var(--accent)}
+.vnav button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+#pview[hidden]{display:none}
+#pframe{display:block;width:100%;height:70vh;border:0;background:var(--bg)}
+body[data-view="src"] .wrap>section.step,body[data-view="nom"] .wrap>section.step{display:none!important}
+body[data-view="src"] .wrap,body[data-view="nom"] .wrap{padding-bottom:0}
+@media (max-width:640px){.vnav{gap:6px;padding:8px 20px}.vnav button{font-size:12px;padding:9px 4px}}
 @media print{
   @page{size:A4;margin:16mm 15mm}
   body{background:#fff!important;color:#000}
@@ -261,8 +285,11 @@ input[type=date]:focus{outline:0;border-color:var(--accent);box-shadow:0 0 0 3px
   <div class="card">
     <p class="eb">Shahzodbek O'roqov</p>
     <h2 id="gtt">Ekspert ma'lumotlari</h2>
+    <div id="gmnt" class="gmnt" hidden></div>
     <div id="gform">
-    <p class="d">Ro'yxatdan o'zingizni tanlang va shaxsiy parolingizni kiriting.</p>
+    <p class="d">Avval bo'limingizni, keyin ro'yxatdan o'zingizni tanlang va shaxsiy parolingizni kiriting.</p>
+    <label for="gdep">Bo'lim / qo'mita</label>
+    <select id="gdep" disabled><option value="">Yuklanmoqda…</option></select>
     <label for="gnm">Familiya, ism, otasining ismi</label>
     <select id="gnm" disabled><option value="">Ro'yxat yuklanmoqda…</option></select>
     <label for="gpw">Shaxsiy parol</label>
@@ -273,18 +300,31 @@ input[type=date]:focus{outline:0;border-color:var(--accent);box-shadow:0 0 0 3px
     </div>
     <div id="gwait" style="display:none"></div>
     <p class="err" id="gerr"></p>
+    <p class="gsup">Yordam: <a href="https://t.me/bek_shoh07" target="_blank" rel="noopener">Telegram @bek_shoh07</a></p>
   </div>
 </div>
 
 <div class="wrap">
 
+<div class="sup noprint">
+  <span>Yaratuvchi: <b>Shahzodbek O'roqov</b></span>
+  <a href="https://t.me/bek_shoh07" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M21.5 3.5L2.5 11l6.5 2.5 2.5 6.5 3.5-4.5 5 4z"/><path d="M9 13.5l12.5-10"/></svg>Yordam (support): Telegram @bek_shoh07</a>
+</div>
+
 <header>
   <p class="who" id="who"></p> <button class="mini noprint" id="chiq" style="vertical-align:top;margin-left:6px;display:none">Chiqish</button>
-  <p class="eyebrow">Tibbiy jihozlar qo'mitasi · Shahzodbek O'roqov · 3-nashr</p>
+  <p class="eyebrow">Tibbiy jihozlar qo'mitasi · Shahzodbek O'roqov · 4-nashr</p>
   <h1>Xorijiy hujjatni tekshirish
     <span class="thin">PF-6221 bo'yicha tan olinadigan olti vakolatli organ — FDA, EMA, CE sertifikatini beruvchi organlar, PMDA, MFDS, MHRA — hamda ma'lumot uchun boshqa davlatlar reestrlari va ISO 13485 sertifikatlari. Har bir manba uchun aniq maydon nomi va ma'lum tuzoqlar ko'rsatilgan.</span>
   </h1>
 </header>
+
+<nav class="vnav noprint" id="vnav" hidden aria-label="Bo'limlar">
+  <button type="button" data-v="tek" aria-selected="true">Hujjatni tekshirish</button>
+  <button type="button" data-v="src" aria-selected="false">Vakolatli organlar va reestrlar</button>
+  <button type="button" data-v="nom" aria-selected="false">Tibbiy jihoz haqida ma'lumotnoma</button>
+</nav>
+<div id="pview" class="noprint" hidden><iframe id="pframe" title="Vakolatli organlar va ma'lumotnoma" allow="clipboard-write"></iframe></div>
 
 <section class="step" id="s1">
   <div class="sh"><span class="num">1</span><h2>Hujjatni kiriting</h2></div>
@@ -1012,7 +1052,7 @@ function paintArch(f){
   $("arch").innerHTML=`<table><thead><tr><th>Sana</th><th>Ekspert</th><th>So'rov</th><th>Turi</th><th>Koef.</th><th>Natijalar</th><th>Xulosa</th></tr></thead><tbody>
     ${rows.map(r=>`<tr><td class="mono">${esc(r.ts)}</td><td>${esc(r.expert||"—")}</td><td>${esc(r.q)}</td><td>${r.type==="drug"?"Dori":r.type==="iso"?"ISO 13485":"Jihoz"}</td>
     <td class="mono" style="color:${koefRang(r.koef||0)};font-weight:600">${r.koef==null?"—":r.koef+"%"}</td>
-    <td class="mono" style="font-size:11.5px">${Object.entries(r.marks).map(([k,v])=>k.toUpperCase()+": "+LBL[v]).join("<br>")}</td>
+    <td class="mono" style="font-size:11.5px">${Object.entries(r.marks||{}).map(([k,v])=>k.toUpperCase()+": "+LBL[v]).join("<br>")}</td>
     <td>${r.verdict?`<b>${VD[r.verdict]}</b><br>`:""}${esc(r.concl||"—")}</td></tr>`).join("")}</tbody></table>`;
 }
 
@@ -1179,6 +1219,10 @@ const FB_CONFIG={
 };
 /* ============ MARKAZIY BAZA: KIRISH, QURILMA NAZORATI, ARXIV ============ */
 let AUTH=null, DB=null, FV=null, SESS=null, DIR=[], UNSUB=[], HB=null;
+const DEPS=[["qom","Tibbiy jihozlar qo'mitasi"],["reg","Tibbiy jihozlarni ro'yxatdan o'tkazish bo'limi"]];
+const depNomi=k=>(DEPS.find(d=>d[0]===k)||["",""])[1];
+let MAINT={}, MWAS=false, KEYP=Promise.resolve("");
+const MDEF="Sayt yangilanmoqda. Iltimos, keyinroq urinib ko'ring.";
 const QKALIT="tk_qurilma";
 function qurilmaId(){
   try{ let d=localStorage.getItem(QKALIT);
@@ -1215,13 +1259,25 @@ async function bulutStart(){
   if(!window.firebase){ err.textContent="Tizimga ulanib bo'lmadi. Internet aloqasini tekshirib, sahifani yangilang."; return; }
   firebase.initializeApp(FB_CONFIG);
   AUTH=firebase.auth(); DB=firebase.firestore(); FV=firebase.firestore.FieldValue;
+  DB.doc("config/maint").onSnapshot(s=>{ MAINT=s.data()||{}; maintQoll(); },()=>{});
   try{
     const d=await DB.doc("dir/list").get();
     DIR=(d.exists&&d.data().items)||[];
   }catch(e){ err.textContent="Ro'yxatni yuklab bo'lmadi: "+(e.message||e); return; }
   if(!DIR.length){ nm.innerHTML=`<option value="">Ro'yxat bo'sh</option>`; err.textContent="Tizim hali sozlanmagan: administrator xodimlar ro'yxatini yuklashi kerak."; return; }
-  nm.innerHTML=`<option value="">— ro'yxatdan tanlang —</option>`+DIR.map(x=>`<option value="${esc(x.code)}">${esc(x.name)}</option>`).join("");
-  nm.disabled=false; btn.disabled=false; nm.focus();
+  const dep=$("gdep");
+  dep.innerHTML=`<option value="">— bo'limni tanlang —</option>`+DEPS.map(([k,n])=>`<option value="${k}">${esc(n)}</option>`).join("");
+  dep.disabled=false;
+  const toldir=()=>{ const k=dep.value; pos.value=""; err.textContent="";
+    if(!k){ nm.innerHTML=`<option value="">— avval bo'limni tanlang —</option>`; nm.disabled=true; btn.disabled=true; return; }
+    const L=DIR.filter(x=>(x.dept||"reg")===k);
+    nm.innerHTML=L.length?`<option value="">— ro'yxatdan tanlang —</option>`+L.map(x=>`<option value="${esc(x.code)}">${esc(x.name)}</option>`).join("")
+      :`<option value="">Bu bo'limda hali xodim yo'q</option>`;
+    nm.disabled=!L.length; btn.disabled=!L.length;
+    try{ localStorage.setItem("tk_bolim",k); }catch(e){} };
+  dep.addEventListener("change",()=>{ toldir(); if(!nm.disabled) nm.focus(); });
+  try{ const k=localStorage.getItem("tk_bolim"); if(k&&DEPS.some(d=>d[0]===k)) dep.value=k; }catch(e){}
+  toldir(); (dep.value&&!nm.disabled?nm:dep).focus();
   nm.addEventListener("change",()=>{ const x=DIR.find(d=>d.code===nm.value); pos.value=x?x.pos:""; err.textContent=""; if(x) pw.focus(); });
   btn.addEventListener("click",kirish);
   pw.addEventListener("keydown",e=>{ if(e.key==="Enter") kirish(); });
@@ -1280,9 +1336,11 @@ function kutish(x,dev,uid){
 }
 
 function ichkari(x,st,dev,uid){
-  SESS={code:x.code,name:x.name,pos:x.pos,role:st.role||"expert",dev,uid};
+  SESS={code:x.code,name:x.name,pos:x.pos,role:st.role||"expert",dept:st.dept||x.dept||"reg",dev,uid};
   EXPERT={nm:x.name,pos:x.pos};
-  $("who").innerHTML=`Ekspert: <b>${esc(x.name)}</b> · ${esc(x.pos)}`;
+  $("who").innerHTML=`Ekspert: <b>${esc(x.name)}</b> · ${esc(x.pos)} · ${esc(depNomi(SESS.dept))}`;
+  KEYP=DB.doc("keys/nom").get().then(s=>(s.exists&&s.data().k)||"").catch(()=>"");
+  $("vnav").hidden=false;
   $("chiq").style.display="";
   $("gate").remove(); document.body.classList.remove("locked"); $("q").focus();
   HB=setInterval(()=>DB.doc("sessions/"+uid).update({seen:FV.serverTimestamp()}).catch(()=>{}),120000);
@@ -1293,17 +1351,20 @@ function ichkari(x,st,dev,uid){
   },()=>chetlatish("Sessiya yaroqsiz: parol o'zgartirilgan yoki kirish yopilgan.")));
   UNSUB.push(DB.doc("sessions/"+uid).onSnapshot(s=>{ if(!s.exists) chetlatish("Administrator sessiyangizni yakunladi."); },()=>{}));
   if(SESS.role==="rahbar") arxivniOch();
+  if(maintBlocked()) maintQoll();
 }
 
-function chetlatish(sabab){
+function chetlatish(sabab,sarlavha){
+  if(!sarlavha && MAINT.on && maintBlocked()){ sabab=MAINT.msg||MDEF; sarlavha="Sayt yangilanmoqda"; MWAS=true; }
   UNSUB.forEach(f=>{try{f();}catch(e){}}); UNSUB=[]; clearInterval(HB);
   if(CUR) CUR.saqlandi=true;
   document.body.classList.add("locked");
   let g=$("gate");
   if(!g){ g=document.createElement("div"); g.id="gate"; document.body.prepend(g); }
-  g.innerHTML=`<div class="card"><p class="eb">Shahzodbek O'roqov</p><h2>Kirish yopildi</h2>
-    <p class="d">${esc(sabab)}</p><p class="d">Savol bo'lsa, administratorga murojaat qiling.</p>
-    <button onclick="location.reload()">Qayta kirish</button></div>`;
+  g.innerHTML=`<div class="card"><p class="eb">Shahzodbek O'roqov</p><h2>${esc(sarlavha||"Kirish yopildi")}</h2>
+    <p class="d">${esc(sabab)}</p><p class="d">${sarlavha?"Yangilash tugashi bilan sahifa o'zi ochiladi — oynani yopmang.":"Savol bo'lsa, administratorga murojaat qiling."}</p>
+    <button onclick="location.reload()">Qayta kirish</button>
+    <p class="gsup">Yordam: <a href="https://t.me/bek_shoh07" target="_blank" rel="noopener">Telegram @bek_shoh07</a></p></div>`;
 }
 
 $("chiq").addEventListener("click",async()=>{
@@ -1321,17 +1382,52 @@ function bazaUchun(v){
 }
 function bulutSaqla(nus){
   return DB.doc("checks/"+nus.id).set(Object.assign(bazaUchun(nus),
-    {code:SESS.code,uid:SESS.uid,dev:SESS.dev,sts:FV.serverTimestamp()}));
+    {code:SESS.code,dept:SESS.dept,uid:SESS.uid,dev:SESS.dev,sts:FV.serverTimestamp()}));
 }
 
 /* Bo'lim boshlig'i: barcha ekspertlar arxivi va statistikasi */
 function arxivniOch(){
   $("s5").style.display=""; $("s6").style.display="";
   holat(`<b>Markaziy baza.</b> Ma'lumotlar yuklanmoqda…`);
-  UNSUB.push(DB.collection("checks").orderBy("sts","desc").limit(1000).onSnapshot(q=>{
-    ARCH=q.docs.map(d=>d.data()); holat(); paintArch($("find").value); paintStats();
+  UNSUB.push(DB.collection("checks").where("dept","==",SESS.dept).limit(2000).onSnapshot(q=>{
+    const t=v=>v&&v.toMillis?v.toMillis():0;
+    ARCH=q.docs.map(d=>d.data()).sort((a,b)=>t(b.sts)-t(a.sts)); holat(); paintArch($("find").value); paintStats();
   },e=>holat(`<b>Arxivni yuklab bo'lmadi.</b> ${esc(e.message||e)}`)));
 }
+
+/* ============ YANGILASH REJIMI ============ */
+function maintBlocked(){ return !!MAINT.on && !(SESS && (MAINT.allow||[]).includes(SESS.code)); }
+function maintQoll(){
+  const box=$("gmnt");
+  if(MAINT.on){
+    if(SESS){ if(maintBlocked()){ MWAS=true; chetlatish(MAINT.msg||MDEF,"Sayt yangilanmoqda"); } return; }
+    MWAS=true;
+    if(box){ box.hidden=false;
+      box.innerHTML=`<b>Sayt yangilanmoqda</b><p>${esc(MAINT.msg||MDEF)}</p><p style="margin-top:8px;color:var(--dim);font-size:12.5px">Yangilash tugashi bilan sahifa o'zi ochiladi.</p>
+        ${(MAINT.allow||[]).length?`<button type="button" class="lnk" id="gmlnk">Ruxsat berilgan xodim sifatida kirish</button>`:""}`;
+      $("gform").style.display="none";
+      const l=$("gmlnk"); if(l) l.onclick=()=>{ $("gform").style.display=""; l.remove(); }; }
+  } else if(MWAS){ location.reload(); }
+}
+
+/* ============ KO'RINISHLAR: tekshirish · organlar · ma'lumotnoma ============ */
+let VIEW="tek", PF=null;
+function ramka(){
+  if(PF) return PF; const f=$("pframe");
+  PF=new Promise(res=>{ f.addEventListener("load",async()=>{ const k=await KEYP; try{ f.contentWindow.TK.setKey(k); }catch(e){} res(f); },{once:true});
+    f.src="organlar.html?v=4"; });
+  return PF;
+}
+function ramkaOlcham(){ if($("pview").hidden) return; $("pframe").style.height=Math.max(420,innerHeight-$("vnav").offsetHeight-6)+"px"; }
+function korinish(v){
+  VIEW=v; document.body.dataset.view=v;
+  document.querySelectorAll("#vnav button").forEach(b=>b.setAttribute("aria-selected",String(b.dataset.v===v)));
+  $("pview").hidden=(v==="tek");
+  if(v!=="tek"){ ramkaOlcham(); $("vnav").scrollIntoView({block:"start"});
+    ramka().then(f=>{ try{ f.contentWindow.TK.mode(v); }catch(e){} }); }
+}
+$("vnav").addEventListener("click",e=>{ const b=e.target.closest("button[data-v]"); if(b) korinish(b.dataset.v); });
+addEventListener("resize",ramkaOlcham);
 
 bulutStart();
 </script>

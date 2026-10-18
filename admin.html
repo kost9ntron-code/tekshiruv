@@ -95,6 +95,25 @@ h4{margin:22px 0 10px;font-size:15px}
 .devrow.pend{border-color:rgba(251,191,110,.5);background:var(--warnbg)}
 @media(max-width:620px){.top{padding-top:22px}.tabs button{padding:10px 8px;font-size:13.5px}}
 
+/* ===== 4-nashr ===== */
+.mband{max-width:1240px;margin:14px auto 0;padding:0 24px}
+.mband>div{display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap;border:1px solid rgba(251,123,142,.45);background:var(--stopbg);border-radius:12px;padding:12px 16px}
+.mband b{color:var(--stop)} .mband span{color:var(--dim);font-size:13px}
+.fbar{max-width:1240px;margin:14px auto 0;padding:0 24px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.fbar label{flex-direction:row;align-items:center;gap:10px;font-size:13px}
+.tag{display:inline-block;font:600 10.5px var(--mono);letter-spacing:.04em;padding:1px 8px;border-radius:99px;background:var(--chip);color:var(--dim);margin-left:6px;vertical-align:1px}
+.nmbtn{background:none;border:0;padding:0;color:var(--fg);font:inherit;font-weight:700;cursor:pointer;text-align:left}
+.nmbtn:hover{color:var(--accent);text-decoration:underline;text-underline-offset:3px}
+.kk{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:14px 0 6px}
+.kk div{border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.kk b{display:block;font-size:22px;letter-spacing:-.02em} .kk span{font-size:12px;color:var(--dim)}
+.sw{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:0 0 14px}
+.swst{font:700 12px var(--mono);padding:4px 12px;border-radius:99px}
+.swst.on{color:var(--stop);background:var(--stopbg)} .swst.off{color:var(--accent);background:var(--accentbg)}
+textarea{font:inherit;color:var(--fg);background:var(--field);border:1px solid var(--line);border-radius:10px;padding:10px 12px;min-height:70px;resize:vertical;width:100%}
+.alw{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:4px 16px;margin:8px 0 12px;max-height:320px;overflow:auto;border:1px solid var(--line);border-radius:12px;padding:10px 14px}
+.alw h5{grid-column:1/-1;margin:8px 0 2px;font-size:12px;color:var(--dim);font-weight:600}
+@media(max-width:620px){.kk{grid-template-columns:1fr 1fr}}
 </style>
 </head>
 <body>
@@ -113,17 +132,20 @@ h4{margin:22px 0 10px;font-size:15px}
 <div id="app" style="display:none">
   <header class="top">
     <div>
-      <p class="eyebrow">Tibbiy jihozlar qo'mitasi · Xorijiy hujjatni tekshirish</p>
+      <p class="eyebrow">Xorijiy hujjatni tekshirish · 4-nashr</p>
       <h1>Boshqaruv paneli</h1>
     </div>
     <div class="me"><span id="me"></span><button class="mini" id="out">Chiqish</button></div>
   </header>
+  <div class="mband" id="mband" hidden><div><span><b>Sayt yangilash rejimida.</b> Xodimlar konsolga kira olmaydi.</span><button class="mini stop" id="mbOff">Rejimni o'chirish</button></div></div>
+  <div class="fbar"><label>Bo'lim:<select id="fdep"><option value="">Barcha bo'limlar</option><option value="qom">Tibbiy jihozlar qo'mitasi</option><option value="reg">Tibbiy jihozlarni ro'yxatdan o'tkazish bo'limi</option></select></label></div>
   <nav class="tabs" role="tablist">
     <button data-tab="umumiy" aria-selected="true">Umumiy holat <span class="cnt" id="t-alert"></span></button>
     <button data-tab="xodimlar" aria-selected="false">Xodimlar</button>
     <button data-tab="kirishlar" aria-selected="false">Kirishlar jurnali</button>
     <button data-tab="tekshiruvlar" aria-selected="false">Tekshiruvlar</button>
     <button data-tab="sozlash" aria-selected="false">Ro'yxatni yuklash</button>
+    <button data-tab="sozlamalar" aria-selected="false">Yangilash rejimi va kalit</button>
   </nav>
   <main>
     <section data-pane="umumiy"><div id="p-umumiy"></div></section>
@@ -132,8 +154,9 @@ h4{margin:22px 0 10px;font-size:15px}
       <div id="addform" class="panel" hidden>
         <div class="grid">
           <label>F.I.Sh.<input id="a-nm" placeholder="Familiya Ism Otasining ismi"></label>
+          <label>Bo'lim<select id="a-dep"><option value="qom">Tibbiy jihozlar qo'mitasi</option><option value="reg">Tibbiy jihozlarni ro'yxatdan o'tkazish bo'limi</option></select></label>
           <label>Lavozim<select id="a-pos">
-            <option>Bo'lim boshlig'i</option><option>Bosh mutaxassis</option><option selected>Yetakchi mutaxassis</option>
+            <option>Qo'mita raisi</option><option>Rais o'rinbosari</option><option>Bo'lim boshlig'i</option><option>Bosh mutaxassis</option><option selected>Yetakchi mutaxassis</option>
             <option>1-toifali mutaxassis</option><option>2-toifali mutaxassis</option></select></label>
           <label>Parol<input id="a-pw" placeholder="Masalan: Ism112"></label>
           <label>Qurilmalar soni<select id="a-max"><option>1</option><option>2</option><option>3</option></select></label>
@@ -152,10 +175,26 @@ h4{margin:22px 0 10px;font-size:15px}
       <div class="bar"><button class="mini" id="csv">CSV yuklab olish</button><button class="mini" id="json">JSON yuklab olish</button></div>
       <div id="p-tekshiruvlar"></div>
     </section>
+    <section data-pane="sozlamalar" hidden>
+      <div class="panel">
+        <h3>Yangilash rejimi</h3>
+        <p class="d">Yoqilganda xodimlar konsolga kira olmaydi: ularga quyidagi xabar ko'rsatiladi. Ishlab turganlar darhol chiqariladi. O'chirilganda hammaning sahifasi o'zi ochiladi.</p>
+        <div class="sw"><span class="swst off" id="mst">O'chiq</span><button class="btn" id="mtog">Yoqish</button></div>
+        <label>Xodimlarga ko'rsatiladigan xabar<textarea id="mmsg" placeholder="Sayt yangilanmoqda. Iltimos, keyinroq urinib ko'ring."></textarea></label>
+        <p class="d" style="margin:14px 0 4px">Yangilash paytida kira oladigan xodimlar (masalan, sinab ko'rish uchun):</p>
+        <div class="alw" id="malw"></div>
+        <div class="bar"><button class="btn ghost" id="msave">Xabar va ruxsatlarni saqlash</button><span class="err" id="merr"></span></div>
+      </div>
+      <div class="panel">
+        <h3>Ma'lumotnoma kaliti</h3>
+        <p class="d">Ma'lumotnoma fayllari shifrlangan. Kalit faqat shu yerda saqlanadi va faqat tasdiqlangan qurilmadan kirgan xodimga beriladi. Holat: <b id="kst">—</b></p>
+        <div class="bar"><input id="kval" placeholder="Kalitni shu yerga qo'ying" style="flex:1;min-width:260px;font-family:var(--mono)" autocomplete="off" spellcheck="false"><button class="btn" id="ksave">Kalitni saqlash</button><span class="err" id="kerr"></span></div>
+      </div>
+    </section>
     <section data-pane="sozlash" hidden>
       <div class="panel">
         <h3>Xodimlar ro'yxatini Exceldan yuklash</h3>
-        <p class="d">Ustunlar: <b>F.I.Sh.</b>, <b>Lavozim</b>, <b>Parol</b> (sarlavha nomlari shunday bo'lishi kerak). Ro'yxatda bor xodimning ismi, lavozimi va paroli yangilanadi, qurilmalari va blok holati saqlanib qoladi. Yangi ism bo'lsa — yangi xodim qo'shiladi.</p>
+        <p class="d">Ustunlar: <b>F.I.Sh.</b>, <b>Lavozim</b>, <b>Parol</b>, <b>Bo'lim</b> (sarlavha nomlari shunday bo'lishi kerak; «Bo'lim» bo'lmasa — yuqoridagi filtrda tanlangan bo'lim, u ham tanlanmagan bo'lsa — ro'yxatdan o'tkazish bo'limi). Ro'yxatda bor xodimning ismi, lavozimi va paroli yangilanadi, qurilmalari va blok holati saqlanib qoladi. Yangi ism bo'lsa — yangi xodim qo'shiladi.</p>
         <input type="file" id="xl" accept=".xlsx,.xls">
         <div id="xlprev"></div>
       </div>
@@ -208,7 +247,14 @@ const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&
 firebase.initializeApp(FB_CONFIG);
 const AUTH=firebase.auth(), DB=firebase.firestore(), FV=firebase.firestore.FieldValue, FP=firebase.firestore.FieldPath;
 const S={dir:[],staff:{},sess:[],logins:[],checks:[]};
-let ADMIN=null, TAB="umumiy", MODAL=null, SUBS=[];
+let ADMIN=null, TAB="umumiy", MODAL=null, KARTA=null, SUBS=[];
+const DEPS={qom:"Tibbiy jihozlar qo'mitasi",reg:"Tibbiy jihozlarni ro'yxatdan o'tkazish bo'limi"};
+const DQ={qom:"Qo'mita",reg:"Ro'yxatdan o'tkazish"};
+const MDEF="Sayt yangilanmoqda. Iltimos, keyinroq urinib ko'ring.";
+S.maint={}; S.key=null; let MIGR=false;
+const depOf=code=>(S.dir.find(d=>d.code===code)||{}).dept||(S.staff[code]||{}).dept||"reg";
+const bolimda=code=>!$("fdep").value||depOf(code)===$("fdep").value;
+const depMatn=t=>/qo.?mita|komitet|комитет|қўмита/i.test(String(t))?"qom":/ro.?yxat|bo.?lim|регистр|отдел|бўлим/i.test(String(t))?"reg":"";
 const VD={ok:"Tasdiqlandi",more:"Qo'shimcha hujjat",no:"Rad etildi"};
 const ONLINE_MS=5*60000;
 
@@ -258,8 +304,10 @@ function boshla(){
   SUBS.push(DB.doc("dir/list").onSnapshot(s=>{ S.dir=(s.exists&&s.data().items)||[]; chiz(); },er));
   SUBS.push(DB.collection("staff").onSnapshot(q=>{ S.staff={}; q.forEach(d=>S.staff[d.id]=d.data()); chiz(); },er));
   SUBS.push(DB.collection("sessions").onSnapshot(q=>{ S.sess=q.docs.map(d=>Object.assign({id:d.id},d.data())); chiz(); },er));
-  SUBS.push(DB.collection("logins").orderBy("ts","desc").limit(500).onSnapshot(q=>{ S.logins=q.docs.map(d=>d.data()); chiz(); },er));
-  SUBS.push(DB.collection("checks").orderBy("sts","desc").limit(2000).onSnapshot(q=>{ S.checks=q.docs.map(d=>d.data()); chiz(); },er));
+  SUBS.push(DB.collection("logins").orderBy("ts","desc").limit(1500).onSnapshot(q=>{ S.logins=q.docs.map(d=>d.data()); chiz(); },er));
+  SUBS.push(DB.collection("checks").orderBy("sts","desc").limit(2000).onSnapshot(q=>{ S.checks=q.docs.map(d=>Object.assign({_id:d.id},d.data())); S.ckOk=true; chiz(); kochir(); },er));
+  SUBS.push(DB.doc("config/maint").onSnapshot(s=>{ S.maint=s.data()||{}; mBanner(); if(TAB==="sozlamalar") sozlamalar(); },er));
+  SUBS.push(DB.doc("keys/nom").onSnapshot(s=>{ S.key=s.exists?(s.data().k||""):""; if(TAB==="sozlamalar") sozlamalar(); },er));
   setInterval(chiz,30000);
 }
 
@@ -274,46 +322,49 @@ function ogohlantirishlar(){
   const A=[], now=Date.now();
   for(const [code,st] of Object.entries(S.staff)){
     for(const [dev,p] of Object.entries(st.pending||{}))
-      A.push({c:"warn",t:`<b>${esc(ism(code))}</b> yangi qurilmadan kirmoqchi`,
+      A.push({code,c:"warn",t:`<b>${esc(ism(code))}</b> yangi qurilmadan kirmoqchi`,
         s:`${esc(p.label)} · ${esc(p.city||"joy noma'lum")} · ${esc(p.ip||"")} · ${oldin(p.ts)}`,
         a:`<button class="mini ok" data-act="ok" data-code="${code}" data-dev="${esc(dev)}">Tasdiqlash</button><button class="mini stop" data-act="rad" data-code="${code}" data-dev="${esc(dev)}">Rad etish</button>`});
   }
   const by={}; S.sess.filter(onlayn).forEach(s=>{ (by[s.code]=by[s.code]||new Set()).add(s.dev); });
   for(const [code,set] of Object.entries(by)) if(set.size>1)
-    A.push({c:"stop",t:`<b>${esc(ism(code))}</b> bir vaqtda ${set.size} ta qurilmadan ishlayapti`,
+    A.push({code,c:"stop",t:`<b>${esc(ism(code))}</b> bir vaqtda ${set.size} ta qurilmadan ishlayapti`,
       s:"Login va parol boshqa odamga berilgan bo'lishi mumkin.",
       a:`<button class="mini stop" data-act="kick" data-code="${code}">Hammasini chiqarish</button><button class="mini" data-act="dev" data-code="${code}">Qurilmalar</button>`});
   const day=S.logins.filter(l=>now-ms(l.ts)<86400000);
   const fail={}; day.filter(l=>!l.ok&&/parol/.test(l.reason||"")).forEach(l=>fail[l.code]=(fail[l.code]||0)+1);
   for(const [code,n] of Object.entries(fail)) if(n>=3)
-    A.push({c:"stop",t:`<b>${esc(ism(code))}</b>: 24 soatda ${n} marta noto'g'ri parol`,s:"Kimdir parolni topishga urinayotgan bo'lishi mumkin.",
+    A.push({code,c:"stop",t:`<b>${esc(ism(code))}</b>: 24 soatda ${n} marta noto'g'ri parol`,s:"Kimdir parolni topishga urinayotgan bo'lishi mumkin.",
       a:`<button class="mini" data-act="pw" data-code="${code}">Parolni almashtirish</button>`});
   const cities={}; day.filter(l=>l.ok&&l.city).forEach(l=>(cities[l.code]=cities[l.code]||new Set()).add(l.city));
   for(const [code,set] of Object.entries(cities)) if(set.size>1)
-    A.push({c:"warn",t:`<b>${esc(ism(code))}</b> 24 soatda turli shaharlardan kirgan`,s:[...set].map(esc).join(", "),a:""});
+    A.push({code,c:"warn",t:`<b>${esc(ism(code))}</b> 24 soatda turli shaharlardan kirgan`,s:[...set].map(esc).join(", "),a:""});
   S.logins.filter(l=>now-ms(l.ts)<7*86400000 && l.country && l.country!=="UZ").forEach(l=>
-    A.push({c:"warn",t:`<b>${esc(l.name||ism(l.code))}</b> O'zbekistondan tashqaridan kirgan`,s:`${esc(l.country)} · ${esc(l.city)} · ${vaqt(l.ts)}`,a:""}));
+    A.push({code:l.code,c:"warn",t:`<b>${esc(l.name||ism(l.code))}</b> O'zbekistondan tashqaridan kirgan`,s:`${esc(l.country)} · ${esc(l.city)} · ${vaqt(l.ts)}`,a:""}));
   return A;
 }
 
 /* ---------- chizish ---------- */
 function chiz(){
   if(!ADMIN) return;
-  const A=ogohlantirishlar(); $("t-alert").textContent=A.length||"";
+  kochir();
+  const A=ogohlantirishlar().filter(a=>bolimda(a.code)); $("t-alert").textContent=A.length||"";
   if(TAB==="umumiy") umumiy(A);
   if(TAB==="xodimlar") xodimlar();
   if(TAB==="kirishlar") kirishlar();
   if(TAB==="tekshiruvlar") tekshiruvlar();
+  if(TAB==="sozlamalar") sozlamalar();
   if(MODAL) qurilmaOyna(MODAL);
+  if(KARTA) karta(KARTA);
 }
 function umumiy(A){
-  const on=S.sess.filter(onlayn), onCodes=new Set(on.map(s=>s.code));
+  const on=S.sess.filter(s=>onlayn(s)&&bolimda(s.code)), onCodes=new Set(on.map(s=>s.code));
   const t0=new Date(); t0.setHours(0,0,0,0);
-  const bugun=S.checks.filter(c=>ms(c.sts)>=t0.getTime()).length;
-  const blok=Object.values(S.staff).filter(s=>s.blocked).length;
+  const bugun=S.checks.filter(c=>ms(c.sts)>=t0.getTime()&&bolimda(c.code)).length;
+  const blok=Object.entries(S.staff).filter(([c,s])=>s.blocked&&bolimda(c)).length;
   $("p-umumiy").innerHTML=`
    <div class="kpis">
-     <div class="kpi"><b>${S.dir.length}</b><span>xodim${blok?` · ${blok} tasi bloklangan`:""}</span></div>
+     <div class="kpi"><b>${S.dir.filter(d=>bolimda(d.code)).length}</b><span>xodim${blok?` · ${blok} tasi bloklangan`:""}</span></div>
      <div class="kpi on"><b>${onCodes.size}</b><span>hozir onlayn</span></div>
      <div class="kpi"><b>${bugun}</b><span>bugungi tekshiruv</span></div>
      <div class="kpi ${A.length?"al":""}"><b>${A.length}</b><span>ogohlantirish</span></div>
@@ -332,14 +383,15 @@ function xodimlar(){
   if(!S.dir.length){ $("p-xodimlar").innerHTML=`<div class="empty">Ro'yxat bo'sh. «Ro'yxatni yuklash» bo'limidan Excel faylni yuklang yoki xodim qo'shing.</div>`; return; }
   const cnt={}; S.checks.forEach(c=>cnt[c.code]=(cnt[c.code]||0)+1);
   $("p-xodimlar").innerHTML=`<div class="tw"><table><thead><tr><th>Xodim</th><th>Holat</th><th>Qurilmalar</th><th>Oxirgi kirish</th><th>Tekshiruv</th><th>Amallar</th></tr></thead><tbody>
-   ${S.dir.map(d=>{ const st=S.staff[d.code]||{}; const on=S.sess.some(s=>s.code===d.code&&onlayn(s));
+   ${S.dir.filter(d=>bolimda(d.code)).map(d=>{ const st=S.staff[d.code]||{}; const on=S.sess.some(s=>s.code===d.code&&onlayn(s));
      const last=S.logins.find(l=>l.code===d.code&&l.ok); const nA=Object.keys(st.approved||{}).length, nP=Object.keys(st.pending||{}).length;
-     return `<tr><td><span class="dot ${on?"on":""}"></span><b>${esc(d.name)}</b><small>${esc(d.pos)}${st.role==="rahbar"?" · arxivni ko'radi":""}</small></td>
+     return `<tr><td><span class="dot ${on?"on":""}"></span><button class="nmbtn" data-act="karta" data-code="${d.code}">${esc(d.name)}</button><small>${esc(d.pos)}${st.role==="rahbar"?" · bo'lim arxivini ko'radi":""}<span class="tag">${DQ[depOf(d.code)]}</span></small></td>
        <td>${st.blocked?'<span class="pill stop">bloklangan</span>':'<span class="pill ok">faol</span>'}</td>
        <td>${nA} / ${st.maxDev||1}${nP?` <span class="pill warn">${nP} so'rov</span>`:""}</td>
        <td>${last?`${vaqt(last.ts)}<small>${esc(last.city||"")} · ${esc(last.ua||"")}</small>`:"—"}</td>
        <td class="mono">${cnt[d.code]||0}</td>
        <td><div class="acts">
+         <button class="mini" data-act="karta" data-code="${d.code}">Kartochka</button>
          <button class="mini" data-act="dev" data-code="${d.code}">Qurilmalar</button>
          <button class="mini" data-act="pw" data-code="${d.code}">Parol</button>
          ${st.blocked?`<button class="mini ok" data-act="unblock" data-code="${d.code}">Ochish</button>`:`<button class="mini stop" data-act="block" data-code="${d.code}">Bloklash</button>`}
@@ -350,8 +402,8 @@ function xodimlar(){
 }
 function kirishlar(){
   const f=$("lf"), cur=f.value;
-  f.innerHTML=`<option value="">Barcha xodimlar</option>`+S.dir.map(d=>`<option value="${d.code}">${esc(d.name)}</option>`).join(""); f.value=cur;
-  const L=S.logins.filter(l=>(!cur||l.code===cur)&&(!$("lfx").checked||!l.ok)).slice(0,300);
+  f.innerHTML=`<option value="">Barcha xodimlar</option>`+S.dir.filter(d=>bolimda(d.code)).map(d=>`<option value="${d.code}">${esc(d.name)}</option>`).join(""); f.value=cur;
+  const L=S.logins.filter(l=>bolimda(l.code)&&(!cur||l.code===cur)&&(!$("lfx").checked||!l.ok)).slice(0,300);
   $("p-kirishlar").innerHTML=L.length?`<div class="tw"><table><thead><tr><th>Vaqt</th><th>Xodim</th><th>Natija</th><th>Izoh</th><th>Qurilma</th><th>Joy</th></tr></thead><tbody>
     ${L.map(l=>`<tr><td class="mono">${vaqt(l.ts)}</td><td>${esc(l.name||ism(l.code))}</td>
       <td>${l.ok?'<span class="pill ok">kirdi</span>':'<span class="pill stop">rad etildi</span>'}</td>
@@ -361,13 +413,13 @@ function kirishlar(){
 }
 $("lf").addEventListener("change",kirishlar); $("lfx").addEventListener("change",kirishlar);
 function tekshiruvlar(){
-  const G={}; const now=Date.now();
-  S.checks.forEach(c=>{ const g=G[c.code]=G[c.code]||{n:0,w:0,k:[],ok:0,more:0,no:0,secs:[],last:0,name:c.expert};
+  const G={}; const now=Date.now(); const CK=S.checks.filter(c=>!$("fdep").value||(c.dept||depOf(c.code))===$("fdep").value);
+  CK.forEach(c=>{ const g=G[c.code]=G[c.code]||{n:0,w:0,k:[],ok:0,more:0,no:0,secs:[],last:0,name:c.expert};
     g.n++; if(now-ms(c.sts)<7*86400000) g.w++; if(c.koef!=null) g.k.push(c.koef); if(c.secs) g.secs.push(c.secs);
     if(c.verdict) g[c.verdict]=(g[c.verdict]||0)+1; g.last=Math.max(g.last,ms(c.sts)); });
   const avg=a=>a.length?Math.round(a.reduce((x,y)=>x+y,0)/a.length):null;
   const rows=Object.entries(G).sort((a,b)=>b[1].n-a[1].n);
-  $("p-tekshiruvlar").innerHTML=!S.checks.length?`<div class="empty">Hali tekshiruv saqlanmagan.</div>`:`
+  $("p-tekshiruvlar").innerHTML=!CK.length?`<div class="empty">Hali tekshiruv saqlanmagan.</div>`:`
    <h4 style="margin-top:0">Ekspertlar kesimida</h4>
    <div class="tw"><table><thead><tr><th>Ekspert</th><th>Jami</th><th>7 kunda</th><th>O'rtacha koef.</th><th>Tasdiqlandi</th><th>Qo'shimcha</th><th>Rad</th><th>O'rtacha vaqt</th><th>Oxirgisi</th></tr></thead><tbody>
    ${rows.map(([code,g])=>{ const k=avg(g.k), s=avg(g.secs);
@@ -378,7 +430,7 @@ function tekshiruvlar(){
    </tbody></table></div>
    <h4>Oxirgi tekshiruvlar</h4>
    <div class="tw"><table><thead><tr><th>Sana</th><th>Ekspert</th><th>Hujjat raqami</th><th>Koef.</th><th>Xulosa</th></tr></thead><tbody>
-   ${S.checks.slice(0,150).map(c=>`<tr><td class="mono">${esc(c.ts||vaqt(c.sts))}</td><td>${esc(c.expert||ism(c.code))}</td><td class="mono">${esc(c.q)}</td>
+   ${CK.slice(0,150).map(c=>`<tr><td class="mono">${esc(c.ts||vaqt(c.sts))}</td><td>${esc(c.expert||ism(c.code))}</td><td class="mono">${esc(c.q)}</td>
      <td class="mono">${c.koef==null?"—":c.koef+"%"}</td><td>${c.verdict?`<b>${VD[c.verdict]||c.verdict}</b><small>${esc((c.concl||"").slice(0,140))}</small>`:esc(c.concl||"—")}</td></tr>`).join("")}
    </tbody></table></div>`;
 }
@@ -396,7 +448,8 @@ function bogla(root){ root.querySelectorAll("[data-act]").forEach(b=>b.addEventL
 async function amal(d,b){
   const c=d.code; b.disabled=true;
   try{
-    if(d.act==="dev"){ MODAL=c; qurilmaOyna(c); }
+    if(d.act==="dev"){ KARTA=null; MODAL=c; qurilmaOyna(c); }
+    else if(d.act==="karta"){ MODAL=null; KARTA=c; karta(c); }
     else if(d.act==="ok"){ const p=(S.staff[c].pending||{})[d.dev]; await DB.doc("staff/"+c).update(new FP("approved",d.dev),p,new FP("pending",d.dev),FV.delete()); }
     else if(d.act==="rad"){ await DB.doc("staff/"+c).update(new FP("pending",d.dev),FV.delete()); }
     else if(d.act==="devdel"){ if(!confirm("Bu qurilmaning ruxsati bekor qilinsinmi? Xodim undan kira olmaydi.")) return;
@@ -439,8 +492,8 @@ function qurilmaOyna(code){
      :`<div class="empty">Hali qurilma yo'q. Xodim birinchi marta kirganda qurilmasi avtomatik qo'shiladi.</div>`}`;
   $("modal").hidden=false; bogla($("mbody"));
 }
-$("mx").addEventListener("click",()=>{ MODAL=null; $("modal").hidden=true; });
-$("modal").addEventListener("click",e=>{ if(e.target.id==="modal"){ MODAL=null; $("modal").hidden=true; } });
+$("mx").addEventListener("click",()=>{ MODAL=null; KARTA=null; $("modal").hidden=true; });
+$("modal").addEventListener("click",e=>{ if(e.target.id==="modal"){ MODAL=null; KARTA=null; $("modal").hidden=true; } });
 
 /* ---------- xodim qo'shish ---------- */
 function keyingiKod(band){ const n=[...S.dir.map(d=>d.code),...Object.keys(S.staff),...(band||[])].map(c=>+String(c).replace(/\D/g,"")||0);
@@ -451,11 +504,12 @@ async function xodimlarniYoz(rows){
   for(const r of rows){
     let it=items.find(x=>norm(x.name)===norm(r.name));
     const salt=tuz();
-    if(!it){ it={code:keyingiKod(band),name:r.name,pos:r.pos,salt}; band.push(it.code); items.push(it); }
-    else Object.assign(it,{name:r.name,pos:r.pos,salt});
+    const dept=r.dept||"reg";
+    if(!it){ it={code:keyingiKod(band),name:r.name,pos:r.pos,dept,salt}; band.push(it.code); items.push(it); }
+    else Object.assign(it,{name:r.name,pos:r.pos,dept,salt});
     const ex=S.staff[it.code];
-    b.set(DB.doc("staff/"+it.code), ex?{name:r.name,pos:r.pos,role:r.role}
-      :{name:r.name,pos:r.pos,role:r.role,blocked:false,maxDev:r.maxDev||1,approved:{},pending:{},created:FV.serverTimestamp()},{merge:true});
+    b.set(DB.doc("staff/"+it.code), ex?{name:r.name,pos:r.pos,role:r.role,dept}
+      :{name:r.name,pos:r.pos,role:r.role,dept,blocked:false,maxDev:r.maxDev||1,approved:{},pending:{},created:FV.serverTimestamp()},{merge:true});
     b.set(DB.doc("secrets/"+it.code),{ph:parolXesh(salt,r.pw)});
   }
   b.set(DB.doc("dir/list"),{items,upd:FV.serverTimestamp()});
@@ -463,14 +517,14 @@ async function xodimlarniYoz(rows){
   for(const it of items) if(rows.some(r=>norm(r.name)===norm(it.name))) await chiqar(it.code);
 }
 $("addbtn").addEventListener("click",()=>{ $("addform").hidden=!$("addform").hidden; });
-$("a-pos").addEventListener("change",()=>{ $("a-rah").checked=/boshlig/i.test($("a-pos").value); });
+$("a-pos").addEventListener("change",()=>{ $("a-rah").checked=/boshlig|rais/i.test($("a-pos").value); });
 $("a-save").addEventListener("click",async()=>{
   const name=$("a-nm").value.replace(/\s+/g," ").trim(), pw=$("a-pw").value.trim();
   if(name.split(" ").length<2){ $("a-err").textContent="F.I.Sh.ni to'liq yozing."; return; }
   if(pw.length<3){ $("a-err").textContent="Parol kamida 3 belgi bo'lsin."; return; }
   if(S.dir.some(x=>norm(x.name)===norm(name))&&!confirm("Bu xodim ro'yxatda bor. Lavozimi va paroli yangilansinmi?")) return;
   $("a-err").textContent="";
-  try{ await xodimlarniYoz([{name,pos:$("a-pos").value,pw,role:$("a-rah").checked?"rahbar":"expert",maxDev:+$("a-max").value}]);
+  try{ await xodimlarniYoz([{name,pos:$("a-pos").value,pw,dept:$("a-dep").value,role:$("a-rah").checked?"rahbar":"expert",maxDev:+$("a-max").value}]);
     $("a-nm").value=""; $("a-pw").value=""; $("addform").hidden=true; }
   catch(e){ $("a-err").textContent="Saqlab bo'lmadi: "+(e.message||e); }
 });
@@ -483,14 +537,15 @@ $("xl").addEventListener("change",async e=>{
     const rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:""});
     const hi=rows.findIndex(r=>r.some(c=>/f\.?\s*i\.?\s*sh/i.test(String(c)))); if(hi<0) throw new Error("«F.I.Sh.» ustuni topilmadi");
     const H=rows[hi].map(c=>String(c).toLowerCase());
-    const ci=H.findIndex(c=>/f\.?\s*i\.?\s*sh/.test(c)), cp=H.findIndex(c=>/lavozim/.test(c)), cw=H.findIndex(c=>/parol/.test(c));
+    const ci=H.findIndex(c=>/f\.?\s*i\.?\s*sh/.test(c)), cp=H.findIndex(c=>/lavozim/.test(c)), cw=H.findIndex(c=>/parol/.test(c)), cd=H.findIndex(c=>/bo.?lim|qo.?mita/.test(c));
+    const d0=$("fdep").value||"reg";
     if(cp<0||cw<0) throw new Error("«Lavozim» yoki «Parol» ustuni topilmadi");
     const R=rows.slice(hi+1).filter(r=>String(r[ci]).trim()&&String(r[cw]).trim()).map(r=>{
-      const pos=String(r[cp]).trim(); return {name:String(r[ci]).replace(/\s+/g," ").trim(),pos,pw:String(r[cw]).trim(),role:/boshlig/i.test(pos)?"rahbar":"expert",maxDev:1}; });
+      const pos=String(r[cp]).trim(); return {name:String(r[ci]).replace(/\s+/g," ").trim(),pos,pw:String(r[cw]).trim(),dept:(cd>=0&&depMatn(r[cd]))||d0,role:/boshlig|rais/i.test(pos)?"rahbar":"expert",maxDev:1}; });
     if(!R.length) throw new Error("Faylda xodim topilmadi");
     $("xlprev").innerHTML=`<p class="d" style="margin-top:14px">${R.length} ta xodim topildi. Tekshirib, «Bazaga yozish»ni bosing.</p>
-      <div class="tw"><table><thead><tr><th>F.I.Sh.</th><th>Lavozim</th><th>Parol</th><th>Holat</th></tr></thead><tbody>
-      ${R.map(r=>`<tr><td>${esc(r.name)}</td><td>${esc(r.pos)}${r.role==="rahbar"?"<small>arxivni ko'radi</small>":""}</td><td class="mono">${esc(r.pw)}</td>
+      <div class="tw"><table><thead><tr><th>F.I.Sh.</th><th>Bo'lim</th><th>Lavozim</th><th>Parol</th><th>Holat</th></tr></thead><tbody>
+      ${R.map(r=>`<tr><td>${esc(r.name)}</td><td>${esc(DEPS[r.dept])}</td><td>${esc(r.pos)}${r.role==="rahbar"?"<small>bo'lim arxivini ko'radi</small>":""}</td><td class="mono">${esc(r.pw)}</td>
         <td>${S.dir.some(x=>norm(x.name)===norm(r.name))?'<span class="pill warn">yangilanadi</span>':'<span class="pill ok">yangi</span>'}</td></tr>`).join("")}
       </tbody></table></div><div class="bar" style="margin-top:12px"><button class="btn" id="xlgo">Bazaga yozish</button><span class="err" id="xlerr"></span></div>`;
     $("xlgo").onclick=async()=>{ $("xlgo").disabled=true; $("xlgo").textContent="Yozilmoqda…";
@@ -498,6 +553,91 @@ $("xl").addEventListener("change",async e=>{
       catch(err){ $("xlerr").textContent="Xato: "+(err.message||err); $("xlgo").disabled=false; $("xlgo").textContent="Bazaga yozish"; } };
   }catch(err){ $("xlprev").innerHTML=`<p class="err">Faylni o'qib bo'lmadi: ${esc(err.message||err)}</p>`; }
   e.target.value="";
+});
+
+/* ---------- filtr ---------- */
+$("fdep").addEventListener("change",()=>{ try{ localStorage.setItem("tk_afdep",$("fdep").value); }catch(e){} chiz(); });
+try{ const v=localStorage.getItem("tk_afdep"); if(v!==null) $("fdep").value=v; }catch(e){}
+
+/* ---------- eski yozuvlarni bo'limga bog'lash (bir marta, avtomatik) ---------- */
+async function kochir(){
+  if(MIGR||!S.ckOk||!S.dir.length||!Object.keys(S.staff).length) return; MIGR=true;
+  const W=[];
+  if(S.dir.some(d=>!d.dept)) W.push(["set",DB.doc("dir/list"),{items:S.dir.map(d=>Object.assign({},d,{dept:d.dept||"reg"})),upd:FV.serverTimestamp()}]);
+  for(const [c,st] of Object.entries(S.staff)) if(!st.dept) W.push(["upd",DB.doc("staff/"+c),{dept:depOf(c)}]);
+  for(const k of S.checks) if(!k.dept) W.push(["upd",DB.doc("checks/"+k._id),{dept:depOf(k.code)}]);
+  if(!W.length) return;
+  try{ for(let i=0;i<W.length;i+=400){ const b=DB.batch();
+      W.slice(i,i+400).forEach(([t,ref,v])=>t==="set"?b.set(ref,v,{merge:true}):b.update(ref,v)); await b.commit(); }
+    console.log("Bo'limga bog'landi:",W.length);
+  }catch(e){ MIGR=false; console.error("Ko'chirish xatosi",e); }
+}
+
+/* ---------- ekspert kartochkasi ---------- */
+function karta(code){
+  const st=S.staff[code]; if(!st){ KARTA=null; $("modal").hidden=true; return; }
+  const L=S.logins.filter(l=>l.code===code), now=Date.now(), D30=30*86400000;
+  const L30=L.filter(l=>now-ms(l.ts)<D30), ok30=L30.filter(l=>l.ok), bad30=L30.filter(l=>!l.ok);
+  const last=L.find(l=>l.ok);
+  const kun=t=>{ const d=new Date(ms(t)); return `${d.getFullYear()}-${p2(d.getMonth()+1)}-${p2(d.getDate())}`; };
+  const soat=t=>{ const d=new Date(ms(t)); return `${p2(d.getHours())}:${p2(d.getMinutes())}`; };
+  const G={}; L.forEach(l=>{ if(!ms(l.ts)) return; const k=kun(l.ts); const g=G[k]=G[k]||{ok:0,bad:0,dev:new Set(),t:[]};
+    if(l.ok){ g.ok++; g.t.push(soat(l.ts)); } else g.bad++; if(l.ua) g.dev.add(l.ua); });
+  const days=Object.keys(G).sort().reverse().slice(0,21);
+  const devs=new Set(ok30.map(l=>l.ua).filter(Boolean));
+  const A=Object.entries(st.approved||{});
+  $("mbody").innerHTML=`<h3>${esc(ism(code))}</h3>
+   <p class="d" style="margin:0">${esc((S.dir.find(d=>d.code===code)||{}).pos||st.pos||"")} · ${esc(DEPS[depOf(code)])} · ${st.blocked?'<span class="pill stop">bloklangan</span>':'<span class="pill ok">faol</span>'}</p>
+   <div class="kk"><div><b>${last?oldin(last.ts):"—"}</b><span>oxirgi kirish</span></div>
+     <div><b>${ok30.length}</b><span>kirish (30 kun)</span></div>
+     <div><b style="color:${bad30.length?"var(--stop)":"inherit"}">${bad30.length}</b><span>xato urinish (30 kun)</span></div>
+     <div><b>${devs.size}</b><span>qurilma (30 kun)</span></div></div>
+   <h4>Kunlar bo'yicha</h4>
+   ${days.length?`<div class="tw"><table><thead><tr><th>Sana</th><th>Kirishlar</th><th>Xato</th><th>Vaqtlar</th><th>Qurilma</th></tr></thead><tbody>
+     ${days.map(k=>{ const g=G[k]; return `<tr><td class="mono">${k}</td><td class="mono">${g.ok}</td><td class="mono" style="color:${g.bad?"var(--stop)":"inherit"}">${g.bad}</td>
+       <td class="mono">${g.t.slice().reverse().join(", ")||"—"}</td><td>${[...g.dev].map(esc).join("<br>")||"—"}</td></tr>`; }).join("")}
+   </tbody></table></div>`:`<div class="empty">Hali kirish yozuvi yo'q.</div>`}
+   <h4>Tasdiqlangan qurilmalar</h4>
+   ${A.length?A.map(([dev,p])=>`<div class="devrow"><div>${esc(p.label)}<small class="d" style="display:block;margin:0">${esc(p.city||"joy noma'lum")} · ${esc(p.ip||"")} · qo'shilgan: ${vaqt(p.ts)}</small></div></div>`).join("")
+     :`<div class="empty">Hali qurilma yo'q.</div>`}
+   <div class="bar" style="margin-top:12px"><button class="mini" data-act="dev" data-code="${code}">Qurilmalarni boshqarish</button></div>
+   <p class="d" style="font-size:12px;margin-top:6px">Hisob kirishlar jurnalidagi oxirgi 1 500 ta yozuv asosida.</p>`;
+  $("modal").hidden=false; bogla($("mbody"));
+}
+
+/* ---------- yangilash rejimi va kalit ---------- */
+function mBanner(){ $("mband").hidden=!S.maint.on; }
+let MSTAT=null;
+function sozlamalar(){
+  const m=S.maint, on=!!m.on;
+  $("mst").className="swst "+(on?"on":"off"); $("mst").textContent=on?"Yoqilgan — xodimlar kira olmaydi":"O'chiq — sayt ishlayapti";
+  $("mtog").textContent=on?"O'chirish":"Yoqish"; $("mtog").className=on?"btn":"btn";
+  if(document.activeElement!==$("mmsg") && MSTAT!==JSON.stringify(m)){ $("mmsg").value=m.msg||""; }
+  if(MSTAT!==JSON.stringify(m)||!$("malw").childElementCount){
+    const al=new Set(m.allow||[]);
+    $("malw").innerHTML=Object.keys(DEPS).map(k=>{ const L=S.dir.filter(d=>(d.dept||"reg")===k); if(!L.length) return "";
+      return `<h5>${esc(DEPS[k])}</h5>`+L.map(d=>`<label class="chk"><input type="checkbox" value="${d.code}" ${al.has(d.code)?"checked":""}> ${esc(d.name)}</label>`).join(""); }).join("")||`<div class="empty">Xodimlar ro'yxati bo'sh.</div>`;
+  }
+  MSTAT=JSON.stringify(m);
+  $("kst").textContent=S.key===null?"…":S.key?"o'rnatilgan":"o'rnatilmagan";
+  $("kst").style.color=S.key?"var(--accent)":"var(--stop)";
+}
+function mOqi(){ return {msg:$("mmsg").value.trim(),allow:[...$("malw").querySelectorAll("input:checked")].map(i=>i.value)}; }
+async function mYoz(v){ $("merr").textContent="";
+  try{ await DB.doc("config/maint").set(Object.assign({},v,{ts:FV.serverTimestamp()}),{merge:true}); }
+  catch(e){ $("merr").textContent="Saqlab bo'lmadi: "+(e.message||e); throw e; } }
+$("mtog").addEventListener("click",async()=>{ const on=!S.maint.on;
+  if(on&&!confirm("Yangilash rejimi yoqilsinmi? Ruxsat berilmagan xodimlar darhol chiqariladi.")) return;
+  $("mtog").disabled=true; try{ await mYoz(Object.assign(mOqi(),{on})); }catch(e){} finally{ $("mtog").disabled=false; } });
+$("mbOff").addEventListener("click",async()=>{ $("mbOff").disabled=true; try{ await mYoz({on:false}); }catch(e){ alert("Bajarilmadi: "+(e.message||e)); } finally{ $("mbOff").disabled=false; } });
+$("msave").addEventListener("click",async()=>{ $("msave").disabled=true; try{ await mYoz(mOqi()); $("merr").style.color="var(--accent)"; $("merr").textContent="Saqlandi."; setTimeout(()=>{ $("merr").textContent=""; $("merr").style.color=""; },2500); }catch(e){} finally{ $("msave").disabled=false; } });
+$("ksave").addEventListener("click",async()=>{
+  const k=$("kval").value.trim(); $("kerr").textContent="";
+  let ok=false; try{ ok=atob(k).length===32; }catch(e){}
+  if(!ok){ $("kerr").textContent="Kalit noto'g'ri ko'rinishda (44 belgili qator bo'lishi kerak)."; return; }
+  try{ await DB.doc("keys/nom").set({k,ts:FV.serverTimestamp()}); $("kval").value=""; $("kerr").style.color="var(--accent)"; $("kerr").textContent="Kalit saqlandi.";
+    setTimeout(()=>{ $("kerr").textContent=""; $("kerr").style.color=""; },3000); }
+  catch(e){ $("kerr").textContent="Saqlab bo'lmadi: "+(e.message||e); }
 });
 
 </script>
