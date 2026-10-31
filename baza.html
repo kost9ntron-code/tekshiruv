@@ -270,7 +270,7 @@ async function prilIndeks(){ if(PIDX) return PIDX; PIDX=[]; for(let i=0;i<(META.
 const nm={
   firma:id=>{ const f=FIRMA[id]; return f?(f["Наим_фирм_рус"]||f["Наим_Фирмы_произ"]||""):(id?"["+id+"]":""); },
   firmaUz:id=>{ const f=FIRMA[id]; return f?(f["Наим_фирм_узбlat"]||f["Наим_фирм_анг"]||f["Наим_Фирмы_произ"]||""):""; },
-  adres:id=>{ if(!id) return ""; const a=ADRES[id]; if(!a) return "["+id+"]"; return a["Адрес"]||a["Адрес_рус"]||Object.values(a).find(v=>v&&v.length>8)||"["+id+"]"; },
+  adres:id=>{ if(!id) return ""; const a=ADRES[id]; if(!a) return "["+id+"]"; const vs=Object.values(a).filter(x=>typeof x==="string"&&x.trim()); vs.sort((x,y)=>y.length-x.length); return (a["Адрес"]&&a["Адрес"].length>=(vs[0]||"").length*0.6?a["Адрес"]:vs[0])||"["+id+"]"; },
   strana:id=>{ const s=SPR.strany[id]; return s?s["Наим_стран"]:(id?"["+id+"]":""); },
   spr:(t,id,f)=>{ if(!id) return ""; const o=SPR[t]&&SPR[t][id]; return o?(o[f]||Object.values(o)[0]||""):"["+id+"]"; },
   status:id=>nm.spr("status",id,"Наим_состоян"),
@@ -282,7 +282,7 @@ const nm={
   reshPrez:id=>nm.spr("resh_prez",id,"Наим_решкр"), reshEksov:id=>nm.spr("resh_eksov",id,"Наим_решкр"),
   ekspLab:id=>nm.spr("eksp_lab",id,"Эксперт"), papka:id=>nm.spr("papki",id,"имя_папки"),
   prez:id=>{ const p=SPR.prez[id]; return p?("№ "+(p["Номер_през"]||"")+" от "+C.fromISO(p["Дата_през"])):(id?"["+id+"]":""); },
-  vopr:id=>{ const o=SPR.vopr&&SPR.vopr[id]; return o?(Object.values(o)[0]||id):id; },
+  vopr:id=>{ if(!id) return ""; const o=SPR.vopr&&SPR.vopr[id]; if(!o) return id; const vs=Object.values(o).filter(x=>typeof x==="string"&&x.trim()).sort((x,y)=>y.length-x.length); return vs[0]?id+" — "+vs[0]:id; },
 };
 const D=C.fromISO;
 
@@ -552,9 +552,14 @@ function ochQisqa(){
 document.addEventListener("keydown",e=>{ if(e.key==="Escape"){ if(!$("ovSum").classList.contains("hidden")) yopQisqa(); else if(!$("ovCard").classList.contains("hidden")) yopKarta(); } });
 
 /* ================= boshlash ================= */
+function authReady(){ return new Promise(res=>{ const un=firebase.auth().onAuthStateChanged(u=>{ un(); res(u); }); }); }
 async function start(sess){
   SESS=sess||{role:"expert"};
-  try{ await yukla(); }catch(e){ $("st").innerHTML=`<span class="err">Bazani yuklab bo'lmadi: ${esc(e.message||e)}</span><p>Administrator bazani hali yuklamagan bo'lishi mumkin.</p>`; return; }
+  try{
+    if(!LOCAL){ const u=await authReady(); if(!u) throw new Error("Tizimga kirilmagan — asosiy sahifadan qayta kiring."); }
+    try{ await yukla(); }
+    catch(e){ if(!LOCAL&&/permission/i.test(String(e.message||e))){ await new Promise(r=>setTimeout(r,2500)); holat("Qayta urinilmoqda…",0); IDX=[]; FIRMA={}; ADRES={}; await yukla(); } else throw e; }
+  }catch(e){ $("st").innerHTML=`<span class="err">Bazani yuklab bo'lmadi: ${esc(e.message||e)}</span><p>Administrator bazani hali yuklamagan bo'lishi mumkin.</p>`; return; }
   sozla(); $("st").classList.add("hidden"); $("app").classList.remove("hidden");
 }
 window.BAZA={ start, theme:t=>{ document.documentElement.dataset.theme=t==="dark"?"dark":""; }, och:id=>ochKarta(+id) };
