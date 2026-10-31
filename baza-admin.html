@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tibbiy jihozlar bazasi — yangilash (administrator)</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:dark;--bg:#0A0E22;--panel:rgba(255,255,255,.045);--line:rgba(255,255,255,.10);--fg:#E7EAF6;--dim:#98A1C4;--accent:#5EEAD4;--onaccent:#062229;--stop:#FB7B8E;--ok:#A78BFA}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.55 "Space Grotesk",system-ui,sans-serif}
+.wrap{max-width:900px;margin:0 auto;padding:28px 20px 60px}
+.eb{font-family:"Space Mono",monospace;font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);margin:0 0 10px}
+h1{margin:0 0 6px;font-size:28px;letter-spacing:-.03em}
+.d{color:var(--dim);margin:0 0 18px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin-bottom:16px}
+.btn{font:600 14px "Space Grotesk",system-ui,sans-serif;background:var(--accent);color:var(--onaccent);border:0;border-radius:12px;padding:12px 22px;cursor:pointer;min-height:44px}
+.btn[disabled]{opacity:.5;cursor:default}
+.btn.ghost{background:var(--panel);color:var(--fg);border:1px solid var(--line)}
+input[type=file]{display:block;margin:10px 0;color:var(--dim)}
+.log{font-family:"Space Mono",monospace;font-size:12px;white-space:pre-wrap;background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:12px;max-height:340px;overflow:auto;margin-top:12px}
+.bar{height:8px;background:var(--line);border-radius:4px;overflow:hidden;margin:10px 0}
+.bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .2s}
+.err{color:var(--stop)}
+.ok{color:var(--ok)}
+code{font-family:"Space Mono",monospace;font-size:12.5px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="eb">Tibbiy jihozlar qo'mitasi · administrator</p>
+  <h1>Tibbiy jihozlar bazasini yangilash</h1>
+  <p class="d">Access/SQL Server'dan eksport qilingan CSV fayllar (C:\KNMT\csv) shu yerdan saytga yuklanadi. Eski ma'lumot to'liq almashadi. Xodimlar keyingi kirishda yangi ma'lumotni oladi.</p>
+
+  <div class="card" id="login">
+    <p>Yangilash faqat administratorga ochiq.</p>
+    <button class="btn" id="gbtn">Google orqali kirish</button>
+    <p class="err" id="lerr"></p>
+  </div>
+
+  <div class="card" id="app" style="display:none">
+    <p style="margin:0 0 6px">Kirdingiz: <b id="me"></b> <button class="btn ghost" id="out" style="padding:6px 12px;min-height:32px;margin-left:8px">Chiqish</button></p>
+    <p id="joriy" class="d" style="margin:0 0 14px"></p>
+    <p style="margin:0">1. <code>C:\KNMT\csv</code> papkasidagi <b>barcha</b> CSV fayllarni tanlang (Ctrl+A). Keraklilarini sayt o'zi ajratib oladi.</p>
+    <input type="file" id="files" accept=".csv,text/csv" multiple>
+    <p style="margin:0 0 8px">2. «Paketlash va yuklash» ni bosing. Jarayon 1–3 daqiqa; oynani yopmang.</p>
+    <button class="btn" id="go" disabled>Paketlash va yuklash</button>
+    <div class="bar"><i id="pb"></i></div>
+    <div class="log" id="log">Fayllar tanlanmagan.</div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script src="baza-core.js"></script>
+<script>
+"use strict";
+const FB_CONFIG={apiKey:"AIzaSyBeZKgyvUInhF0K4xw4amfP1echBlu0wl0",authDomain:"tekshiruv-88c03.firebaseapp.com",projectId:"tekshiruv-88c03",
+  storageBucket:"tekshiruv-88c03.firebasestorage.app",messagingSenderId:"989419587759",appId:"1:989419587759:web:052e115735c4ff6d86ac5a"};
+firebase.initializeApp(FB_CONFIG);
+const AUTH=firebase.auth(), DB=firebase.firestore();
+const $=id=>document.getElementById(id);
+const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+let FILES={};
+function log(s,cls){ const l=$("log"); l.innerHTML+=(cls?`<span class="${cls}">`:"")+esc(s)+(cls?"</span>":"")+"\n"; l.scrollTop=l.scrollHeight; }
+function pb(p){ $("pb").style.width=Math.round(p*100)+"%"; }
+
+$("gbtn").onclick=async()=>{ $("lerr").textContent="";
+  const pr=new firebase.auth.GoogleAuthProvider(); pr.setCustomParameters({prompt:"select_account"});
+  try{ await AUTH.signInWithPopup(pr); }
+  catch(e){ if(e.code==="auth/popup-blocked"||e.code==="auth/operation-not-supported-in-this-environment") AUTH.signInWithRedirect(pr);
+    else if(e.code!=="auth/popup-closed-by-user") $("lerr").textContent="Kirib bo'lmadi: "+(e.message||e.code); } };
+$("out").onclick=()=>AUTH.signOut().then(()=>location.reload());
+AUTH.onAuthStateChanged(async u=>{
+  if(!u||u.isAnonymous){ $("login").style.display=""; $("app").style.display="none"; return; }
+  let d; try{ d=await DB.doc("config/admin").get(); }catch(e){ $("lerr").textContent="Bazaga ulanib bo'lmadi: "+(e.message||e); return; }
+  if(!d.exists||d.data().uid!==u.uid){ $("lerr").textContent=u.email+" — administrator emas."; await AUTH.signOut(); return; }
+  $("login").style.display="none"; $("app").style.display=""; $("me").textContent=u.email;
+  try{ const m=await DB.doc("baza/meta").get();
+    $("joriy").textContent=m.exists?`Hozirgi baza: ${(m.data().counts||{}).izd||"?"} ta ish, yuklangan ${BazaCore.fromISO((m.data().ver||"").slice(0,10))}.`:"Saytda hali baza yo'q.";
+  }catch(e){ $("joriy").textContent="Hozirgi baza holatini o'qib bo'lmadi: "+(e.message||e); }
+});
+
+$("files").onchange=async e=>{
+  FILES={}; $("log").textContent=""; const fl=Array.from(e.target.files||[]);
+  for(const f of fl) FILES[f.name]=await f.text();
+  const kerak=["Изделие","Приложение","Производители","Адреспроизв","Месторег","Страны","Типы_стран","Статус","Сост_делопр","Сост_опл","Сост_рег","сост_реестра","Реестры","Эксперты","Лаборатории","Клиники","Разрешения","Тип_реш_Эксп","Тип_реш_лаб","Тип_реш_клин","Тип_реш_през","Тип_реш_эксов","эксп_лаб","папки","Президиумы","Вопросы_през","Типы_изделий"];
+  const yoq=kerak.filter(k=>!BazaCore.findCSV(FILES,k));
+  log(`Tanlandi: ${fl.length} ta fayl.`);
+  if(yoq.length) log("Topilmadi: "+yoq.join(", ")+(yoq.includes("Изделие")?"\nИзделие.csv shart — usiz yuklab bo'lmaydi.":"\n(bo'sh qoladi, qolgani ishlaydi)"),"err");
+  $("go").disabled=!BazaCore.findCSV(FILES,"Изделие");
+};
+
+$("go").onclick=async()=>{
+  $("go").disabled=true; $("files").disabled=true; pb(0);
+  try{
+    log("Paketlanmoqda…");
+    const {meta,docs}=await BazaCore.build(FILES,s=>log(s));
+    const names=Object.keys(docs).filter(k=>k!=="meta");
+    log(`Yuklanmoqda: ${names.length} ta paket…`);
+    let done=0; const q=names.slice();
+    const worker=async()=>{ while(q.length){ const n=q.shift(); const u8=docs[n];
+      await DB.collection("baza").doc(n).set({gz:firebase.firestore.Blob.fromUint8Array(u8),ver:meta.ver,n:u8.length,ts:firebase.firestore.FieldValue.serverTimestamp()});
+      done++; pb(done/(names.length+1)); if(done%10===0) log(`  ${done}/${names.length}`); } };
+    await Promise.all([worker(),worker(),worker(),worker()]);
+    await DB.doc("baza/meta").set(Object.assign({},meta,{ts:firebase.firestore.FieldValue.serverTimestamp()}));
+    pb(1);
+    log(`TAYYOR. Ishlar: ${meta.counts.izd}, ilovalar: ${meta.counts.pril||0}, firmalar: ${meta.counts.firma}. Versiya: ${meta.ver}`,"ok");
+    $("joriy").textContent=`Hozirgi baza: ${meta.counts.izd} ta ish, yuklangan ${BazaCore.fromISO(meta.ver.slice(0,10))}.`;
+  }catch(e){ log("XATO: "+(e.message||e),"err"); console.error(e); }
+  finally{ $("files").disabled=false; $("go").disabled=false; }
+};
+</script>
+</body>
+</html>

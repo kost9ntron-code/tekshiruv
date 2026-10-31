@@ -245,16 +245,16 @@ input[type=date]:focus{outline:0;border-color:var(--accent);box-shadow:0 0 0 3px
 #gate .gmnt b{display:block;color:var(--warn);font-size:15px;margin:0 0 6px}
 #gate .gmnt p{margin:0;font-size:13.5px;line-height:1.55;color:var(--fg)}
 #gate .gmnt .lnk{display:inline-block;width:auto;margin:12px 0 0;padding:0;background:none;border:0;color:var(--dim);font:500 12.5px var(--body);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
-.vnav{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:0 -20px 18px;padding:10px 20px;background:rgba(10,14,34,.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.vnav{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:0 -20px 18px;padding:10px 20px;background:rgba(10,14,34,.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
 .vnav[hidden]{display:none}
 .vnav button{font:600 14px var(--body);color:var(--dim);background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:11px 10px;cursor:pointer;line-height:1.25}
 .vnav button:hover{color:var(--fg);border-color:var(--linehi)}
 .vnav button[aria-selected="true"]{color:var(--onaccent);background:var(--accent);border-color:var(--accent)}
 .vnav button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-#pview[hidden]{display:none}
-#pframe{display:block;width:100%;height:70vh;border:0;background:var(--bg)}
-body[data-view="src"] .wrap>section.step,body[data-view="nom"] .wrap>section.step{display:none!important}
-body[data-view="src"] .wrap,body[data-view="nom"] .wrap{padding-bottom:0}
+#pview[hidden],#bview[hidden]{display:none}
+#pframe,#bframe{display:block;width:100%;height:70vh;border:0;background:var(--bg)}
+body[data-view="src"] .wrap>section.step,body[data-view="nom"] .wrap>section.step,body[data-view="baza"] .wrap>section.step{display:none!important}
+body[data-view="src"] .wrap,body[data-view="nom"] .wrap,body[data-view="baza"] .wrap{padding-bottom:0}
 @media (max-width:640px){.vnav{gap:6px;padding:8px 20px}.vnav button{font-size:12px;padding:9px 4px}}
 @media print{
   @page{size:A4;margin:16mm 15mm}
@@ -313,7 +313,7 @@ body[data-view="src"] .wrap,body[data-view="nom"] .wrap{padding-bottom:0}
 
 <header>
   <p class="who" id="who"></p> <button class="mini noprint" id="chiq" style="vertical-align:top;margin-left:6px;display:none">Chiqish</button>
-  <p class="eyebrow">Tibbiy jihozlar qo'mitasi · Shahzodbek O'roqov · 4-nashr</p>
+  <p class="eyebrow">Tibbiy jihozlar qo'mitasi · Shahzodbek O'roqov · 5-nashr</p>
   <h1>Xorijiy hujjatni tekshirish
     <span class="thin">PF-6221 bo'yicha tan olinadigan olti vakolatli organ — FDA, EMA, CE sertifikatini beruvchi organlar, PMDA, MFDS, MHRA — hamda ma'lumot uchun boshqa davlatlar reestrlari va ISO 13485 sertifikatlari. Har bir manba uchun aniq maydon nomi va ma'lum tuzoqlar ko'rsatilgan.</span>
   </h1>
@@ -323,8 +323,10 @@ body[data-view="src"] .wrap,body[data-view="nom"] .wrap{padding-bottom:0}
   <button type="button" data-v="tek" aria-selected="true">Hujjatni tekshirish</button>
   <button type="button" data-v="src" aria-selected="false">Vakolatli organlar va reestrlar</button>
   <button type="button" data-v="nom" aria-selected="false">Tibbiy jihoz haqida ma'lumotnoma</button>
+  <button type="button" data-v="baza" aria-selected="false">Tibbiy jihozlar bazasi</button>
 </nav>
 <div id="pview" class="noprint" hidden><iframe id="pframe" title="Vakolatli organlar va ma'lumotnoma" allow="clipboard-write"></iframe></div>
+<div id="bview" class="noprint" hidden><iframe id="bframe" title="Tibbiy jihozlar bazasi" allow="clipboard-write"></iframe></div>
 
 <section class="step" id="s1">
   <div class="sh"><span class="num">1</span><h2>Hujjatni kiriting</h2></div>
@@ -1418,12 +1420,21 @@ function ramka(){
     f.src="organlar.html?v=4"; });
   return PF;
 }
-function ramkaOlcham(){ if($("pview").hidden) return; $("pframe").style.height=Math.max(420,innerHeight-$("vnav").offsetHeight-6)+"px"; }
+let BF=null;
+function ramkaB(){
+  if(BF) return BF; const f=$("bframe");
+  BF=new Promise(res=>{ f.addEventListener("load",()=>{ try{ f.contentWindow.BAZA.start(SESS); }catch(e){} res(f); },{once:true});
+    f.src="baza.html?v=5"; });
+  return BF;
+}
+function ramkaOlcham(){ const h=Math.max(420,innerHeight-$("vnav").offsetHeight-6)+"px"; if(!$("pview").hidden) $("pframe").style.height=h; if(!$("bview").hidden) $("bframe").style.height=h; }
 function korinish(v){
   VIEW=v; document.body.dataset.view=v;
   document.querySelectorAll("#vnav button").forEach(b=>b.setAttribute("aria-selected",String(b.dataset.v===v)));
-  $("pview").hidden=(v==="tek");
-  if(v!=="tek"){ ramkaOlcham(); $("vnav").scrollIntoView({block:"start"});
+  $("pview").hidden=!(v==="src"||v==="nom");
+  $("bview").hidden=(v!=="baza");
+  if(v==="baza"){ ramkaOlcham(); $("vnav").scrollIntoView({block:"start"}); ramkaB(); }
+  else if(v!=="tek"){ ramkaOlcham(); $("vnav").scrollIntoView({block:"start"});
     ramka().then(f=>{ try{ f.contentWindow.TK.mode(v); }catch(e){} }); }
 }
 $("vnav").addEventListener("click",e=>{ const b=e.target.closest("button[data-v]"); if(b) korinish(b.dataset.v); });

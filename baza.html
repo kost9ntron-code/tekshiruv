@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tibbiy jihozlar bazasi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme:light;
+  --bg:#ececec; --form:#f0f0f0; --panel:#ffffff; --fg:#000; --dim:#444; --faint:#777;
+  --line:#abadb3; --linehi:#3c7fb1; --head:#d9d9d9; --tab:#e4e4e4; --tabon:#f0f0f0;
+  --accent:#1a5fa0; --onaccent:#fff; --sel:#cce4f7; --row:#fff; --row2:#f7f7f7;
+  --ok:#2e7d32; --warn:#b26a00; --stop:#c62828;
+  --font:Tahoma,"Segoe UI",system-ui,sans-serif; --mono:Consolas,"Space Mono",monospace;
+  --r:3px;
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0A0E22; --form:#111633; --panel:#161c3f; --fg:#E7EAF6; --dim:#98A1C4; --faint:#66709A;
+  --line:rgba(255,255,255,.16); --linehi:#5EEAD4; --head:#1b2250; --tab:#131a3d; --tabon:#1f2756;
+  --accent:#5EEAD4; --onaccent:#062229; --sel:rgba(94,234,212,.18); --row:#161c3f; --row2:#141a3a;
+  --ok:#5EEAD4; --warn:#FBBF6E; --stop:#FB7B8E;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--fg);font:13px/1.35 var(--font)}
+button,input,select,textarea{font:inherit;color:inherit}
+input[type=text],input[type=date],select,textarea{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:3px 5px;min-height:24px;width:100%}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--linehi);box-shadow:0 0 0 2px rgba(60,127,177,.25)}
+input[readonly],textarea[readonly]{background:var(--panel)}
+.btn{background:linear-gradient(#fdfdfd,#e3e3e3);border:1px solid #8e8f8f;border-radius:var(--r);padding:4px 14px;cursor:pointer;min-height:26px;color:#000}
+.btn:hover{border-color:var(--linehi);background:linear-gradient(#eaf6fd,#bee6fd)}
+:root[data-theme="dark"] .btn{background:var(--panel);border-color:var(--line);color:var(--fg)}
+:root[data-theme="dark"] .btn:hover{border-color:var(--linehi)}
+.btn.pri{background:var(--accent);color:var(--onaccent);border-color:var(--accent);font-weight:600}
+.hidden{display:none!important}
+
+/* --- Access oynasi --- */
+.win{background:var(--form);border:1px solid var(--line);border-radius:4px;box-shadow:0 2px 10px rgba(0,0,0,.18);margin:10px auto;max-width:1500px;overflow:hidden}
+.wt{display:flex;align-items:center;gap:8px;padding:5px 10px;background:var(--head);border-bottom:1px solid var(--line);font-weight:600}
+.wt .sp{flex:1}
+.wt .x{background:none;border:0;font-size:16px;cursor:pointer;padding:0 6px;line-height:1}
+.tb{display:flex;gap:6px;padding:6px 10px;border-bottom:3px solid #1a3a7a;background:var(--form);align-items:center;flex-wrap:wrap}
+.tb h2{margin:0 auto;font-size:17px;font-weight:700}
+.frm{padding:10px 12px;display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:4px 28px}
+.row{display:grid;grid-template-columns:185px 1fr;align-items:center;gap:6px;min-height:28px}
+.row label{line-height:1.15}
+.row.dd{grid-template-columns:185px 1fr 24px 1fr}
+.row .po{text-align:center;color:var(--dim)}
+.row.w2{grid-template-columns:185px 1fr 120px 1fr}
+.grp{display:contents}
+@media (max-width:980px){.frm{grid-template-columns:1fr}}
+@media (max-width:640px){.row,.row.dd,.row.w2{grid-template-columns:1fr}.row .po{display:none}}
+
+/* --- natija jadvali --- */
+.res{padding:6px 12px 12px}
+.res .cnt{display:flex;align-items:center;gap:10px;margin:4px 0 6px;color:var(--dim)}
+.res .cnt .sp{flex:1}
+.gridbox{overflow:auto;border:1px solid var(--line);background:var(--panel);max-height:60vh}
+table.g{border-collapse:collapse;width:100%;min-width:1100px;font-size:12.5px}
+table.g th{position:sticky;top:0;background:var(--head);border:1px solid var(--line);padding:5px 6px;text-align:left;font-weight:700;cursor:pointer;white-space:nowrap;user-select:none}
+table.g th .ar{color:var(--faint);font-size:10px;margin-left:3px}
+table.g td{border:1px solid var(--line);padding:4px 6px;vertical-align:top}
+table.g tbody tr{cursor:pointer;background:var(--row)}
+table.g tbody tr:nth-child(even){background:var(--row2)}
+table.g tbody tr:hover{background:var(--sel)}
+table.g td.n{font-family:var(--mono);white-space:nowrap}
+.pg{display:flex;gap:6px;align-items:center;margin-top:6px;color:var(--dim)}
+
+/* --- Изделия kartochkasi --- */
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:50;display:flex;align-items:flex-start;justify-content:center;padding:14px;overflow:auto}
+.card{background:var(--form);border:1px solid var(--line);border-radius:4px;box-shadow:0 10px 40px rgba(0,0,0,.45);width:min(1380px,100%);margin:auto}
+.hdr{display:grid;grid-template-columns:110px 120px 90px 1fr 140px 150px 1fr;gap:6px 8px;align-items:center;padding:8px 12px;background:#e9ecf5;border-bottom:1px solid var(--line)}
+:root[data-theme="dark"] .hdr{background:var(--head)}
+.hdr b.t{font-size:16px;text-align:center}
+.hdr .k{font-weight:700}
+.hdr input,.hdr select{min-height:24px}
+@media (max-width:900px){.hdr{grid-template-columns:110px 1fr;}.hdr b.t{grid-column:1/-1}}
+.tabs{display:flex;gap:2px;padding:6px 10px 0;border-bottom:1px solid var(--line);background:var(--form);flex-wrap:wrap}
+.tabs button{background:var(--tab);border:1px solid var(--line);border-bottom:0;border-radius:4px 4px 0 0;padding:5px 12px;cursor:pointer;font-weight:700}
+.tabs button[aria-selected="true"]{background:var(--tabon);position:relative;top:1px}
+.tp{padding:12px 14px;min-height:420px}
+.fr{display:grid;grid-template-columns:190px 1fr;gap:6px 10px;align-items:start;max-width:1100px}
+.fr label{font-weight:700;padding-top:4px}
+.v{min-height:24px;padding:3px 6px;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);white-space:pre-wrap;word-break:break-word}
+.v.n{font-family:var(--mono)}
+.v.e{color:var(--faint)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:6px 16px;align-items:start}
+.two.h div{text-align:center;font-weight:700;margin-bottom:4px}
+.c3{display:grid;grid-template-columns:150px 1fr 1fr;gap:6px 10px;align-items:start}
+.c3 label{font-weight:700;padding-top:4px}
+.sec{font-weight:700;margin:10px 0 4px;border-bottom:1px solid var(--line);padding-bottom:2px}
+.pz{display:grid;grid-template-columns:150px repeat(var(--n,4),1fr);gap:4px 8px;align-items:center}
+.pz .h{font-weight:700;text-align:center}
+.pz label{font-weight:700}
+.pz .v{min-height:24px;padding:3px 6px;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);word-break:break-word}
+.pz .v.n{font-family:var(--mono)}
+table.pl{border-collapse:collapse;width:100%}
+table.pl th,table.pl td{border:1px solid var(--line);padding:4px 6px;vertical-align:top;text-align:left}
+table.pl th{background:var(--head)}
+.note{color:var(--dim);font-size:12px;margin-top:8px}
+.ft{display:flex;gap:8px;padding:8px 12px;border-top:1px solid var(--line);align-items:center;flex-wrap:wrap}
+.ft .sp{flex:1}
+
+/* --- qisqa ko'rinish (Ish kartochkasi) --- */
+.sum{--bg:#0A0E22;--panel:rgba(255,255,255,.045);--line:rgba(255,255,255,.10);--fg:#E7EAF6;--dim:#98A1C4;--faint:#66709A;--accent:#5EEAD4;--ok:#A78BFA;
+  background:#0A0E22;color:#E7EAF6;font-family:"Space Grotesk",system-ui,sans-serif;border-radius:14px;width:min(1180px,100%);margin:auto;padding:22px 26px 30px;box-shadow:0 10px 40px rgba(0,0,0,.6)}
+.sum .mono{font-family:"Space Mono",monospace}
+.sum .top{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.sum .pill{display:inline-flex;align-items:center;min-height:34px;padding:6px 14px;border-radius:999px;border:1px solid rgba(255,255,255,.10);background:rgba(255,255,255,.045);color:#98A1C4;font-size:13px;cursor:pointer}
+.sum .tag{font-size:11.5px;padding:3px 9px;border-radius:999px;background:rgba(255,255,255,.05);color:#98A1C4}
+.sum .tag.a{background:rgba(94,234,212,.08);color:#5EEAD4}
+.sum .tag.o{background:rgba(167,139,250,.12);color:#A78BFA}
+.sum h1{margin:6px 0 0;font-size:26px;font-weight:700;letter-spacing:-.03em;line-height:1.15}
+.sum .sub{margin:4px 0 0;color:#98A1C4;font-size:14px}
+.sum .hd{padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,.10);margin-bottom:14px}
+.sum .g2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.sum section{background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.10);border-radius:14px;overflow:hidden;margin-bottom:14px}
+.sum h2{margin:0;padding:10px 16px;font-size:14px;font-weight:600;border-bottom:1px solid rgba(255,255,255,.10)}
+.sum dl{margin:0;padding:8px 16px 10px;display:grid;grid-template-columns:170px minmax(0,1fr);gap:6px 12px;font-size:13.5px}
+.sum dt{color:#98A1C4}.sum dd{margin:0}
+.sum .g4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr))}
+.sum .g4>div{padding:10px 14px;border-right:1px solid rgba(255,255,255,.08)}
+.sum .g4>div:last-child{border-right:0}
+.sum h3{margin:0 0 6px;font-size:11.5px;text-transform:uppercase;letter-spacing:.08em;color:#98A1C4;font-weight:500}
+.sum p{margin:0 0 4px;font-size:13px}
+.sum small{color:#98A1C4;font-family:"Space Mono",monospace;font-size:11.5px}
+.sum table{width:100%;border-collapse:collapse;font-size:13px}
+.sum th{text-align:left;padding:8px 14px;border-bottom:1px solid rgba(255,255,255,.10);font-weight:500;color:#98A1C4;font-size:11.5px;text-transform:uppercase;letter-spacing:.06em}
+.sum td{padding:8px 14px;border-bottom:1px solid rgba(255,255,255,.06)}
+@media (max-width:800px){.sum .g2,.sum .g4{grid-template-columns:1fr}.sum .g4>div{border-right:0;border-bottom:1px solid rgba(255,255,255,.08)}}
+
+/* --- holat --- */
+#st{padding:40px 20px;text-align:center;color:var(--dim)}
+#st .bar{height:6px;background:var(--line);border-radius:3px;max-width:420px;margin:12px auto;overflow:hidden}
+#st .bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .2s}
+.err{color:var(--stop)}
+</style>
+</head>
+<body>
+
+<div id="st">Ma'lumotlar yuklanmoqda…<div class="bar"><i id="stb"></i></div><div id="stt"></div></div>
+
+<div id="app" class="hidden">
+<div class="win" id="menu">
+  <div class="wt"><span>Меню запроса</span><span class="sp"></span><span id="mver" style="font-weight:400;color:var(--dim)"></span></div>
+  <div class="tb">
+    <button class="btn pri" id="bPoisk">Поиск</button>
+    <button class="btn" id="bOchist">Очистка</button>
+    <button class="btn" id="bExcel" title="Natijani Excel'ga chiqarish">Excel</button>
+    <h2>Меню поиска</h2>
+  </div>
+  <div class="frm">
+    <div class="grp">
+      <div class="row w2"><label for="f_kod">Код документа:</label><input type="text" id="f_kod" inputmode="numeric"><label for="f_arxiv">Номер архива:</label><input type="text" id="f_arxiv"></div>
+      <div class="row w2"><label for="f_dog">Номер договора:</label><input type="text" id="f_dog"><label for="f_gu">Код ЭлекДокум:</label><input type="text" id="f_gu"></div>
+      <div class="row"><label for="f_tipstr">Тип страны</label><select id="f_tipstr"><option value="">— все —</option></select></div>
+      <div class="row"><label for="f_strana">Страна</label><select id="f_strana"><option value="">— все —</option></select></div>
+      <div class="row"><label for="f_naim">Наименование изделий</label><input type="text" id="f_naim" placeholder="ru / uz / en — qism yozilsa ham topadi"></div>
+      <div class="row"><label for="f_firma">Производитель</label><input type="text" id="f_firma"></div>
+      <div class="row"><label for="f_derj">Держатель РУ</label><input type="text" id="f_derj"></div>
+      <div class="row"><label for="f_zayav">Заявитель</label><input type="text" id="f_zayav"></div>
+      <div class="row"><label for="f_eksp">Эксперт</label><select id="f_eksp"><option value="">— все —</option></select></div>
+      <div class="row"><label for="f_lab">Лаборатория</label><select id="f_lab"><option value="">— все —</option></select></div>
+      <div class="row"><label for="f_klin">Клиника</label><select id="f_klin"><option value="">— все —</option></select></div>
+      <div class="row"><label for="f_pril">Наименование приложения</label><input type="text" id="f_pril"></div>
+      <div class="row"><label for="f_norm">Нормативный документ</label><input type="text" id="f_norm"></div>
+      <div class="row w2"><label for="f_vopr">Номер вопроса пр-ма</label><input type="text" id="f_vopr"><label for="f_eksresh">Реш. эксп. совета</label><select id="f_eksresh"><option value="">— все —</option></select></div>
+    </div>
+    <div class="grp">
+      <div class="row dd"><label>Дата договора</label><input type="date" id="d_dog1"><span class="po">по</span><input type="date" id="d_dog2"></div>
+      <div class="row dd"><label>Дата карточки</label><input type="date" id="d_kart1"><span class="po">по</span><input type="date" id="d_kart2"></div>
+      <div class="row dd"><label>Дата документа</label><input type="date" id="d_dok1"><span class="po">по</span><input type="date" id="d_dok2"></div>
+      <div class="row dd"><label>Дата президиума</label><input type="date" id="d_prez1"><span class="po">по</span><input type="date" id="d_prez2"></div>
+      <div class="row dd"><label>Дата экспертного совета</label><input type="date" id="d_eks1"><span class="po">по</span><input type="date" id="d_eks2"></div>
+      <div class="row dd"><label>Дата регистрации</label><input type="date" id="d_reg1"><span class="po">по</span><input type="date" id="d_reg2"></div>
+      <div class="row dd"><label>Дата перерегистрации</label><input type="date" id="d_pereg1"><span class="po">по</span><input type="date" id="d_pereg2"></div>
+      <div class="row dd"><label>Дата корректировки</label><input type="date" id="d_korr1"><span class="po">по</span><input type="date" id="d_korr2"></div>
+      <div class="row dd"><label>Дата забора</label><input type="date" id="d_zab1"><span class="po">по</span><input type="date" id="d_zab2"></div>
+      <div class="row"><label for="f_sdel">Состояние дела</label><select id="f_sdel"><option value="">— все —</option></select></div>
+      <div class="row"><label for="f_sopl">Состояние оплаты</label><select id="f_sopl"><option value="">— все —</option></select></div>
+      <div class="row"><label for="f_sreg">Состояние регистрации</label><select id="f_sreg"><option value="">— все —</option></select></div>
+      <div class="row"><label for="f_reestr">Состояние реестра</label><select id="f_reestr"><option value="">— все —</option></select></div>
+      <div class="row"><label for="f_ispoln">Исполнитель</label><select id="f_ispoln"><option value="">— все —</option></select></div>
+      <div class="row"><label for="f_papka">Работа с папками</label><select id="f_papka"><option value="">— все —</option></select></div>
+      <div class="row"><label for="f_status">Статус</label><select id="f_status"><option value="">— все —</option></select></div>
+    </div>
+  </div>
+  <div class="res">
+    <div class="cnt"><span id="rcnt">Qidiruv uchun shartni kiriting va «Поиск» ni bosing.</span><span class="sp"></span><span id="rhint" style="font-size:12px"></span></div>
+    <div class="gridbox">
+      <table class="g" id="grid">
+        <thead><tr>
+          <th data-k="Док_ном">№ папки<span class="ar"></span></th><th data-k="Док_дат">Дата<span class="ar"></span></th><th data-k="Ном_договора">№ договора<span class="ar"></span></th>
+          <th data-k="Дата_догов">Дата дог-ра<span class="ar"></span></th><th data-k="Наим_изделия">Наименование изделия<span class="ar"></span></th><th data-k="_firma">Фирма-Производитель<span class="ar"></span></th>
+          <th data-k="_strana">Страна<span class="ar"></span></th><th data-k="Направл">Направление<span class="ar"></span></th><th data-k="Эксп_дат">Дата экс.<span class="ar"></span></th>
+        </tr></thead>
+        <tbody id="gb"></tbody>
+      </table>
+    </div>
+    <div class="pg"><button class="btn" id="pgPrev">◀</button><span id="pgInfo"></span><button class="btn" id="pgNext">▶</button></div>
+  </div>
+</div>
+</div>
+
+<div id="ovCard" class="ov hidden"></div>
+<div id="ovSum" class="ov hidden"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script src="baza-core.js"></script>
+<script>
+"use strict";
+const FB_CONFIG={apiKey:"AIzaSyBeZKgyvUInhF0K4xw4amfP1echBlu0wl0",authDomain:"tekshiruv-88c03.firebaseapp.com",projectId:"tekshiruv-88c03",
+  storageBucket:"tekshiruv-88c03.firebasestorage.app",messagingSenderId:"989419587759",appId:"1:989419587759:web:052e115735c4ff6d86ac5a"};
+const $=id=>document.getElementById(id);
+const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]||c));
+const C=BazaCore;
+const LOCAL=new URLSearchParams(location.search).has("local");
+const P=C.IDX_POS;
+let META=null, IDX=[], SPR=null, FIRMA={}, ADRES={}, PIDX=null, RES=[], PAGE=0, SORT={k:"Док_ном",d:-1}, SESS=null, DB=null;
+const FULL={};  // paket raqami -> {id: rec}
+
+/* ================= saqlash (IndexedDB) ================= */
+const IDBN="tj_baza", IDBS="paket";
+function idb(){ return new Promise((res,rej)=>{ const r=indexedDB.open(IDBN,1); r.onupgradeneeded=()=>r.result.createObjectStore(IDBS); r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error); }); }
+async function cacheGet(k){ try{ const d=await idb(); return await new Promise((res,rej)=>{ const t=d.transaction(IDBS).objectStore(IDBS).get(k); t.onsuccess=()=>res(t.result); t.onerror=()=>rej(t.error); }); }catch(e){ return null; } }
+async function cachePut(k,v){ try{ const d=await idb(); await new Promise((res,rej)=>{ const t=d.transaction(IDBS,"readwrite").objectStore(IDBS).put(v,k); t.onsuccess=res; t.onerror=()=>rej(t.error); }); }catch(e){} }
+
+/* ================= paketlarni olish ================= */
+async function rawDoc(name){
+  if(LOCAL){ const r=await fetch("baza-data/"+(name==="meta"?"meta.json":name+".gz")); if(!r.ok) throw new Error(name+" topilmadi"); return name==="meta"?await r.json():new Uint8Array(await r.arrayBuffer()); }
+  const s=await DB.collection("baza").doc(name).get();
+  if(!s.exists) throw new Error("Paket yo'q: "+name);
+  const d=s.data(); return name==="meta"?d:d.gz.toUint8Array();
+}
+async function paket(name){                 // gz paket -> obyekt (kesh bilan)
+  const ck=name+"@"+META.ver;
+  let u8=await cacheGet(ck);
+  if(!u8){ u8=await rawDoc(name); await cachePut(ck,u8); }
+  return JSON.parse(await C.gunzipToStr(u8));
+}
+function holat(t,p){ $("stt").textContent=t||""; if(p!=null) $("stb").style.width=Math.round(p*100)+"%"; }
+
+async function yukla(){
+  META=await rawDoc("meta");
+  const ishlar=[]; for(let i=0;i<META.idx;i++) ishlar.push("idx_"+i);
+  const firm=[]; for(let i=0;i<(META.firma||0);i++) firm.push("firma_"+i);
+  const adr=[]; for(let i=0;i<(META.adres||0);i++) adr.push("adres_"+i);
+  const all=["spr",...firm,...adr,...ishlar]; let k=0;
+  const out={};
+  for(const n of all){ holat("Yuklanmoqda: "+n, k/all.length); out[n]=await paket(n); k++; }
+  SPR=out.spr;
+  for(const n of firm) Object.assign(FIRMA,out[n]);
+  for(const n of adr) Object.assign(ADRES,out[n]);
+  for(const n of ishlar) for(const r of out[n]) IDX.push(r);
+  holat("Tayyor",1);
+}
+async function toliq(id){                   // bitta ishning to'liq yozuvi
+  const ch=Math.floor(id/META.fullChunk);
+  if(!FULL[ch]) FULL[ch]=await paket("full_"+ch);
+  return FULL[ch][id]||null;
+}
+async function prilIndeks(){ if(PIDX) return PIDX; PIDX=[]; for(let i=0;i<(META.pidx||0);i++){ $("rhint").textContent="Ilova nomlari yuklanmoqda… "+(i+1)+"/"+META.pidx; for(const r of await paket("pidx_"+i)) PIDX.push(r); } $("rhint").textContent=""; return PIDX; }
+
+/* ================= lug'atlar ================= */
+const nm={
+  firma:id=>{ const f=FIRMA[id]; return f?(f["Наим_фирм_рус"]||f["Наим_Фирмы_произ"]||""):(id?"["+id+"]":""); },
+  firmaUz:id=>{ const f=FIRMA[id]; return f?(f["Наим_фирм_узбlat"]||f["Наим_фирм_анг"]||f["Наим_Фирмы_произ"]||""):""; },
+  adres:id=>{ if(!id) return ""; const a=ADRES[id]; if(!a) return "["+id+"]"; return a["Адрес"]||a["Адрес_рус"]||Object.values(a).find(v=>v&&v.length>8)||"["+id+"]"; },
+  strana:id=>{ const s=SPR.strany[id]; return s?s["Наим_стран"]:(id?"["+id+"]":""); },
+  spr:(t,id,f)=>{ if(!id) return ""; const o=SPR[t]&&SPR[t][id]; return o?(o[f]||Object.values(o)[0]||""):"["+id+"]"; },
+  status:id=>nm.spr("status",id,"Наим_состоян"),
+  sdel:id=>nm.spr("sost_del",id,"Наим_состоян"), sopl:id=>nm.spr("sost_opl",id,"Наим_состоян"), sreg:id=>nm.spr("sost_reg",id,"Наим_состоян"),
+  reestr:id=>nm.spr("reestr",id,"Наим_реестра"), ispoln:id=>nm.spr("ispoln",id,"Наим_реестра"),
+  ekspert:id=>nm.spr("eksperty",id,"Фамилия"), lab:id=>nm.spr("lab",id,"Наим_лабор_кор"), labPoln:id=>nm.spr("lab",id,"Наим_лаб_полн"),
+  klin:id=>nm.spr("klin",id,"Наим_клиники"), razr:id=>nm.spr("razr",id,"Наим_разр_рус"),
+  reshEksp:id=>nm.spr("resh_eksp",id,"Наим_решРус"), reshLab:id=>nm.spr("resh_lab",id,"Наим_решРус"), reshKlin:id=>nm.spr("resh_klin",id,"Наим_решРус"),
+  reshPrez:id=>nm.spr("resh_prez",id,"Наим_решкр"), reshEksov:id=>nm.spr("resh_eksov",id,"Наим_решкр"),
+  ekspLab:id=>nm.spr("eksp_lab",id,"Эксперт"), papka:id=>nm.spr("papki",id,"имя_папки"),
+  prez:id=>{ const p=SPR.prez[id]; return p?("№ "+(p["Номер_през"]||"")+" от "+C.fromISO(p["Дата_през"])):(id?"["+id+"]":""); },
+  vopr:id=>{ const o=SPR.vopr&&SPR.vopr[id]; return o?(Object.values(o)[0]||id):id; },
+};
+const D=C.fromISO;
+
+/* ================= sozlash ================= */
+function tanlov(sel,obj,label,sortNum){
+  const s=$(sel); const keys=Object.keys(obj);
+  keys.sort(sortNum?(a,b)=>(+obj[a][sortNum]||999)-(+obj[b][sortNum]||999):(a,b)=>String(label(obj[a])).localeCompare(String(label(obj[b])),"ru"));
+  for(const k of keys){ const o=document.createElement("option"); o.value=k; o.textContent=label(obj[k]); s.appendChild(o); }
+}
+function sozla(){
+  tanlov("f_tipstr",SPR.tip_stran,o=>o["Наим_тип_страны"]);
+  tanlov("f_strana",SPR.strany,o=>o["Наим_стран"]);
+  tanlov("f_eksp",SPR.eksperty,o=>o["Фамилия"]);
+  tanlov("f_lab",SPR.lab,o=>o["Наим_лабор_кор"]+(o["Наим_лаб_полн"]?" — "+o["Наим_лаб_полн"].slice(0,60):""));
+  tanlov("f_klin",SPR.klin,o=>o["Наим_клиники"]);
+  tanlov("f_eksresh",SPR.resh_eksov,o=>o["Наим_решкр"]);
+  tanlov("f_sdel",SPR.sost_del,o=>o["Наим_состоян"],"пор_вых");
+  tanlov("f_sopl",SPR.sost_opl,o=>o["Наим_состоян"]);
+  tanlov("f_sreg",SPR.sost_reg,o=>o["Наим_состоян"],"пор_вых");
+  tanlov("f_reestr",SPR.reestr,o=>o["Наим_реестра"]);
+  tanlov("f_ispoln",SPR.ispoln,o=>o["Наим_реестра"]);
+  tanlov("f_papka",SPR.papki,o=>o["имя_папки"]);
+  tanlov("f_status",SPR.status,o=>o["Наим_состоян"],"пор_вых");
+  $("mver").textContent="Bazada "+IDX.length.toLocaleString("ru")+" ta ish · yangilangan "+D(META.ver.slice(0,10));
+  $("bPoisk").onclick=qidir; $("bOchist").onclick=tozala; $("bExcel").onclick=excel;
+  $("pgPrev").onclick=()=>{ if(PAGE>0){PAGE--;chiz();} }; $("pgNext").onclick=()=>{ if((PAGE+1)*200<RES.length){PAGE++;chiz();} };
+  document.querySelectorAll("#grid th").forEach(th=>th.onclick=()=>{ const k=th.dataset.k; SORT=SORT.k===k?{k,d:-SORT.d}:{k,d:1}; sarala(); chiz(); });
+  document.querySelectorAll("#menu input").forEach(i=>i.addEventListener("keydown",e=>{ if(e.key==="Enter") qidir(); }));
+  $("gb").addEventListener("click",e=>{ const tr=e.target.closest("tr[data-id]"); if(tr) ochKarta(+tr.dataset.id); });
+}
+function tozala(){ document.querySelectorAll("#menu input,#menu select").forEach(i=>i.value=""); RES=[]; chiz(); $("rcnt").textContent="Qidiruv uchun shartni kiriting va «Поиск» ni bosing."; }
+
+/* ================= qidiruv ================= */
+const low=s=>String(s||"").toLowerCase();
+const v=(r,c)=>r[P[c]]||"";
+function firmaIds(q){ q=low(q); const s=new Set(); for(const id of Object.keys(FIRMA)){ const f=FIRMA[id]; if(low(f["Наим_фирм_рус"]).includes(q)||low(f["Наим_Фирмы_произ"]).includes(q)||low(f["Наим_фирм_узбlat"]).includes(q)||low(f["Наим_фирм_анг"]).includes(q)) s.add(id); } return s; }
+function inRange(d,a,b){ if(!a&&!b) return true; if(!d) return false; if(a&&d<a) return false; if(b&&d>b) return false; return true; }
+async function qidir(){
+  const g=id=>$(id).value.trim();
+  const kod=g("f_kod"), arxiv=low(g("f_arxiv")), dog=low(g("f_dog")), gu=low(g("f_gu")), tipstr=g("f_tipstr"), strana=g("f_strana"), naim=low(g("f_naim")),
+    firma=g("f_firma"), derj=g("f_derj"), zayav=g("f_zayav"), eksp=g("f_eksp"), lab=g("f_lab"), klin=g("f_klin"), pril=low(g("f_pril")), norm=low(g("f_norm")),
+    vopr=g("f_vopr"), eksresh=g("f_eksresh"), sdel=g("f_sdel"), sopl=g("f_sopl"), sreg=g("f_sreg"), reestr=g("f_reestr"), ispoln=g("f_ispoln"), papka=g("f_papka"), status=g("f_status");
+  const dd=k=>[g("d_"+k+"1"),g("d_"+k+"2")];
+  const [dog1,dog2]=dd("dog"),[kart1,kart2]=dd("kart"),[dok1,dok2]=dd("dok"),[prez1,prez2]=dd("prez"),[eks1,eks2]=dd("eks"),[reg1,reg2]=dd("reg"),[pereg1,pereg2]=dd("pereg"),[korr1,korr2]=dd("korr"),[zab1,zab2]=dd("zab");
+  const fF=firma?firmaIds(firma):null, fD=derj?firmaIds(derj):null, fZ=zayav?firmaIds(zayav):null;
+  const stranaTip=tipstr?new Set(Object.keys(SPR.strany).filter(k=>SPR.strany[k]["Тип_страны"]===tipstr)):null;
+  let prilIds=null;
+  if(pril){ const px=await prilIndeks(); prilIds=new Set(); for(const [id,n] of px) if(low(n).includes(pril)) prilIds.add(String(id)); }
+  const out=[];
+  for(const r of IDX){
+    const id=v(r,"Док_ном");
+    if(kod&&id!==kod) continue;
+    if(arxiv&&!low(v(r,"ном_архив")).includes(arxiv)) continue;
+    if(dog&&!low(v(r,"Ном_договора")).includes(dog)) continue;
+    if(gu&&!low(v(r,"Код_док_ГУ")).includes(gu)) continue;
+    if(strana&&v(r,"Страна")!==strana) continue;
+    if(stranaTip&&!stranaTip.has(v(r,"Страна"))) continue;
+    if(naim&&!(low(v(r,"Наим_изделия")).includes(naim)||low(v(r,"Наим_издел_lat")).includes(naim)||low(v(r,"Наим_издел_мнр")).includes(naim))) continue;
+    if(fF&&!fF.has(v(r,"Фирма_произв"))) continue;
+    if(fD&&!fD.has(v(r,"Держатель РУ"))) continue;
+    if(fZ&&!fZ.has(v(r,"Представитель"))) continue;
+    if(eksp&&![1,2,3,4].some(i=>v(r,"Эксп_"+i)===eksp)) continue;
+    if(lab&&![1,2,3,4,5].some(i=>v(r,"Лаб_"+i)===lab)) continue;
+    if(klin&&![1,2,3].some(i=>v(r,"Клин_"+i)===klin)) continue;
+    if(prilIds&&!prilIds.has(id)) continue;
+    if(norm&&!low(v(r,"Нормдок")).includes(norm)) continue;
+    if(vopr&&![1,2,3,4].some(i=>v(r,"Вопр"+i+"_през")===vopr)) continue;
+    if(eksresh&&v(r,"Эксп_реш")!==eksresh) continue;
+    if(sdel&&v(r,"Сост_дел")!==sdel) continue;
+    if(sopl&&v(r,"Сост_опл")!==sopl) continue;
+    if(sreg&&v(r,"Сост_рег")!==sreg) continue;
+    if(reestr&&v(r,"Реестр")!==reestr) continue;
+    if(ispoln&&v(r,"Исполнит")!==ispoln) continue;
+    if(papka&&v(r,"папка")!==papka) continue;
+    if(status&&v(r,"Статус")!==status) continue;
+    if(!inRange(v(r,"Дата_догов"),dog1,dog2)) continue;
+    if(!inRange(v(r,"Дата_карточки"),kart1,kart2)) continue;
+    if(!inRange(v(r,"Док_дат"),dok1,dok2)) continue;
+    if((prez1||prez2)&&![1,2,3,4].some(i=>v(r,"През_"+i+"_дат")&&inRange(v(r,"През_"+i+"_дат"),prez1,prez2))) continue;
+    if(!inRange(v(r,"Эксп_дат"),eks1,eks2)) continue;
+    if(!inRange(v(r,"Рег_дат1"),reg1,reg2)) continue;
+    if(!inRange(v(r,"Рег_дат2"),pereg1,pereg2)) continue;
+    if(!inRange(v(r,"Дата_корр"),korr1,korr2)) continue;
+    if(!inRange(v(r,"Дата_забора"),zab1,zab2)) continue;
+    out.push(r);
+  }
+  RES=out; PAGE=0; sarala(); chiz();
+  $("rcnt").textContent="Topildi: "+RES.length.toLocaleString("ru")+" ta ish";
+}
+function sarala(){
+  const k=SORT.k, d=SORT.d;
+  const key=r=>k==="_firma"?nm.firma(v(r,"Фирма_произв")):k==="_strana"?nm.strana(v(r,"Страна")):k==="Док_ном"?+v(r,"Док_ном"):v(r,k);
+  RES.sort((a,b)=>{ const x=key(a),y=key(b); if(x===y) return 0; if(x===""||x==null) return 1; if(y===""||y==null) return -1; return (x<y?-1:1)*d; });
+  document.querySelectorAll("#grid th").forEach(th=>th.querySelector(".ar").textContent=th.dataset.k===k?(d>0?"▲":"▼"):"");
+}
+function chiz(){
+  const from=PAGE*200, rows=RES.slice(from,from+200);
+  $("gb").innerHTML=rows.map(r=>`<tr data-id="${v(r,"Док_ном")}"><td class="n">${v(r,"Док_ном")}</td><td class="n">${D(v(r,"Док_дат"))}</td><td class="n">${esc(v(r,"Ном_договора"))}</td><td class="n">${D(v(r,"Дата_догов"))}</td>
+    <td>${esc(v(r,"Наим_изделия")||v(r,"Наим_издел_lat"))}</td><td>${esc(nm.firma(v(r,"Фирма_произв")))}</td><td>${esc(nm.strana(v(r,"Страна")))}</td><td class="n">${esc(v(r,"Направл"))}</td><td class="n">${D(v(r,"Эксп_дат"))}</td></tr>`).join("");
+  $("pgInfo").textContent=RES.length?`${from+1}–${Math.min(from+200,RES.length)} / ${RES.length}`:"";
+  $("pgPrev").disabled=PAGE===0; $("pgNext").disabled=(PAGE+1)*200>=RES.length;
+}
+function excel(){
+  if(!RES.length) return;
+  const h=["№ папки","Дата","№ договора","Дата дог-ра","Наименование изделия","Фирма-Производитель","Страна","Направление","Дата экс."];
+  const q=s=>'"'+String(s==null?"":s).replace(/"/g,'""')+'"';
+  const lines=[h.map(q).join(";")].concat(RES.map(r=>[v(r,"Док_ном"),D(v(r,"Док_дат")),v(r,"Ном_договора"),D(v(r,"Дата_догов")),v(r,"Наим_изделия"),nm.firma(v(r,"Фирма_произв")),nm.strana(v(r,"Страна")),v(r,"Направл"),D(v(r,"Эксп_дат"))].map(q).join(";")));
+  const b=new Blob(["\ufeff"+lines.join("\r\n")],{type:"text/csv;charset=utf-8"}); const a=document.createElement("a"); a.href=URL.createObjectURL(b); a.download="qidiruv_natijasi.csv"; a.click();
+}
+
+/* ================= Изделия kartochkasi ================= */
+let CUR=null;
+const V=(rec,c,cls)=>`<div class="v ${cls||""}${rec[c]?"":" e"}">${esc(rec[c]||"")}</div>`;
+const VD=(rec,c)=>`<div class="v n${rec[c]?"":" e"}">${D(rec[c])}</div>`;
+const VL=(val,cls)=>`<div class="v ${cls||""}${val?"":" e"}">${esc(val||"")}</div>`;
+function qolganKun(rec){ if(!rec["Дата_окон"]) return ""; const d=(new Date(rec["Дата_окон"])-new Date(new Date().toISOString().slice(0,10)))/86400000; return String(Math.max(0,Math.round(d))); }
+
+const TABS=[["izd","Изделие"],["naim","Наименование"],["prez","Президиум"],["proch","Прочие"],["pril","Приложение"],["zak","Заказчики"]];
+function tabIzd(r){ return `<div class="fr">
+  <label>Дата поступления</label><div class="two" style="grid-template-columns:150px 180px 150px 90px 1fr;gap:6px;align-items:center">${VD(r,"Док_дат")}<label style="text-align:right">Дата оконч. исполнения</label>${VD(r,"Дата_окон")}<label style="text-align:right">Осталось дней:</label>${VL(qolganKun(r),"n")}<span class="note" style="margin:0">срок: ${esc(r["срок"]||"")}</span></div>
+  <label>Наименование изделия на русском языке</label>${V(r,"Наим_изделия")}
+  <label>Наименование изделия на узбекском языке</label>${V(r,"Наим_издел_узб")}
+  <label>Краткая характеристика изделия</label>${V(r,"Наим_издел_кор")}
+  <label>№ Эксп. совета 1 / 2</label><div class="two">${V(r,"Эксп_ном","n")}${V(r,"Эксп_ном2","n")}</div>
+  <label>Дата Эксп. совета 1 / 2</label><div class="two">${VD(r,"Эксп_дат")}${VD(r,"Эксп_дат2")}</div>
+  <label>Реш. эксп. совета 1 / 2</label><div class="two">${VL(nm.reshEksov(r["Эксп_реш"]))}${VL(nm.reshEksov(r["Эксп_реш2"]))}</div>
+  <label>Основание к Эксп. 1 / 2</label><div class="two">${V(r,"Эксп_осн")}${V(r,"Эксп_осн2")}</div>
+  <label>Президиум эксп. совета 1 / 2</label><div class="two">${VL(nm.prez(r["Эксп_пр"]))}${VL(nm.prez(r["Эксп_пр2"]))}</div>
+  <label>№ Рег. удостов. 1 / 2</label><div class="two">${V(r,"Рег_ном","n")}${V(r,"Рег_ном2","n")}</div>
+  <label>Дата Регистр. 1 / 2</label><div class="two">${VD(r,"Рег_дат1")}${VD(r,"Рег_дат12")}</div>
+  <label>Дата Перерегистрации 1 / 2</label><div class="two">${VD(r,"Рег_дат2")}${VD(r,"Рег_дат3")}</div>
+  <label>Дата Корректировки</label>${VD(r,"Дата_корр")}
+  <label>Дата изменения в НД</label>${VD(r,"Дата_изм_нд")}
+  <label>Состояние регистрации</label>${VL(nm.sreg(r["Сост_рег"]))}
+  <label>Состояние делопроизводства</label>${VL(nm.sdel(r["Сост_дел"]))}
+  <label>Состояние реестра</label>${VL(nm.reestr(r["Реестр"]))}
+  <label>Ф.И.О. исполнителя</label>${VL(nm.ispoln(r["Исполнит"]))}
+</div>`; }
+function tabNaim(r){ return `<div class="c3"><div></div><div style="text-align:center;font-weight:700">Окончательный вариант названия</div><div style="text-align:center;font-weight:700">Название по заявке</div>
+  <label>Наименование изделия на русском языке</label>${V(r,"Наим_изделия")}${V(r,"Наим_изделия_ст")}
+  <label>Наименование изделия на узбекском языке (латиница)</label>${V(r,"Наим_издел_lat")}${V(r,"Наим_издел_lat_ст")}
+  <label>Наименование изделия на узбекском языке (кириллица)</label>${V(r,"Наим_издел_узб")}${V(r,"Наим_издел_узб_ст")}
+  <label>Наименование изделия на международном языке</label>${V(r,"Наим_издел_мнр")}${V(r,"Наим_издел_мнр_ст")}
+</div>`; }
+function pzRow(label,cells,n){ return `<label>${label}</label>`+cells.map(c=>c).join(""); }
+function tabPrez(r){
+  const h=(t,n,names)=>`<div class="pz" style="--n:${n}"><div class="h" style="text-align:left">${t}</div>${names.map(x=>`<div class="h">${x}</div>`).join("")}`;
+  const e=[1,2,3,4], l=[1,2,3,4,5], k=[1,2,3];
+  return `${h("Эксперты:",4,["Первый","Второй","Третий","Четвертый"])}
+    ${pzRow("Фамилия И.О.",e.map(i=>VL(nm.ekspert(r["Эксп_"+i]))))}
+    ${pzRow("№ П-ма / Дата письма",e.map(i=>VL([r["Эксп_нп_"+i],D(r["Эксп_датп_"+i])].filter(Boolean).join(" · "),"n")))}
+    ${pzRow("Разрешения:",e.map(i=>VL(nm.razr(r["Экспр_"+i]))))}
+    ${pzRow("Дата разрешения",e.map(i=>VD(r,"Эксп_дат_"+i)))}
+    </div>
+    <div class="fr" style="margin-top:6px"><label>Результат экспертизы:</label>${VL(nm.reshEksp(r["Реш_эксп"]))}</div>
+    <div class="sec"></div>
+    ${h("Лаборатории:",5,["Первая","Вторая","Третья","Четвертая","Пятая"])}
+    ${pzRow("Наименование:",l.map(i=>VL(nm.lab(r["Лаб_"+i]))))}
+    ${pzRow("Разрешения:",l.map(i=>VL(nm.razr(r["Лабр_"+i]))))}
+    ${pzRow("№ и дата раз-ния:",l.map(i=>VL([r["Лаб_ном_"+i],D(r["Лаб_дат_"+i])].filter(Boolean).join(" · "),"n")))}
+    ${pzRow("Эксперт лаб-рии:",l.map(i=>VL(nm.ekspLab(r["Лабэ_"+i]))))}
+    </div>
+    <div class="fr" style="margin-top:6px"><label>Результаты анализа:</label>${VL(nm.reshLab(r["Реш_лаб"]))}</div>
+    <div class="sec"></div>
+    ${h("Клиники:",3,["Первая","Вторая","Третья"])}
+    ${pzRow("Наименование:",k.map(i=>VL(nm.klin(r["Клин_"+i]))))}
+    ${pzRow("№ П-ма / Дата письма",k.map(i=>VL([r["Клин_нп_"+i],D(r["Клин_датп_"+i])].filter(Boolean).join(" · "),"n")))}
+    ${pzRow("Разрешения:",k.map(i=>VL(nm.razr(r["Клинр_"+i]))))}
+    ${pzRow("Дата разрешения",k.map(i=>VD(r,"Клин_дат_"+i)))}
+    </div>
+    <div class="fr" style="margin-top:6px"><label>Результаты исследований:</label>${VL(nm.reshKlin(r["Реш_клин"]))}</div>
+    <div class="sec"></div>
+    ${h("Президиумы КНМТ",4,["Первый","Второй","Третий","Четвертый"])}
+    ${pzRow("Номер през-ма:",e.map(i=>V(r,"През_"+i+"_ном","n")))}
+    ${pzRow("Дата президиума:",e.map(i=>VD(r,"През_"+i+"_дат")))}
+    ${pzRow("Номер вопроса:",e.map(i=>VL(nm.vopr(r["Вопр"+i+"_през"]),"n")))}
+    ${pzRow("Поряд. номер вопроса:",e.map(i=>V(r,"Нвопр"+i+"_през","n")))}
+    </div>
+    <div class="fr" style="margin-top:6px">
+      ${e.map(i=>`<label>Решение ${i}-го президиума:</label>${VL(nm.reshPrez(r["Реш_през"+i]))}`).join("")}
+      <label>Замечание к хулоса:</label>${V(r,"Замеч_хулоса")}
+    </div>`;
+}
+function tabProch(r){ return `<div class="fr">
+  <label>Номер договора / Дата договора</label><div class="two">${V(r,"Ном_договора","n")}${VD(r,"Дата_догов")}</div>
+  <label>Дата извещения (1 / 2 / 3)</label><div class="two" style="grid-template-columns:1fr 1fr 1fr">${VD(r,"Извещ1")}${VD(r,"Извещ2")}${VD(r,"Извещ3")}</div>
+  <label>Номер архива</label>${V(r,"ном_архив","n")}
+  <label>Состояние оплаты</label>${VL(nm.sopl(r["Сост_опл"]))}
+  <label>Место регистрации I</label>${V(r,"Местрег")}
+  <label>Место регистрации (страны)</label>${VL((r.mr||[]).map(nm.strana).join(", "))}
+  <label>Дата сдачи образцов (I / II / III)</label><div class="two" style="grid-template-columns:1fr 1fr 1fr">${VD(r,"Дата_забора")}${VD(r,"Дата_забора2")}${VD(r,"Дата_забора3")}</div>
+  <label>Место инсталляции</label>${V(r,"Место_инсталяции")}
+  <label>Работа с папками</label>${VL(nm.papka(r["папка"]))}
+  <label>Примечание</label>${V(r,"Примечан")}
+  <label>Представитель</label>${V(r,"Коммент1")}
+  <label>Комментарий</label>${V(r,"Коммент2")}
+  <label>Отзывы от клиник</label>${V(r,"Отзывы")}
+  <label>Нормативный документ</label>${VL([r["Нормдок"],r["Норм_док"]].filter(Boolean).join("; "))}
+  <label>Код документа ГУ</label>${V(r,"Код_док_ГУ","n")}
+  <label>GMDN / Basic UDI-DI</label>${VL([r["GMDN"],r["Basic UDI-DI"]].filter(Boolean).join(" · "),"n")}
+</div><p class="note">Shartnoma summalari, to'lovlar va korrespondensiya bu yerda ko'rsatilmaydi.</p>`; }
+function tabPril(r){ const p=r.pr||[]; if(!p.length) return `<p class="note">Bu ishda ilova yo'q.</p>`;
+  return `<table class="pl"><thead><tr><th style="width:50px">№ п/п</th><th style="width:70px">Пор_ном</th><th>Окончательный вариант названий приложений</th><th style="width:70px">Пор_ном</th><th>Название приложения по заявке</th></tr></thead><tbody>
+  ${p.map((x,i)=>`<tr><td>${i+1}</td><td>${esc(x[4]||x[0])}</td><td>${esc(x[3]||x[2])}</td><td>${esc(x[0])}</td><td>${esc(x[2])}</td></tr>`).join("")}</tbody></table>
+  <p class="note">${p.length} ta pozitsiya</p>`; }
+function tabZak(r){ return `<div class="c3"><div></div><div style="text-align:center;font-weight:700">Окончательные данные о заказчиках</div><div style="text-align:center;font-weight:700">Заявленные данные о заказчиках</div>
+  <label>Производитель</label>${VL(nm.firma(r["Фирма_произв"]))}${VL(nm.firma(r["Фирма_произв_с"]))}
+  <label>Юридический адрес производителя</label>${VL(nm.adres(r["Адрес_пр"]))}${VL(nm.adres(r["Адрес_пр_с"]))}
+  <label>Адрес производства</label>${VL(nm.adres(r["Ном_адр_произв"]))}${VL(nm.adres(r["Ном_адр_произв_с"]))}
+  <label>Держатель РУ</label>${VL(nm.firma(r["Держатель РУ"]))}${VL(nm.firma(r["Держатель РУ_с"]))}
+  <label>Юридический адрес Держателя РУ</label>${VL(nm.adres(r["Адрес_дж"]))}${VL(nm.adres(r["Адрес_дж_с"]))}
+  <label>Заявитель</label>${VL(nm.firma(r["Представитель"]))}${VL(nm.firma(r["Представитель_с"]))}
+  <label>Юридический адрес заявителя</label>${VL(nm.adres(r["Адрес_за"]))}${VL(nm.adres(r["Адрес_за_с"]))}
+  <label>Страна производителя</label>${VL(nm.strana(r["Страна"]))}${VL(nm.strana(r["Страна_с"]))}
+</div>`; }
+const TABF={izd:tabIzd,naim:tabNaim,prez:tabPrez,proch:tabProch,pril:tabPril,zak:tabZak};
+
+async function ochKarta(id,tab){
+  $("ovCard").classList.remove("hidden"); $("ovCard").innerHTML=`<div class="card"><div class="wt">Изделия<span class="sp"></span><button class="x" onclick="yopKarta()">✕</button></div><div class="tp">Yuklanmoqda…</div></div>`;
+  let r; try{ r=await toliq(id); }catch(e){ $("ovCard").querySelector(".tp").innerHTML=`<span class="err">Yuklab bo'lmadi: ${esc(e.message||e)}</span>`; return; }
+  if(!r){ $("ovCard").querySelector(".tp").textContent="Ish topilmadi: "+id; return; }
+  CUR={id,r}; tab=tab||"izd";
+  $("ovCard").innerHTML=`<div class="card">
+    <div class="wt">Изделия<span class="sp"></span><button class="btn" onclick="ochQisqa()">Qisqa ko'rinish</button><button class="btn" onclick="window.print()">Chop etish</button><button class="x" onclick="yopKarta()" aria-label="Yopish">✕</button></div>
+    <div class="hdr">
+      <span class="k">Код док-та</span><div class="v n" style="background:var(--panel);border:1px solid var(--line);padding:3px 6px;font-weight:700">${id}</div>
+      <b class="t">Изделия</b><span></span>
+      <span class="k">Код Направления</span><div class="v n" style="background:var(--panel);border:1px solid var(--line);padding:3px 6px">${esc(r["Направл"]||"")}</div>
+      <div><span class="k">Код Документа ГУ</span> <span style="font-family:var(--mono)">${esc(r["Код_док_ГУ"]||"")}</span></div>
+      <span class="k">Дата кар-ки</span><div class="v n" style="background:var(--panel);border:1px solid var(--line);padding:3px 6px">${D(r["Дата_карточки"])}</div>
+      <span></span><span></span>
+      <span class="k">Статус</span><div class="v" style="background:var(--panel);border:1px solid var(--line);padding:3px 6px;grid-column:span 2">${esc(nm.status(r["Статус"]))}</div>
+    </div>
+    <div class="tabs" role="tablist">${TABS.map(([k,n])=>`<button role="tab" data-t="${k}" aria-selected="${k===tab}">${n}</button>`).join("")}</div>
+    <div class="tp" id="tp">${TABF[tab](r)}</div>
+    <div class="ft"><span style="color:var(--dim)">Faqat ko'rish. Ma'lumot Access/KNMT bazasidan o'zgarishsiz.</span><span class="sp"></span><button class="btn" onclick="yopKarta()">Yopish</button></div>
+  </div>`;
+  $("ovCard").querySelector(".tabs").addEventListener("click",e=>{ const b=e.target.closest("button[data-t]"); if(!b) return;
+    $("ovCard").querySelectorAll(".tabs button").forEach(x=>x.setAttribute("aria-selected",String(x===b))); $("tp").innerHTML=TABF[b.dataset.t](r); });
+}
+function yopKarta(){ $("ovCard").classList.add("hidden"); $("ovCard").innerHTML=""; }
+function yopQisqa(){ $("ovSum").classList.add("hidden"); $("ovSum").innerHTML=""; }
+function ochQisqa(){
+  if(!CUR) return; const r=CUR.r, id=CUR.id;
+  const li=(label,val,mono)=>`<dt>${label}</dt><dd${mono?' class="mono"':''}>${esc(val||"—")}</dd>`;
+  const eks=[1,2,3,4].filter(i=>r["Эксп_"+i]).map(i=>`<p>${i}. ${esc(nm.ekspert(r["Эксп_"+i]))} <small>${D(r["Эксп_дат_"+i])}${r["Экспр_"+i]?" · "+esc(nm.razr(r["Экспр_"+i])):""}</small></p>`).join("")||"<p><small>—</small></p>";
+  const lab=[1,2,3,4,5].filter(i=>r["Лаб_"+i]).map(i=>`<p>${i}. ${esc(nm.lab(r["Лаб_"+i]))} <small>${D(r["Лаб_дат_"+i])}${r["Лабр_"+i]?" · "+esc(nm.razr(r["Лабр_"+i])):""}</small></p>`).join("")||"<p><small>—</small></p>";
+  const kl=[1,2,3].filter(i=>r["Клин_"+i]).map(i=>`<p>${i}. ${esc(nm.klin(r["Клин_"+i]))} <small>${D(r["Клин_дат_"+i])}</small></p>`).join("")||"<p><small>—</small></p>";
+  const pz=[1,2,3,4].filter(i=>r["През_"+i+"_ном"]).map(i=>`<p>Президиум № ${esc(r["През_"+i+"_ном"])} <small>${D(r["През_"+i+"_дат"])}${r["Реш_през"+i]?" · "+esc(nm.reshPrez(r["Реш_през"+i])):""}</small></p>`).join("")+
+    (r["Эксп_ном"]?`<p>Эксп. совет № ${esc(r["Эксп_ном"])} <small>${D(r["Эксп_дат"])}${r["Эксп_реш"]?" · "+esc(nm.reshEksov(r["Эксп_реш"])):""}</small></p>`:"");
+  const p=r.pr||[];
+  $("ovSum").classList.remove("hidden");
+  $("ovSum").innerHTML=`<div class="sum">
+    <div class="top"><button class="pill" onclick="yopQisqa()">‹ Kartochkaga qaytish</button><span class="mono" style="font-size:11px;color:#98A1C4">Tibbiy jihozlar bazasi · Ish kartochkasi</span><span style="flex:1"></span><button class="pill" onclick="window.print()">Chop etish</button></div>
+    <div class="hd"><div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><span class="mono" style="font-size:13px;color:#5EEAD4">№ папки ${id}</span>
+      ${r["Реестр"]?`<span class="tag o">Реестр: ${esc(nm.reestr(r["Реестр"]))}</span>`:""}${r["Сост_дел"]?`<span class="tag a">Сост. дела: ${esc(nm.sdel(r["Сост_дел"]))}</span>`:""}${r["Сост_рег"]?`<span class="tag">Сост. рег.: ${esc(nm.sreg(r["Сост_рег"]))}</span>`:""}</div>
+      <h1>${esc(r["Наим_изделия"]||"—")}</h1><p class="sub">${esc(r["Наим_издел_lat"]||"")}${r["Наим_издел_мнр"]?` · <span style="color:#66709A">${esc(r["Наим_издел_мнр"])}</span>`:""}</p></div>
+    <div class="g2">
+      <section><h2>Asosiy ma'lumotlar</h2><dl>${li("Дата поступления",D(r["Док_дат"]),1)}${li("Дата карточки",D(r["Дата_карточки"]),1)}${li("Фирма-Производитель",nm.firma(r["Фирма_произв"]))}${li("Страна",nm.strana(r["Страна"]))}${li("Заявитель",nm.firma(r["Представитель"]))}${li("Держатель РУ",nm.firma(r["Держатель РУ"]))}${li("Направление",r["Направл"])}${li("Исполнитель",nm.ispoln(r["Исполнит"]))}${li("Статус",nm.status(r["Статус"]))}</dl></section>
+      <section><h2>Ro'yxatga olish va shartnoma</h2><dl>${li("Рег. номер",r["Рег_ном"],1)}${li("Дата регистрации",D(r["Рег_дат1"]),1)}${li("Рег. номер 2",r["Рег_ном2"],1)}${li("Дата перерегистрации",D(r["Рег_дат2"]),1)}${li("№ договора",r["Ном_договора"],1)}${li("Дата договора",D(r["Дата_догов"]),1)}${li("Номер архива",r["ном_архив"],1)}${li("Место регистрации",r["Местрег"])}</dl></section>
+    </div>
+    <section><h2>Ekspertiza jarayoni</h2><div class="g4"><div><h3>Эксперты</h3>${eks}</div><div><h3>Лаборатории</h3>${lab}</div><div><h3>Клиники</h3>${kl}</div><div><h3>Президиум · Эксп. совет</h3>${pz||"<p><small>—</small></p>"}</div></div></section>
+    <section><h2>Приложение <small>${p.length} ta pozitsiya</small></h2>${p.length?`<div style="overflow-x:auto"><table><thead><tr><th style="width:56px">№</th><th>Наименование приложения</th></tr></thead><tbody>${p.map((x,i)=>`<tr><td class="mono" style="color:#98A1C4">${i+1}</td><td>${esc(x[3]||x[2])}</td></tr>`).join("")}</tbody></table></div>`:`<p style="padding:10px 16px;color:#98A1C4">Ilova yo'q.</p>`}</section>
+    <p style="font-size:12px;color:#98A1C4;margin:0">Summalar, rekvizitlar, xatlar bu yerda ko'rsatilmaydi. Tahrirlash yo'q.</p>
+  </div>`;
+}
+document.addEventListener("keydown",e=>{ if(e.key==="Escape"){ if(!$("ovSum").classList.contains("hidden")) yopQisqa(); else if(!$("ovCard").classList.contains("hidden")) yopKarta(); } });
+
+/* ================= boshlash ================= */
+async function start(sess){
+  SESS=sess||{role:"expert"};
+  try{ await yukla(); }catch(e){ $("st").innerHTML=`<span class="err">Bazani yuklab bo'lmadi: ${esc(e.message||e)}</span><p>Administrator bazani hali yuklamagan bo'lishi mumkin.</p>`; return; }
+  sozla(); $("st").classList.add("hidden"); $("app").classList.remove("hidden");
+}
+window.BAZA={ start, theme:t=>{ document.documentElement.dataset.theme=t==="dark"?"dark":""; }, och:id=>ochKarta(+id) };
+(function(){
+  if(LOCAL){ start({role:"admin",name:"sinov"}); return; }
+  firebase.initializeApp(FB_CONFIG); DB=firebase.firestore();
+  const t=setTimeout(()=>{ firebase.auth().onAuthStateChanged(u=>{ if(u&&!SESS) start({role:"expert"}); else if(!u) $("st").innerHTML='<span class="err">Avval asosiy sahifadan tizimga kiring.</span>'; }); },1500);
+  window.addEventListener("message",e=>{ if(e.data&&e.data.baza==="start"){ clearTimeout(t); if(!SESS) start(e.data.sess); } });
+})();
+</script>
+</body>
+</html>
