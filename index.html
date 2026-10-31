@@ -278,6 +278,200 @@ body[data-view="src"] .wrap,body[data-view="nom"] .wrap,body[data-view="baza"] .
   #bayon tr{break-inside:avoid}
 }
 </style>
+<style id="ko-css">
+/* ===== Ko'rinish sozlamalari: tema, rang, andoza ===== */
+html[data-theme="light"]{
+  color-scheme:light;
+  --bg:#F3F5FB; --panel:#FFFFFF; --head:#F0F2F9; --chip:#EEF1F8; --field:#FFFFFF;
+  --fg:#141A33; --dim:#4D5677; --faint:#7C84A3;
+  --line:rgba(20,26,51,.14);
+  --ok:#6D4FD6; --onok:#FFFFFF; --okbg:rgba(109,79,214,.10);
+  --warn:#A8620A; --warnbg:rgba(168,98,10,.10);
+  --stop:#C62840; --stopbg:rgba(198,40,64,.09);
+  --pborder:1px solid rgba(20,26,51,.13); --shadow:0 18px 40px -30px rgba(20,26,51,.45);
+  --hdrule:1px solid rgba(20,26,51,.13);
+  --gatebg:radial-gradient(900px 600px at 30% 20%, #E3E8F7, #F3F5FB 70%);
+  --gateshadow:0 30px 70px -40px rgba(20,26,51,.5);
+  --numfg:#FFFFFF; --h1a:#141A33; --barbg:rgba(243,245,251,.92);
+}
+html[data-theme="dark"]{ --h1a:#FFFFFF; --barbg:rgba(10,14,34,.92); }
+body::before{background:
+  radial-gradient(950px 600px at 12% -8%, rgba(var(--acrgb,94,234,212),.16), transparent 62%),
+  radial-gradient(800px 520px at 92% 4%, rgba(var(--sec,167,139,250),.15), transparent 62%),
+  radial-gradient(700px 500px at 60% 100%, rgba(59,130,246,.09), transparent 65%)!important}
+html[data-theme="light"] body::before{opacity:.75}
+h1{background:linear-gradient(96deg,var(--h1a,#fff) 18%,var(--accent) 62%,rgb(var(--sec,167,139,250)) 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+h1 .thin{background:none;-webkit-text-fill-color:var(--dim);color:var(--dim)}
+.btn,.mini.solid{box-shadow:0 10px 26px -12px rgba(var(--acrgb,94,234,212),.5)}
+html[data-theme="light"] .src:hover{background:rgba(20,26,51,.045)}
+.vnav{background:var(--barbg)}
+
+/* ----- andozalar ----- */
+html[data-layout] .vnav[hidden]{display:none!important}
+/* standart: tekis yorliqlar */
+html[data-layout="standart"] .wrap{max-width:1180px}
+html[data-layout="standart"] .vnav{background:var(--barbg);gap:0;padding:0 20px}
+html[data-layout="standart"] .vnav button{background:transparent;border:0;border-bottom:3px solid transparent;border-radius:0;color:var(--dim);padding:14px 8px}
+html[data-layout="standart"] .vnav button:hover{border-bottom-color:var(--line)}
+html[data-layout="standart"] .vnav button[aria-selected="true"]{background:transparent;color:var(--accent);border-bottom-color:var(--accent)}
+/* ixcham */
+html[data-layout="ixcham"]{--r:10px}
+html[data-layout="ixcham"] body{font-size:14px}
+html[data-layout="ixcham"] .wrap{max-width:920px;padding-top:22px}
+html[data-layout="ixcham"] header{padding-bottom:14px;margin-bottom:16px}
+html[data-layout="ixcham"] h1{font-size:clamp(22px,3.6vw,32px)}
+html[data-layout="ixcham"] .sb{padding:14px 16px}
+html[data-layout="ixcham"] .sh{padding:11px 16px}
+html[data-layout="ixcham"] .vnav button{padding:8px 6px;font-size:12.5px}
+/* zich */
+html[data-layout="zich"]{--r:8px;--sbw:190px}
+html[data-layout="zich"] body{font-size:13.5px;line-height:1.45}
+html[data-layout="zich"] .sb{padding:12px 14px}
+html[data-layout="zich"] .sh{padding:10px 14px}
+html[data-layout="zich"] header{padding-bottom:12px;margin-bottom:14px}
+html[data-layout="zich"] h1{font-size:clamp(20px,3vw,28px)}
+/* ingichka */
+html[data-layout="ingichka"] .wrap{max-width:780px}
+html[data-layout="ingichka"] .vnav{grid-template-columns:repeat(2,1fr)}
+/* markazlashgan */
+html[data-layout="markazlashgan"] header{text-align:center}
+html[data-layout="markazlashgan"] h1 .thin{margin-left:auto;margin-right:auto}
+html[data-layout="markazlashgan"] .sup{justify-content:center}
+html[data-layout="markazlashgan"] .vnav{display:flex;flex-wrap:wrap;justify-content:center;gap:8px}
+html[data-layout="markazlashgan"] .vnav button{flex:0 1 auto;padding:10px 22px;border-radius:999px}
+/* korxona */
+html[data-layout="korxona"]{--r:3px;--rpill:3px;--rnum:3px;--pborder:1px solid var(--line);--shadow:none;--blur:none}
+html[data-layout="korxona"] .wrap{max-width:1100px}
+html[data-layout="korxona"] .vnav button{border-radius:3px;text-transform:uppercase;letter-spacing:.06em;font-size:12px}
+html[data-layout="korxona"] h1{font-weight:600;letter-spacing:-.01em}
+html[data-layout="korxona"] .step{backdrop-filter:none}
+/* material */
+html[data-layout="material"]{--r:22px;--rnum:50%;--shadow:0 22px 50px -26px rgba(0,0,0,.65)}
+html[data-layout="material"][data-theme="light"]{--shadow:0 18px 44px -24px rgba(20,26,51,.4)}
+html[data-layout="material"] .vnav button{border-radius:999px;padding:12px 8px}
+/* zamonaviy */
+html[data-layout="zamonaviy"]{--sbw:230px}
+html[data-layout="zamonaviy"] .wrap{max-width:none}
+/* yon menyu (zich, zamonaviy) — keng ekranda */
+@media (min-width:1000px){
+  html[data-layout="zich"] .vnav,html[data-layout="zamonaviy"] .vnav{position:fixed;left:0;top:0;bottom:0;margin:0;width:var(--sbw);display:flex;flex-direction:column;gap:6px;padding:18px 12px;border-bottom:0;border-right:1px solid var(--line);overflow:auto;z-index:40}
+  html[data-layout="zich"] .vnav button,html[data-layout="zamonaviy"] .vnav button{text-align:left;padding:11px 12px;font-size:13px}
+  html[data-layout="zich"] .wrap,html[data-layout="zamonaviy"] .wrap{max-width:none;margin:0 0 0 var(--sbw);padding-left:30px;padding-right:30px}
+}
+
+/* ----- sozlamalar paneli ----- */
+#koOv{position:fixed;inset:0;z-index:1000}
+#koOv[hidden]{display:none}
+#koOv .kobg{position:absolute;inset:0;background:rgba(0,0,0,.45)}
+#koPanel{position:absolute;top:0;right:0;bottom:0;width:min(360px,100%);background:var(--bg);color:var(--fg);border-left:1px solid var(--line);overflow:auto;padding:18px 18px 30px;box-shadow:-20px 0 60px -30px rgba(0,0,0,.7);font-family:var(--body)}
+#koPanel header{display:flex;align-items:center;justify-content:space-between;border:0;margin:0 0 6px;padding:0}
+#koPanel header b{font-size:18px}
+#koPanel h3{margin:18px 0 8px;font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);font-weight:400;border-top:1px solid var(--line);padding-top:14px;background:none;-webkit-text-fill-color:currentColor}
+#koPanel button{font:inherit;color:var(--fg);cursor:pointer}
+#koPanel .kox{background:none;border:0;font-size:20px;width:40px;height:40px;border-radius:50%}
+#koPanel .kogrid{display:grid;gap:8px}
+#koPanel .kogrid.c3{grid-template-columns:repeat(3,1fr)}
+#koPanel .kogrid.c2{grid-template-columns:repeat(2,1fr)}
+#koPanel .koopt{display:flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:8px 10px;background:var(--panel);border:1px solid var(--line);border-radius:12px;font-size:13px;font-weight:600}
+#koPanel .koopt[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 2px var(--ring);color:var(--fg)}
+#koPanel .koopt i{width:14px;height:14px;border-radius:50%;display:inline-block;flex:none}
+#koPanel .kolay{display:flex;flex-direction:column;align-items:center;gap:5px;padding:8px 6px 7px;background:var(--panel);border:1px solid var(--line);border-radius:12px;font-size:12px;font-weight:600}
+#koPanel .kolay[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 2px var(--ring);color:var(--accent)}
+#koPanel .kolay svg{width:100%;height:auto;display:block;color:var(--dim)}
+#koPanel .kolay[aria-pressed="true"] svg{color:var(--accent)}
+#koPanel .kores{margin-top:20px;width:100%;min-height:44px;background:transparent;border:1px solid var(--line);border-radius:12px;font-size:13px;color:var(--dim)}
+#koPanel .konote{font-size:12px;color:var(--faint);margin:10px 0 0;line-height:1.5}
+</style>
+<script>
+/* ===== Ko'rinish sozlamalari (tema, rang, andoza) ===== */
+(function(){
+"use strict";
+const KEY="tk_ko", DEF={theme:"auto",accent:"default",layout:"klassik"};
+const ACC={
+  default:{n:"Default",sw:"#5EEAD4",dk:["#5EEAD4","#062229","94,234,212","167,139,250"],lt:["#0E8F80","#FFFFFF","14,143,128","109,79,214"]},
+  brand:{n:"Brand",sw:"#3B82F6",dk:["#60A5FA","#071735","96,165,250","34,211,238"],lt:["#1D4ED8","#FFFFFF","29,78,216","14,116,144"]},
+  teal:{n:"Teal",sw:"#14B8A6",dk:["#2DD4BF","#04201C","45,212,191","56,189,248"],lt:["#0F766E","#FFFFFF","15,118,110","3,105,161"]},
+  rose:{n:"Rose",sw:"#F43F5E",dk:["#FB7185","#2B0710","251,113,133","249,168,212"],lt:["#BE123C","#FFFFFF","190,18,60","157,23,77"]},
+  purple:{n:"Purple",sw:"#8B5CF6",dk:["#A78BFA","#150B33","167,139,250","240,171,252"],lt:["#6D28D9","#FFFFFF","109,40,217","162,28,175"]},
+  amber:{n:"Amber",sw:"#F59E0B",dk:["#FBBF24","#2B1A02","251,191,36","251,146,60"],lt:["#B45309","#FFFFFF","180,83,9","194,65,12"]}
+};
+const LAY=[["klassik","Klassik","top"],["standart","Standart","line"],["ixcham","Ixcham","tops"],["zich","Zich","sidenar"],["ingichka","Ingichka","narrow"],
+  ["markazlashgan","Markazlashgan","center"],["korxona","Korxona","sq"],["material","Material","pill"],["zamonaviy","Zamonaviy","side"]];
+const TEMA=[["auto","Avto"],["dark","Qora"],["light","Yorqin"]];
+let P=Object.assign({},DEF), CODE="";
+const mq=window.matchMedia?matchMedia("(prefers-color-scheme: dark)"):null;
+const resolved=()=>P.theme==="auto"?((mq&&mq.matches)?"dark":"light"):P.theme;
+function rd(k){ try{ const j=JSON.parse(localStorage.getItem(k)||"null"); return j&&typeof j==="object"?j:null; }catch(e){ return null; } }
+function wr(){ try{ const s=JSON.stringify(P); localStorage.setItem(KEY,s); if(CODE) localStorage.setItem(KEY+"_"+CODE,s); }catch(e){} }
+function vars(){
+  const t=resolved(), a=(ACC[P.accent]||ACC.default)[t==="dark"?"dk":"lt"];
+  return {"--accent":a[0],"--onaccent":a[1],"--acrgb":a[2],"--sec":a[3],"--accentbg":"rgba("+a[2]+",.09)","--ring":"rgba("+a[2]+",.22)","--linehi":"rgba("+a[2]+","+(t==="dark"?".45":".55")+")",
+    "--numbg":"linear-gradient(135deg,"+a[0]+",rgb("+a[3]+"))"};
+}
+function push(){
+  const v=vars(), t=resolved();
+  ["pframe","bframe"].forEach(id=>{ const f=document.getElementById(id); if(!f) return;
+    try{ const d=f.contentDocument; if(!d||!d.documentElement) return; d.documentElement.dataset.theme=t;
+      for(const k in v) if(k==="--accent"||k==="--onaccent"||k==="--accentbg"||k==="--ring"||k==="--linehi") d.documentElement.style.setProperty(k,v[k]);
+      if(f.contentWindow.BAZA&&f.contentWindow.BAZA.theme) f.contentWindow.BAZA.theme(t);
+    }catch(e){} });
+}
+function apply(){
+  const h=document.documentElement, v=vars();
+  h.dataset.theme=resolved(); h.dataset.layout=P.layout; h.dataset.accent=P.accent;
+  for(const k in v) h.style.setProperty(k,v[k]);
+  push(); mark();
+}
+function set(o){ Object.assign(P,o); wr(); apply(); }
+function mark(){
+  document.querySelectorAll("#koPanel [data-k]").forEach(b=>b.setAttribute("aria-pressed",String(P[b.dataset.k]===b.dataset.v)));
+}
+function prev(kind){
+  const f='<rect x="1" y="1" width="78" height="50" rx="4" fill="none" stroke="currentColor" opacity=".55"/>';
+  const bar=(x,y,w,h,o)=>'<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" rx="2" fill="currentColor" opacity="'+(o||.35)+'"/>';
+  let s=f;
+  if(kind==="top"){ s+=bar(6,6,68,5)+[0,1,2,3].map(i=>bar(6+i*17,15,15,6,i===0?.9:.35)).join("")+bar(6,26,68,20,.18); }
+  else if(kind==="line"){ s+=bar(6,6,40,4)+[0,1,2,3].map(i=>bar(6+i*17,16,15,2,i===0?.9:.3)).join("")+bar(6,24,68,22,.18); }
+  else if(kind==="tops"){ s+=bar(10,7,60,3)+[0,1,2,3].map(i=>bar(10+i*15,13,13,4,i===0?.9:.35)).join("")+bar(10,21,60,25,.18); }
+  else if(kind==="sidenar"){ s+=bar(5,5,13,42,.4)+bar(7,9,9,3,.9)+bar(7,15,9,3)+bar(7,21,9,3)+bar(22,5,53,5)+bar(22,13,53,34,.18); }
+  else if(kind==="narrow"){ s+=bar(22,6,36,5)+[0,1].map(i=>bar(22+i*19,15,17,5,i===0?.9:.35)).join("")+bar(22,24,36,22,.18); }
+  else if(kind==="center"){ s+=bar(22,6,36,5)+[0,1,2,3].map(i=>bar(11+i*15,15,13,5,i===0?.9:.35)).join("")+bar(11,24,58,22,.18); }
+  else if(kind==="sq"){ s=s.replace('rx="4"','rx="0"')+'<rect x="6" y="6" width="68" height="5" fill="currentColor" opacity=".35"/>'+[0,1,2,3].map(i=>'<rect x="'+(6+i*17)+'" y="15" width="15" height="6" fill="currentColor" opacity="'+(i===0?.9:.35)+'"/>').join("")+'<rect x="6" y="26" width="68" height="20" fill="currentColor" opacity=".18"/>'; }
+  else if(kind==="pill"){ s=s.replace('rx="4"','rx="10"')+[0,1,2,3].map(i=>'<rect x="'+(6+i*17)+'" y="9" width="15" height="7" rx="3.5" fill="currentColor" opacity="'+(i===0?.9:.35)+'"/>').join("")+'<rect x="6" y="22" width="68" height="24" rx="8" fill="currentColor" opacity=".18"/>'; }
+  else if(kind==="side"){ s+=bar(5,5,18,42,.4)+bar(8,10,12,4,.9)+bar(8,18,12,4)+bar(8,26,12,4)+bar(8,34,12,4)+bar(27,5,48,42,.18); }
+  return '<svg viewBox="0 0 80 52" aria-hidden="true">'+s+'</svg>';
+}
+function build(){
+  if(document.getElementById("koOv")) return;
+  const el=document.createElement("div"); el.id="koOv"; el.hidden=true;
+  el.innerHTML='<div class="kobg"></div><aside id="koPanel" role="dialog" aria-modal="true" aria-label="Ko\'rinish sozlamalari">'+
+    '<header><b>Ko\'rinish</b><button type="button" class="kox" id="koX" aria-label="Yopish">✕</button></header>'+
+    '<h3>Menyu rangi</h3><div class="kogrid c3">'+Object.keys(ACC).map(k=>'<button type="button" class="koopt" data-k="accent" data-v="'+k+'"><i style="background:'+ACC[k].sw+'"></i>'+ACC[k].n+'</button>').join("")+'</div>'+
+    '<h3>Tema</h3><div class="kogrid c3">'+TEMA.map(t=>'<button type="button" class="koopt" data-k="theme" data-v="'+t[0]+'">'+t[1]+'</button>').join("")+'</div>'+
+    '<h3>Andoza</h3><div class="kogrid c3">'+LAY.map(l=>'<button type="button" class="kolay" data-k="layout" data-v="'+l[0]+'">'+prev(l[2])+'<span>'+l[1]+'</span></button>').join("")+'</div>'+
+    '<button type="button" class="kores" id="koReset">Asl holatga qaytarish</button>'+
+    '<p class="konote">Tanlov shu brauzerda saqlanadi. «Zich» va «Zamonaviy» yon menyusi keng ekranda ko\'rinadi, telefonda oddiy yuqori menyu bo\'ladi.</p></aside>';
+  document.body.appendChild(el);
+  const close=()=>{ el.hidden=true; const b=document.getElementById("koBtn"); if(b) b.focus(); };
+  el.querySelector(".kobg").onclick=close; el.querySelector("#koX").onclick=close;
+  el.querySelector("#koReset").onclick=()=>set(Object.assign({},DEF));
+  el.addEventListener("click",e=>{ const b=e.target.closest("[data-k]"); if(b) set({[b.dataset.k]:b.dataset.v}); });
+  document.addEventListener("keydown",e=>{ if(e.key==="Escape"&&!el.hidden) close(); });
+  mark();
+}
+function wire(){
+  build();
+  const sup=document.querySelector(".sup");
+  if(sup&&!document.getElementById("koBtn")){ const b=document.createElement("button"); b.type="button"; b.id="koBtn"; b.className="mini noprint"; b.textContent="Ko'rinish";
+    b.onclick=()=>{ document.getElementById("koOv").hidden=false; const x=document.getElementById("koX"); if(x) x.focus(); }; sup.appendChild(b); }
+  ["pframe","bframe"].forEach(id=>{ const f=document.getElementById(id); if(f) f.addEventListener("load",push); });
+}
+window.KO={ login:function(code){ CODE=String(code||""); const s=rd(KEY+"_"+CODE); if(s) Object.assign(P,DEF,s); wr(); apply(); }, push:push };
+Object.assign(P,DEF,rd(KEY)||{}); apply();
+if(mq){ const f=()=>{ if(P.theme==="auto") apply(); }; mq.addEventListener?mq.addEventListener("change",f):mq.addListener(f); }
+if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",wire); else wire();
+})();
+</script>
 </head>
 <body class="locked">
 
@@ -313,7 +507,7 @@ body[data-view="src"] .wrap,body[data-view="nom"] .wrap,body[data-view="baza"] .
 
 <header>
   <p class="who" id="who"></p> <button class="mini noprint" id="chiq" style="vertical-align:top;margin-left:6px;display:none">Chiqish</button>
-  <p class="eyebrow">Tibbiy jihozlar qo'mitasi · Shahzodbek O'roqov · 5-nashr</p>
+  <p class="eyebrow">Tibbiy jihozlar qo'mitasi · Shahzodbek O'roqov · 6-nashr</p>
   <h1>Xorijiy hujjatni tekshirish
     <span class="thin">PF-6221 bo'yicha tan olinadigan olti vakolatli organ — FDA, EMA, CE sertifikatini beruvchi organlar, PMDA, MFDS, MHRA — hamda ma'lumot uchun boshqa davlatlar reestrlari va ISO 13485 sertifikatlari. Har bir manba uchun aniq maydon nomi va ma'lum tuzoqlar ko'rsatilgan.</span>
   </h1>
@@ -1340,6 +1534,7 @@ function kutish(x,dev,uid){
 function ichkari(x,st,dev,uid){
   SESS={code:x.code,name:x.name,pos:x.pos,role:st.role||"expert",dept:st.dept||x.dept||"reg",dev,uid};
   EXPERT={nm:x.name,pos:x.pos};
+  if(window.KO) KO.login(x.code);
   $("who").innerHTML=`Ekspert: <b>${esc(x.name)}</b> · ${esc(x.pos)} · ${esc(depNomi(SESS.dept))}`;
   KEYP=DB.doc("keys/nom").get().then(s=>(s.exists&&s.data().k)||"").catch(()=>"");
   $("vnav").hidden=false;
@@ -1427,14 +1622,16 @@ function ramkaB(){
     f.src="baza.html?v=5"; });
   return BF;
 }
-function ramkaOlcham(){ const h=Math.max(420,innerHeight-$("vnav").offsetHeight-6)+"px"; if(!$("pview").hidden) $("pframe").style.height=h; if(!$("bview").hidden) $("bframe").style.height=h; }
+const yonMenyu=()=>getComputedStyle($("vnav")).position==="fixed";
+function kScroll(v){ (yonMenyu()?$(v==="baza"?"bview":"pview"):$("vnav")).scrollIntoView({block:"start"}); }
+function ramkaOlcham(){ const h=Math.max(420,innerHeight-(yonMenyu()?24:$("vnav").offsetHeight+6))+"px"; if(!$("pview").hidden) $("pframe").style.height=h; if(!$("bview").hidden) $("bframe").style.height=h; }
 function korinish(v){
   VIEW=v; document.body.dataset.view=v;
   document.querySelectorAll("#vnav button").forEach(b=>b.setAttribute("aria-selected",String(b.dataset.v===v)));
   $("pview").hidden=!(v==="src"||v==="nom");
   $("bview").hidden=(v!=="baza");
-  if(v==="baza"){ ramkaOlcham(); $("vnav").scrollIntoView({block:"start"}); ramkaB(); }
-  else if(v!=="tek"){ ramkaOlcham(); $("vnav").scrollIntoView({block:"start"});
+  if(v==="baza"){ ramkaOlcham(); kScroll(v); ramkaB(); }
+  else if(v!=="tek"){ ramkaOlcham(); kScroll(v);
     ramka().then(f=>{ try{ f.contentWindow.TK.mode(v); }catch(e){} }); }
 }
 $("vnav").addEventListener("click",e=>{ const b=e.target.closest("button[data-v]"); if(b) korinish(b.dataset.v); });
