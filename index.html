@@ -252,6 +252,8 @@ input[type=date]:focus{outline:0;border-color:var(--accent);box-shadow:0 0 0 3px
 .vnav button[aria-selected="true"]{color:var(--onaccent);background:var(--accent);border-color:var(--accent)}
 .vnav button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 #pview[hidden],#bview[hidden]{display:none}
+body[data-view="baza"] .wrap{max-width:min(1640px,100%)}
+body[data-view="baza"] .vnav{margin-left:0;margin-right:0}
 #pframe,#bframe{display:block;width:100%;height:70vh;border:0;background:var(--bg)}
 body[data-view="src"] .wrap>section.step,body[data-view="nom"] .wrap>section.step,body[data-view="baza"] .wrap>section.step{display:none!important}
 body[data-view="src"] .wrap,body[data-view="nom"] .wrap,body[data-view="baza"] .wrap{padding-bottom:0}
