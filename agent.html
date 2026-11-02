@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pharmcontroluz_AI_Agent</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:dark;--bg:#0A0E22;--panel:rgba(255,255,255,.045);--chip:rgba(255,255,255,.05);--field:rgba(255,255,255,.05);--fg:#E7EAF6;--dim:#98A1C4;--faint:#66709A;
+  --line:rgba(255,255,255,.12);--accent:#5EEAD4;--onaccent:#062229;--accentbg:rgba(94,234,212,.09);--ring:rgba(94,234,212,.22);--linehi:rgba(94,234,212,.45);
+  --ok:#A78BFA;--okbg:rgba(167,139,250,.13);--warn:#FBBF6E;--stop:#FB7B8E;--mono:"Space Mono",ui-monospace,Consolas,monospace;--body:"Space Grotesk",system-ui,sans-serif}
+:root[data-theme="light"]{color-scheme:light;--bg:#F3F5FB;--panel:#FFFFFF;--chip:#EEF1F8;--field:#FFFFFF;--fg:#141A33;--dim:#4D5677;--faint:#7C84A3;--line:rgba(20,26,51,.14);
+  --accent:#0E8F80;--onaccent:#FFFFFF;--accentbg:rgba(14,143,128,.09);--ring:rgba(14,143,128,.22);--linehi:rgba(14,143,128,.55);--ok:#6D4FD6;--okbg:rgba(109,79,214,.10);--warn:#A8620A;--stop:#C62840}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--fg);font:14px/1.55 var(--body);-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+.app{max-width:1240px;margin:0 auto;padding:16px 18px 28px;display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.main{flex:999 1 560px;min-width:0;display:flex;flex-direction:column;min-height:calc(100vh - 40px)}
+.side{flex:1 1 300px;min-width:0;display:flex;flex-direction:column;gap:14px}
+.hd{display:flex;align-items:center;gap:12px;padding:12px 18px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.logo{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,var(--accent),var(--ok));display:flex;align-items:center;justify-content:center;flex:none}
+.hd h1{margin:0;font-size:17px;font-weight:700;letter-spacing:-.02em}
+.hd small{display:block;color:var(--dim);font-size:12px}
+.modes{margin-left:auto;display:flex;gap:6px;background:var(--chip);border:1px solid var(--line);border-radius:999px;padding:3px}
+.modes button{border:0;background:transparent;border-radius:999px;padding:7px 14px;min-height:34px;font-size:13px;font-weight:600;color:var(--dim)}
+.modes button[aria-pressed="true"]{background:var(--accent);color:var(--onaccent)}
+.chat{flex:1;padding:16px 18px;display:flex;flex-direction:column;gap:14px;overflow:auto;min-height:320px}
+.u{align-self:flex-end;max-width:80%;background:var(--accentbg);border:1px solid var(--linehi);border-radius:14px 14px 4px 14px;padding:9px 14px;white-space:pre-wrap;word-break:break-word}
+.a{align-self:flex-start;max-width:96%;display:flex;flex-direction:column;gap:8px}
+.bub{background:var(--chip);border:1px solid var(--line);border-radius:14px 14px 14px 4px;padding:11px 15px;white-space:pre-wrap;word-break:break-word;line-height:1.6}
+.note{color:var(--dim);font-size:12.5px}
+.hint{color:var(--dim);padding:18px;text-align:center}
+.res{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 14px}
+.res .t{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:6px}
+.pill{font-family:var(--mono);font-size:11px;padding:3px 9px;border-radius:999px;background:var(--okbg);color:var(--ok);white-space:normal}
+.pill.n{background:var(--accentbg);color:var(--accent)}
+.res .tx{white-space:pre-wrap;word-break:break-word;font-size:13.5px}
+.res mark{background:rgba(251,191,110,.35);color:inherit;border-radius:3px;padding:0 1px}
+.res .ac{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+.mini{font-size:12px;color:var(--dim);background:var(--chip);border:1px solid var(--line);border-radius:999px;padding:6px 12px;min-height:32px}
+.mini:hover{border-color:var(--linehi);color:var(--fg)}
+.srcs{display:flex;flex-wrap:wrap;gap:6px}
+.srcs .pill{cursor:pointer;border:0}
+.compose{padding:10px 14px 14px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:8px}
+.row{display:flex;gap:8px;align-items:flex-end}
+textarea{flex:1;min-height:46px;max-height:140px;resize:vertical;padding:11px 14px;background:var(--field);border:1px solid var(--line);border-radius:12px}
+textarea:focus,input:focus,select:focus{outline:none;border-color:var(--linehi);box-shadow:0 0 0 2px var(--ring)}
+.send{width:46px;height:46px;border-radius:12px;border:0;background:var(--accent);color:var(--onaccent);display:flex;align-items:center;justify-content:center;flex:none}
+.send[disabled]{opacity:.5}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+select,input[type=text],input[type=password]{background:var(--field);border:1px solid var(--line);border-radius:10px;padding:8px 10px;min-height:38px}
+.side h2{margin:0;padding:11px 16px;font-size:13.5px;font-weight:600;border-bottom:1px solid var(--line)}
+.side .bd{padding:10px 14px 14px;font-size:13px}
+.docs{list-style:none;margin:0;padding:0;max-height:300px;overflow:auto}
+.docs li{padding:6px 4px;border-radius:8px;display:flex;justify-content:space-between;gap:8px;cursor:pointer;line-height:1.35}
+.docs li:hover,.docs li[aria-selected="true"]{background:var(--accentbg)}
+.docs span{color:var(--accent);font-family:var(--mono);font-size:11px;flex:none}
+.key{display:flex;flex-direction:column;gap:8px}
+.keyrow{display:flex;gap:6px}
+.keyrow input{flex:1}
+.btn{background:var(--accent);color:var(--onaccent);border:0;border-radius:10px;padding:8px 14px;min-height:38px;font-weight:600}
+.err{color:var(--stop)}
+.dots{display:inline-flex;gap:4px}.dots i{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:b 1s infinite}.dots i:nth-child(2){animation-delay:.15s}.dots i:nth-child(3){animation-delay:.3s}
+@keyframes b{0%,80%,100%{opacity:.25}40%{opacity:1}}
+</style>
+</head>
+<body>
+<div class="app">
+  <section class="card main">
+    <div class="hd">
+      <span class="logo" aria-hidden="true"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="#0A0E22" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="2.5"/></svg></span>
+      <div><h1>Pharmcontroluz_AI_Agent</h1><small id="sub">Normativ hujjatlar bo'yicha qidiruv va javob</small></div>
+      <div class="modes" role="group" aria-label="Rejim">
+        <button type="button" id="mSearch" aria-pressed="true">Hujjatlar qidiruvi</button>
+        <button type="button" id="mAI" aria-pressed="false">AI javob</button>
+      </div>
+    </div>
+    <div class="chat" id="chat"><div class="hint" id="hint">Savolni yozing: tizim 24 ta normativ hujjat ichidan mos bandlarni topib, hujjat nomi va band raqami bilan ko'rsatadi.</div></div>
+    <div class="compose">
+      <div class="chips" id="chips"></div>
+      <div class="row">
+        <label for="q" style="position:absolute;left:-9999px">Savol</label>
+        <textarea id="q" rows="2" placeholder="Masalan: ISO 13485 qachondan talab qilinadi? (Enter — yuborish, Shift+Enter — yangi qator)"></textarea>
+        <button class="send" id="go" aria-label="Yuborish"><svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+      </div>
+      <div class="note" id="status"></div>
+    </div>
+  </section>
+  <aside class="side">
+    <section class="card"><h2>Bilimlar bazasi</h2><div class="bd">
+      <ul class="docs" id="docs" aria-label="Hujjatni tanlang"></ul>
+      <p class="note" style="margin:8px 0 0" id="docNote">Hujjatni bosing — qidiruv faqat shu hujjat ichida bo'ladi. Qayta bossangiz — hammasida.</p>
+    </div></section>
+    <section class="card" id="aiBox"><h2>AI sozlamalari</h2><div class="bd key">
+      <label class="note" for="model">Model</label>
+      <select id="model"><option value="claude-sonnet-5-5">Sonnet 5.5 — aniqroq</option><option value="claude-haiku-5-5">Haiku 5.5 — arzonroq</option></select>
+      <label class="note" for="key">Anthropic API kaliti</label>
+      <div class="keyrow"><input type="password" id="key" placeholder="sk-ant-..." autocomplete="off" spellcheck="false"><button class="btn" id="saveKey">Saqlash</button></div>
+      <p class="note" id="keyState" style="margin:0"></p>
+      <p class="note" style="margin:0">Kalit faqat shu brauzerda saqlanadi va faqat Anthropic'ga yuboriladi. Xarajat kalit egasining hisobidan. Umumiy kompyuterda kiritmang.</p>
+      <p class="note" id="usage" style="margin:0"></p>
+    </div></section>
+  </aside>
+</div>
+
+<script>
+"use strict";
+const $=id=>document.getElementById(id);
+const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const LAT={"а":"a","б":"b","в":"v","г":"g","д":"d","е":"e","ё":"yo","ж":"j","з":"z","и":"i","й":"y","к":"k","л":"l","м":"m","н":"n","о":"o","п":"p","р":"r","с":"s","т":"t","у":"u","ф":"f","х":"x","ц":"s","ч":"ch","ш":"sh","щ":"sh","ъ":"","ы":"i","ь":"","э":"e","ю":"yu","я":"ya","ў":"o'","қ":"q","ғ":"g'","ҳ":"h"};
+const STOP=new Set("va,bu,ham,uchun,bilan,yoki,ning,dan,ga,da,mazkur,ushbu,boqlgan,boqladi,etiladi,qilinadi,hamda,shu,bunda,agar,the,of,and,in,to".split(","));
+const norm=t=>String(t).toLowerCase().replace(/[а-яёўқғҳ]/g,c=>LAT[c]??c).replace(/[ʻʼ‘’`´]/g,"'").replace(/o'|g'/g,m=>m[0]+"q");
+const toks=t=>norm(t).split(/[^a-z0-9q]+/).filter(w=>w.length>1&&!STOP.has(w)).map(w=>/^\d+$/.test(w)?w:w.slice(0,6));
+let KB=null, DOC=null, MODE="search", MSGS=[], BUSY=false;
+const KEYN="tk_agent_key", MODN="tk_agent_model";
+
+async function load(){
+  if(KB) return KB;
+  const r=await fetch("agent-kb.json?v=1"); if(!r.ok) throw new Error("Bilimlar bazasi fayli topilmadi (agent-kb.json).");
+  const raw=await r.json();
+  const tk=raw.chunks.map(c=>toks(c.h+" "+c.t)); const df=new Map();
+  tk.forEach(a=>new Set(a).forEach(w=>df.set(w,(df.get(w)||0)+1)));
+  const avg=tk.reduce((s,a)=>s+a.length,0)/tk.length;
+  KB={...raw,toks:tk.map(a=>{const m=new Map();a.forEach(w=>m.set(w,(m.get(w)||0)+1));return{m,len:a.length}}),df,N:tk.length,avg};
+  return KB;
+}
+function search(q,docId,k){
+  const q2=[...new Set(toks(q))], out=[];
+  KB.chunks.forEach((c,i)=>{
+    if(docId!=null&&c.d!==docId) return;
+    const t=KB.toks[i]; let s=0;
+    for(const w of q2){ const f=t.m.get(w); if(!f) continue; const d=KB.df.get(w); const idf=Math.log(1+(KB.N-d+.5)/(d+.5)); s+=idf*(f*2.2)/(f+1.2*(.25+.75*t.len/KB.avg)); }
+    if(s>0) out.push([s,i]);
+  });
+  out.sort((a,b)=>b[0]-a[0]);
+  return out.slice(0,k||6).map(([s,i])=>({...KB.chunks[i],i,s,q:q2}));
+}
+const docTitle=id=>(KB.docs.find(d=>d.id===id)||{}).title||("Hujjat "+id);
+function hl(text,q){
+  let h=esc(text); const seen=new Set();
+  q.forEach(w=>{ if(w.length<3||seen.has(w)) return; seen.add(w);
+    const re=new RegExp("("+w.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+"[\\p{L}\\p{N}'ʻ’]*)","giu");
+    h=h.replace(re,"<mark>$1</mark>"); });
+  return h;
+}
+
+/* ---------- chat ---------- */
+function add(cls,html){ const h=$("hint"); if(h) h.remove(); const d=document.createElement("div"); d.className=cls; d.innerHTML=html; $("chat").appendChild(d); $("chat").scrollTop=$("chat").scrollHeight; return d; }
+function resHtml(r,full){
+  const txt=full?r.t:(r.t.length>520?r.t.slice(0,520)+"…":r.t);
+  return `<div class="res" data-i="${r.i}"><div class="t"><span class="pill">${esc(docTitle(r.d))}</span>${r.n?`<span class="pill n">${esc(r.n)}-band</span>`:""}</div>
+    ${r.h&&r.h.length>3?`<div class="note" style="margin-bottom:4px">${esc(r.h.slice(0,200))}</div>`:""}
+    <div class="tx">${hl(txt,r.q||[])}</div>
+    <div class="ac">${r.t.length>520&&!full?`<button class="mini" data-act="more">To'liq matn</button>`:""}<button class="mini" data-act="copy">Nusxalash</button></div></div>`;
+}
+$("chat").addEventListener("click",e=>{
+  const b=e.target.closest("[data-act]"), p=e.target.closest("[data-i]"); if(!b&&!p) return;
+  if(b){ const i=+b.closest(".res").dataset.i, c=KB.chunks[i];
+    if(b.dataset.act==="more"){ b.closest(".res").outerHTML=resHtml({...c,i,q:[]},true); }
+    if(b.dataset.act==="copy"){ navigator.clipboard&&navigator.clipboard.writeText(docTitle(c.d)+(c.n?", "+c.n+"-band":"")+"\n"+c.t).then(()=>{b.textContent="Nusxalandi";}); }
+    return; }
+  const s=e.target.closest(".srcs .pill"); if(s){ const i=+s.dataset.i, c=KB.chunks[i]; const box=s.closest(".a").querySelector(".full"); box.innerHTML=resHtml({...c,i,q:[]},true); }
+});
+
+async function doSearch(q){
+  await load();
+  const r=search(q,DOC,6);
+  const a=add("a","");
+  if(!r.length){ a.innerHTML=`<div class="bub">«${esc(q)}» bo'yicha hech narsa topilmadi. Boshqa so'z bilan yozib ko'ring (masalan, qisqa kalit so'zlar: «klinik tadqiqot», «ISO 13485», «xavf sinfi»).</div>`; return; }
+  a.innerHTML=`<div class="note">${r.length} ta mos band${DOC!=null?" · "+esc(docTitle(DOC)):""}. Bu rejim o'z so'zi bilan emas, hujjatdagi matnni topib beradi.</div>`+r.map(x=>resHtml(x)).join("");
+}
+
+/* ---------- AI ---------- */
+const SYS=()=>`You are Pharmcontroluz_AI_Agent, an assistant for staff of Tibbiy jihozlar qo'mitasi (Uzbekistan, medical device state registration).
+Answering rules:
+- Reply in the language of the user's latest message. Uzbek written in Latin gets Uzbek Latin; Uzbek in Cyrillic gets Cyrillic.
+- For any question about Uzbek rules on medicines or medical devices, FIRST call search_documents (short Uzbek Latin keywords; try 2-3 phrasings or synonyms if weak). Answer ONLY from the passages returned.
+- Always name the document and the clause number (for example "738-son qaror, 2-ilova, 11-band"). Give concrete facts: numbers, deadlines, requirements.
+- If the passages do not contain the answer, say so plainly and say what you searched. Never invent clauses, numbers or dates.
+- Plain text only: no markdown, no asterisks, no headings. Short paragraphs. You are not a lawyer; the official text decides.
+Documents in the library:
+${KB.docs.map(d=>d.id+": "+d.title).join("\n")}`;
+const TOOLS=()=>[{name:"search_documents",description:"Search the local library of official Uzbekistan documents on medicines and medical devices. Returns the best matching passages with document, section and clause number. Optionally limit to one document with doc_id.",
+  input_schema:{type:"object",properties:{query:{type:"string"},doc_id:{type:"integer"}},required:["query"]}}];
+const fmt=r=>`[${docTitle(r.d)}${r.n?", "+r.n+"-band":""}${r.h?" | "+r.h.slice(0,120):""}]\n${r.t}`;
+
+async function doAI(q){
+  await load();
+  const key=localStorage.getItem(KEYN)||""; if(!key){ add("a",`<div class="bub err">Avval o'ng tomondagi «AI sozlamalari»ga API kalitni kiriting va «Saqlash»ni bosing.</div>`); return; }
+  const model=$("model").value; const srcs=[]; let inT=0,outT=0;
+  MSGS.push({role:"user",content:q});
+  const a=add("a",`<div class="bub"><span class="dots"><i></i><i></i><i></i></span> <span class="note" id="ph">hujjatlar o'qilmoqda…</span></div>`);
+  try{
+    for(let round=0;round<5;round++){
+      const res=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"content-type":"application/json","x-api-key":key,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},
+        body:JSON.stringify({model,max_tokens:1800,system:[{type:"text",text:SYS(),cache_control:{type:"ephemeral"}}],tools:TOOLS(),messages:MSGS})});
+      if(!res.ok){ let m=""; try{ m=(await res.json()).error.message; }catch(e){}
+        throw new Error(res.status===401?"Kalit noto'g'ri yoki o'chirilgan.":res.status===429?"So'rovlar limiti yoki hisobda mablag' tugagan. Birozdan keyin urinib ko'ring.":("Xato "+res.status+(m?": "+m:""))); }
+      const j=await res.json(); inT+=(j.usage&&j.usage.input_tokens)||0; outT+=(j.usage&&j.usage.output_tokens)||0;
+      MSGS.push({role:"assistant",content:j.content});
+      const tu=j.content.filter(b=>b.type==="tool_use");
+      if(!tu.length||j.stop_reason!=="tool_use"){
+        const text=j.content.filter(b=>b.type==="text").map(b=>b.text).join("\n").trim()||"(javob bo'sh)";
+        const uniq=[...new Map(srcs.map(x=>[x.i,x])).values()].slice(0,8);
+        a.innerHTML=`<div class="bub">${esc(text)}</div>`+(uniq.length?`<div class="note">Manbalar (bosing — to'liq matn):</div><div class="srcs">${uniq.map(x=>`<button class="pill" data-i="${x.i}">${esc(docTitle(x.d).split(":")[0].slice(0,40))}${x.n?" · "+esc(x.n)+"-band":""}</button>`).join("")}</div><div class="full"></div>`:"");
+        $("usage").textContent="Oxirgi so'rov: "+inT+" kirish + "+outT+" chiqish token.";
+        $("chat").scrollTop=$("chat").scrollHeight; return;
+      }
+      MSGS.push({role:"user",content:tu.map(b=>{ const r=search(b.input.query||"",Number.isInteger(b.input.doc_id)?b.input.doc_id:null,6); r.forEach(x=>srcs.push(x));
+        $("ph")&&($("ph").textContent="qidirilmoqda: «"+String(b.input.query||"").slice(0,40)+"»");
+        return {type:"tool_result",tool_use_id:b.id,content:r.length?r.map(fmt).join("\n\n"):"No results."}; })});
+    }
+    throw new Error("Javob tayyor bo'lmadi (juda ko'p qidiruv). Savolni aniqroq yozing.");
+  }catch(e){ MSGS.pop(); a.innerHTML=`<div class="bub err">${esc(e.message||e)}</div>`; }
+}
+
+/* ---------- boshqaruv ---------- */
+async function send(){
+  if(BUSY) return; const q=$("q").value.trim(); if(!q) return;
+  BUSY=true; $("go").disabled=true; $("q").value="";
+  add("u",esc(q));
+  try{ if(MODE==="ai") await doAI(q); else await doSearch(q); }
+  catch(e){ add("a",`<div class="bub err">${esc(e.message||e)}</div>`); }
+  BUSY=false; $("go").disabled=false; $("q").focus();
+}
+function setMode(m){
+  MODE=m; $("mSearch").setAttribute("aria-pressed",String(m==="search")); $("mAI").setAttribute("aria-pressed",String(m==="ai"));
+  $("aiBox").style.display=m==="ai"?"":"none";
+  $("sub").textContent=m==="ai"?"AI hujjatlar ichidan o'qib, o'z so'zi bilan javob beradi":"Normativ hujjatlar bo'yicha qidiruv va javob";
+  $("q").placeholder=m==="ai"?"Savolingizni yozing — AI hujjatlarni o'qib javob beradi…":"Masalan: ISO 13485 qachondan talab qilinadi? (Enter — yuborish)";
+  try{ localStorage.setItem("tk_agent_mode",m); }catch(e){}
+}
+$("mSearch").onclick=()=>setMode("search"); $("mAI").onclick=()=>setMode("ai");
+$("go").onclick=send;
+$("q").addEventListener("keydown",e=>{ if(e.key==="Enter"&&!e.shiftKey){ e.preventDefault(); send(); } });
+$("saveKey").onclick=()=>{ const k=$("key").value.trim(); if(!k){ localStorage.removeItem(KEYN); $("keyState").textContent="Kalit o'chirildi."; return; }
+  if(!/^sk-ant-/.test(k)){ $("keyState").innerHTML='<span class="err">Kalit «sk-ant-» bilan boshlanishi kerak.</span>'; return; }
+  localStorage.setItem(KEYN,k); $("key").value=""; $("keyState").textContent="Kalit saqlandi (…"+k.slice(-4)+")."; };
+$("model").onchange=()=>{ try{ localStorage.setItem(MODN,$("model").value); }catch(e){} };
+
+const FAQ=["ISO 13485 qachondan talab qilinadi","Tibbiy jihozlarni tasniflash qoidalari","Klinik tadqiqot tartibi","Ro'yxatdan o'tkazish muddatlari","Raqamli markirovkalash","Noxush holat (insident) xabarnomasi"];
+$("chips").innerHTML=FAQ.map(f=>`<button class="mini" type="button">${esc(f)}</button>`).join("");
+$("chips").addEventListener("click",e=>{ const b=e.target.closest("button"); if(b){ $("q").value=b.textContent; send(); } });
+
+(async function init(){
+  try{ $("model").value=localStorage.getItem(MODN)||"claude-sonnet-5-5"; }catch(e){}
+  const k=localStorage.getItem(KEYN); if(k) $("keyState").textContent="Kalit saqlangan (…"+k.slice(-4)+").";
+  try{ const kb=await load();
+    $("docs").innerHTML=kb.docs.map(d=>`<li data-id="${d.id}" role="option" aria-selected="false"><b style="font-weight:500">${esc(d.title.length>110?d.title.slice(0,108)+"…":d.title)}</b><span>${kb.chunks.filter(c=>c.d===d.id).length}</span></li>`).join("");
+    $("docs").addEventListener("click",e=>{ const li=e.target.closest("li"); if(!li) return; const id=+li.dataset.id;
+      DOC=DOC===id?null:id; $("docs").querySelectorAll("li").forEach(x=>x.setAttribute("aria-selected",String(+x.dataset.id===DOC)));
+      $("docNote").textContent=DOC==null?"Qidiruv hamma hujjatlar ichida.":"Qidiruv faqat tanlangan hujjat ichida."; });
+  }catch(e){ $("docs").innerHTML=`<li class="err">${esc(e.message)}</li>`; }
+  setMode((function(){try{return localStorage.getItem("tk_agent_mode")||"search"}catch(e){return "search"}})());
+})();
+</script>
+</body>
+</html>
