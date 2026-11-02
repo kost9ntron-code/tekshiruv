@@ -254,6 +254,8 @@ input[type=date]:focus{outline:0;border-color:var(--accent);box-shadow:0 0 0 3px
 #pview[hidden],#bview[hidden]{display:none}
 body[data-view="baza"] .wrap,body[data-view="agent"] .wrap{max-width:min(1640px,100%)}
 #aview[hidden]{display:none}
+.vnav button[hidden]{display:none!important}
+.vnav.n4{grid-template-columns:repeat(4,1fr)}
 body[data-view="baza"] .vnav,body[data-view="agent"] .vnav{margin-left:0;margin-right:0}
 #pframe,#bframe,#aframe{display:block;width:100%;height:70vh;border:0;background:var(--bg)}
 body[data-view="src"] .wrap>section.step,body[data-view="nom"] .wrap>section.step,body[data-view="baza"] .wrap>section.step,body[data-view="agent"] .wrap>section.step{display:none!important}
@@ -516,12 +518,12 @@ if(document.readyState==="loading") document.addEventListener("DOMContentLoaded"
   </h1>
 </header>
 
-<nav class="vnav noprint" id="vnav" hidden aria-label="Bo'limlar">
+<nav class="vnav noprint n4" id="vnav" hidden aria-label="Bo'limlar">
   <button type="button" data-v="tek" aria-selected="true">Hujjatni tekshirish</button>
   <button type="button" data-v="src" aria-selected="false">Vakolatli organlar va reestrlar</button>
   <button type="button" data-v="nom" aria-selected="false">Tibbiy jihoz haqida ma'lumotnoma</button>
   <button type="button" data-v="baza" aria-selected="false">Tibbiy jihozlar bazasi</button>
-  <button type="button" data-v="agent" aria-selected="false">Pharmcontroluz_AI_Agent</button>
+  <button type="button" data-v="agent" aria-selected="false" hidden>Pharmcontroluz_AI_Agent</button>
 </nav>
 <div id="pview" class="noprint" hidden><iframe id="pframe" title="Vakolatli organlar va ma'lumotnoma" allow="clipboard-write"></iframe></div>
 <div id="bview" class="noprint" hidden><iframe id="bframe" title="Tibbiy jihozlar bazasi" allow="clipboard-write"></iframe></div>
@@ -1536,10 +1538,17 @@ function kutish(x,dev,uid){
   },()=>{ un(); chetlatish("Kirish rad etildi."); });
 }
 
+function agentRuxsat(code){
+  const b=document.querySelector('#vnav button[data-v="agent"]'); if(!b) return;
+  const set=ok=>{ b.hidden=!ok; $("vnav").classList.toggle("n4",!ok); if(!ok&&VIEW==="agent") korinish("tek"); };
+  set(false);
+  UNSUB.push(DB.doc("config/agent").onSnapshot(s=>{ const a=(s.exists&&s.data().allow)||[]; set(a.map(String).includes(String(code))); },()=>set(false)));
+}
 function ichkari(x,st,dev,uid){
   SESS={code:x.code,name:x.name,pos:x.pos,role:st.role||"expert",dept:st.dept||x.dept||"reg",dev,uid};
   EXPERT={nm:x.name,pos:x.pos};
   if(window.KO) KO.login(x.code);
+  agentRuxsat(x.code);
   $("who").innerHTML=`Ekspert: <b>${esc(x.name)}</b> · ${esc(x.pos)} · ${esc(depNomi(SESS.dept))}`;
   KEYP=DB.doc("keys/nom").get().then(s=>(s.exists&&s.data().k)||"").catch(()=>"");
   $("vnav").hidden=false;

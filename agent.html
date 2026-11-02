@@ -106,8 +106,14 @@ select,input[type=text],input[type=password]{background:var(--field);border:1px 
   </aside>
 </div>
 
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
 <script>
 "use strict";
+const FB_CONFIG={apiKey:"AIzaSyBeZKgyvUInhF0K4xw4amfP1echBlu0wl0",authDomain:"tekshiruv-88c03.firebaseapp.com",projectId:"tekshiruv-88c03",
+  storageBucket:"tekshiruv-88c03.firebasestorage.app",messagingSenderId:"989419587759",appId:"1:989419587759:web:052e115735c4ff6d86ac5a"};
+const LOCAL=new URLSearchParams(location.search).has("local");
 const $=id=>document.getElementById(id);
 const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const LAT={"а":"a","б":"b","в":"v","г":"g","д":"d","е":"e","ё":"yo","ж":"j","з":"z","и":"i","й":"y","к":"k","л":"l","м":"m","н":"n","о":"o","п":"p","р":"r","с":"s","т":"t","у":"u","ф":"f","х":"x","ц":"s","ч":"ch","ш":"sh","щ":"sh","ъ":"","ы":"i","ь":"","э":"e","ю":"yu","я":"ya","ў":"o'","қ":"q","ғ":"g'","ҳ":"h"};
@@ -119,8 +125,19 @@ const KEYN="tk_agent_key", MODN="tk_agent_model";
 
 async function load(){
   if(KB) return KB;
-  const r=await fetch("agent-kb.json?v=1"); if(!r.ok) throw new Error("Bilimlar bazasi fayli topilmadi (agent-kb.json).");
-  const raw=await r.json();
+  let raw;
+  if(LOCAL){ const r=await fetch("agent-kb.json"); if(!r.ok) throw new Error("agent-kb.json topilmadi"); raw=await r.json(); }
+  else{
+    if(!firebase.apps.length) firebase.initializeApp(FB_CONFIG);
+    const u=await new Promise(res=>{ const un=firebase.auth().onAuthStateChanged(x=>{ un(); res(x); }); });
+    if(!u) throw new Error("NOAUTH");
+    let snap;
+    try{ snap=await firebase.firestore().doc("agentkb/kb").get(); }
+    catch(e){ if(/permission/i.test(String(e.message||e))) throw new Error("NOPERM"); throw e; }
+    if(!snap.exists) throw new Error("NOKB");
+    const ds=new DecompressionStream("gzip"), w=ds.writable.getWriter(); w.write(snap.data().gz.toUint8Array()); w.close();
+    raw=JSON.parse(new TextDecoder().decode(await new Response(ds.readable).arrayBuffer()));
+  }
   const tk=raw.chunks.map(c=>toks(c.h+" "+c.t)); const df=new Map();
   tk.forEach(a=>new Set(a).forEach(w=>df.set(w,(df.get(w)||0)+1)));
   const avg=tk.reduce((s,a)=>s+a.length,0)/tk.length;
@@ -253,7 +270,13 @@ $("chips").addEventListener("click",e=>{ const b=e.target.closest("button"); if(
     $("docs").addEventListener("click",e=>{ const li=e.target.closest("li"); if(!li) return; const id=+li.dataset.id;
       DOC=DOC===id?null:id; $("docs").querySelectorAll("li").forEach(x=>x.setAttribute("aria-selected",String(+x.dataset.id===DOC)));
       $("docNote").textContent=DOC==null?"Qidiruv hamma hujjatlar ichida.":"Qidiruv faqat tanlangan hujjat ichida."; });
-  }catch(e){ $("docs").innerHTML=`<li class="err">${esc(e.message)}</li>`; }
+  }catch(e){
+    const m=String(e.message||e);
+    const txt=m==="NOPERM"?"Sizga bu bo'limga ruxsat berilmagan. Ruxsat uchun administratorga murojaat qiling."
+      :m==="NOAUTH"?"Avval asosiy sahifadan tizimga kiring.":m==="NOKB"?"Bilimlar bazasi hali yuklanmagan (administrator yuklashi kerak).":"Bazani yuklab bo'lmadi: "+m;
+    document.querySelector(".app").innerHTML=`<section class="card" style="flex:1;padding:40px 24px;text-align:center"><h1 style="margin:0 0 10px;font-size:20px">Pharmcontroluz_AI_Agent</h1><p class="err" style="margin:0">${esc(txt)}</p></section>`;
+    return;
+  }
   setMode((function(){try{return localStorage.getItem("tk_agent_mode")||"search"}catch(e){return "search"}})());
 })();
 </script>
