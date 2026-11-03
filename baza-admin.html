@@ -51,8 +51,8 @@ code{font-family:"Space Mono",monospace;font-size:12.5px}
 
   <div id="app2" style="display:none">
   <div class="card">
-    <h2 style="margin:0 0 6px;font-size:18px">5-bo'lim: Pharmcontroluz_AI_Agent — ruxsatlar</h2>
-    <p class="d" style="margin:0 0 12px">Belgilangan xodimlar menyuda 5-bo'limni ko'radi va bilimlar bazasini ocha oladi. Belgilanmaganlarga tugma ko'rinmaydi, sahifani to'g'ridan-to'g'ri ochsa ham «ruxsat berilmagan» chiqadi.</p>
+    <h2 style="margin:0 0 6px;font-size:18px">4-bo'lim: Tibbiy jihozlar bazasi — ruxsatlar</h2>
+    <p class="d" style="margin:0 0 12px">Belgilangan xodimlar menyuda «Tibbiy jihozlar bazasi» tugmasini ko'radi va bazani ocha oladi. Belgilanmaganlarga tugma ko'rinmaydi, sahifani to'g'ridan-to'g'ri ochsa ham «ruxsat berilmagan» chiqadi.</p>
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
       <button class="btn ghost" id="agAll" type="button" style="padding:8px 14px;min-height:36px">Hammasini belgilash</button>
       <button class="btn ghost" id="agNone" type="button" style="padding:8px 14px;min-height:36px">Hammasini olib tashlash</button>
@@ -61,14 +61,6 @@ code{font-family:"Space Mono",monospace;font-size:12.5px}
     <div style="display:flex;gap:10px;align-items:center;margin-top:12px;flex-wrap:wrap">
       <button class="btn" id="agSave" type="button">Ruxsatlarni saqlash</button><span id="agMsg" class="d" style="margin:0"></span>
     </div>
-  </div>
-  <div class="card">
-    <h2 style="margin:0 0 6px;font-size:18px">5-bo'lim: bilimlar bazasi</h2>
-    <p class="d" style="margin:0 0 6px" id="kbState">—</p>
-    <p style="margin:0">Kompyuteringizdagi <code>agent-kb.json</code> faylini tanlang va yuklang. Baza Firestore'da turadi va faqat ruxsat berilgan xodimlar o'qiy oladi.</p>
-    <input type="file" id="kbFile" accept=".json,application/json">
-    <button class="btn" id="kbGo" type="button" disabled>Bazani yuklash</button>
-    <p id="kbMsg" class="d" style="margin:10px 0 0"></p>
   </div>
   </div>
 </div>
@@ -112,7 +104,7 @@ let AGDIR=[];
 async function agentLoad(){
   $("app2").style.display="";
   try{
-    const [d,c]=await Promise.all([DB.doc("dir/list").get(),DB.doc("config/agent").get()]);
+    const [d,c]=await Promise.all([DB.doc("dir/list").get(),DB.doc("config/bazaruxsat").get()]);
     AGDIR=(d.exists&&d.data().items)||[];
     const allow=new Set(((c.exists&&c.data().allow)||[]).map(String));
     const by={}; AGDIR.forEach(x=>{ const k=x.dept||"reg"; (by[k]=by[k]||[]).push(x); });
@@ -120,31 +112,17 @@ async function agentLoad(){
       by[k].map(x=>`<label style="display:flex;gap:10px;align-items:center;padding:6px 4px;cursor:pointer"><input type="checkbox" data-code="${esc(x.code)}" ${allow.has(String(x.code))?"checked":""} style="width:18px;height:18px"> <span>${esc(x.name)}</span><span class="d" style="margin:0;font-size:12px">${esc(x.pos||"")}</span></label>`).join("")).join("")||"Xodimlar ro'yxati bo'sh.";
     $("agMsg").textContent=allow.size?("Hozir ruxsat: "+allow.size+" ta xodim."):"Hozir hech kimga ruxsat yo'q.";
   }catch(e){ $("agList").innerHTML=`<span class="err">Yuklab bo'lmadi: ${esc(e.message||e)}. Firestore qoidasi qo'shilganini tekshiring.</span>`; }
-  try{ const k=await DB.doc("agentkb/kb").get(); $("kbState").textContent=k.exists?("Bazada bor: "+(k.data().docs||"?")+" hujjat, "+(k.data().chunks||"?")+" band, yuklangan "+BazaCore.fromISO(String(k.data().ver||"").slice(0,10))+"."):"Baza hali yuklanmagan."; }
-  catch(e){ $("kbState").textContent="Holatni o'qib bo'lmadi (bu normal: bazani faqat ruxsatli xodim o'qiydi)."; }
 }
 $("agAll").onclick=()=>document.querySelectorAll("#agList input").forEach(i=>i.checked=true);
 $("agNone").onclick=()=>document.querySelectorAll("#agList input").forEach(i=>i.checked=false);
 $("agSave").onclick=async()=>{
   const codes=[...document.querySelectorAll("#agList input:checked")].map(i=>{ const c=i.dataset.code; const o=AGDIR.find(x=>String(x.code)===c); return o?o.code:c; });
   $("agSave").disabled=true; $("agMsg").textContent="Saqlanmoqda…";
-  try{ await DB.doc("config/agent").set({allow:codes,ts:firebase.firestore.FieldValue.serverTimestamp()}); $("agMsg").innerHTML=`<span class="ok">Saqlandi: ${codes.length} ta xodimga ruxsat.</span>`; }
+  try{ await DB.doc("config/bazaruxsat").set({allow:codes,ts:firebase.firestore.FieldValue.serverTimestamp()}); $("agMsg").innerHTML=`<span class="ok">Saqlandi: ${codes.length} ta xodimga ruxsat.</span>`; }
   catch(e){ $("agMsg").innerHTML=`<span class="err">Saqlab bo'lmadi: ${esc(e.message||e)}</span>`; }
   $("agSave").disabled=false;
 };
-let KBTXT=null;
-$("kbFile").onchange=async e=>{ KBTXT=null; $("kbGo").disabled=true; const f=e.target.files[0]; if(!f) return;
-  try{ const t=await f.text(); const j=JSON.parse(t); if(!Array.isArray(j.docs)||!Array.isArray(j.chunks)) throw new Error("bu agent-kb.json emas");
-    KBTXT={t,docs:j.docs.length,chunks:j.chunks.length}; $("kbMsg").textContent=`Tanlandi: ${j.docs.length} hujjat, ${j.chunks.length} band.`; $("kbGo").disabled=false; }
-  catch(err){ $("kbMsg").innerHTML=`<span class="err">Fayl noto'g'ri: ${esc(err.message||err)}</span>`; } };
-$("kbGo").onclick=async()=>{ if(!KBTXT) return; $("kbGo").disabled=true; $("kbMsg").textContent="Siqilmoqda va yuklanmoqda…";
-  try{ const gz=await BazaCore.gzipStr(KBTXT.t); if(gz.length>1000000) throw new Error("siqilgan hajm 1 MB dan katta ("+gz.length+")");
-    const ver=new Date().toISOString();
-    await DB.doc("agentkb/kb").set({gz:firebase.firestore.Blob.fromUint8Array(gz),ver,docs:KBTXT.docs,chunks:KBTXT.chunks,n:gz.length});
-    $("kbMsg").innerHTML=`<span class="ok">TAYYOR: ${KBTXT.docs} hujjat, ${KBTXT.chunks} band yuklandi (${(gz.length/1024).toFixed(0)} KB).</span>`;
-    $("kbState").textContent="Bazada bor: "+KBTXT.docs+" hujjat, "+KBTXT.chunks+" band, yuklangan "+BazaCore.fromISO(ver.slice(0,10))+".";
-  }catch(e){ $("kbMsg").innerHTML=`<span class="err">XATO: ${esc(e.message||e)}</span>`; }
-  $("kbGo").disabled=false; };
+
 $("files").onchange=async e=>{
   FILES={}; $("log").textContent=""; const fl=Array.from(e.target.files||[]);
   for(const f of fl) FILES[f.name]=await f.text();
