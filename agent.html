@@ -66,6 +66,7 @@ select,input[type=text],input[type=password]{background:var(--field);border:1px 
 .dots{display:inline-flex;gap:4px}.dots i{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:b 1s infinite}.dots i:nth-child(2){animation-delay:.15s}.dots i:nth-child(3){animation-delay:.3s}
 @keyframes b{0%,80%,100%{opacity:.25}40%{opacity:1}}
 </style>
+<script src="til.js?v=1"></script>
 </head>
 <body>
 <div class="app">
@@ -106,9 +107,6 @@ select,input[type=text],input[type=password]{background:var(--field);border:1px 
   </aside>
 </div>
 
-<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
 <script>
 "use strict";
 const FB_CONFIG={apiKey:"AIzaSyBeZKgyvUInhF0K4xw4amfP1echBlu0wl0",authDomain:"tekshiruv-88c03.firebaseapp.com",projectId:"tekshiruv-88c03",
@@ -125,19 +123,8 @@ const KEYN="tk_agent_key", MODN="tk_agent_model";
 
 async function load(){
   if(KB) return KB;
-  let raw;
-  if(LOCAL){ const r=await fetch("agent-kb.json"); if(!r.ok) throw new Error("agent-kb.json topilmadi"); raw=await r.json(); }
-  else{
-    if(!firebase.apps.length) firebase.initializeApp(FB_CONFIG);
-    const u=await new Promise(res=>{ const un=firebase.auth().onAuthStateChanged(x=>{ un(); res(x); }); });
-    if(!u) throw new Error("NOAUTH");
-    let snap;
-    try{ snap=await firebase.firestore().doc("agentkb/kb").get(); }
-    catch(e){ if(/permission/i.test(String(e.message||e))) throw new Error("NOPERM"); throw e; }
-    if(!snap.exists) throw new Error("NOKB");
-    const ds=new DecompressionStream("gzip"), w=ds.writable.getWriter(); w.write(snap.data().gz.toUint8Array()); w.close();
-    raw=JSON.parse(new TextDecoder().decode(await new Response(ds.readable).arrayBuffer()));
-  }
+  const r=await fetch("agent-kb.json?v=2"); if(!r.ok) throw new Error("Bilimlar bazasi fayli topilmadi (agent-kb.json).");
+  const raw=await r.json();
   const tk=raw.chunks.map(c=>toks(c.h+" "+c.t)); const df=new Map();
   tk.forEach(a=>new Set(a).forEach(w=>df.set(w,(df.get(w)||0)+1)));
   const avg=tk.reduce((s,a)=>s+a.length,0)/tk.length;

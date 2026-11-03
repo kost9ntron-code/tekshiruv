@@ -365,6 +365,7 @@ html[data-layout="zamonaviy"] .wrap{max-width:none}
 }
 
 /* ----- sozlamalar paneli ----- */
+#koBtn{font-size:13px;letter-spacing:.08em;padding:9px 20px;min-height:40px;border-color:var(--linehi);color:var(--accent);font-weight:700}
 #koOv{position:fixed;inset:0;z-index:1000}
 #koOv[hidden]{display:none}
 #koOv .kobg{position:absolute;inset:0;background:rgba(0,0,0,.45)}
@@ -375,7 +376,8 @@ html[data-layout="zamonaviy"] .wrap{max-width:none}
 #koPanel button{font:inherit;color:var(--fg);cursor:pointer}
 #koPanel .kox{background:none;border:0;font-size:20px;width:40px;height:40px;border-radius:50%}
 #koPanel .kogrid{display:grid;gap:8px}
-#koPanel .kogrid.c3{grid-template-columns:repeat(3,1fr)}
+#koPanel .kogrid.c3{grid-template-columns:repeat(3,minmax(0,1fr))}
+#koPanel .kolay span{font-size:11.5px;line-height:1.2;text-align:center;overflow-wrap:anywhere}
 #koPanel .kogrid.c2{grid-template-columns:repeat(2,1fr)}
 #koPanel .koopt{display:flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:8px 10px;background:var(--panel);border:1px solid var(--line);border-radius:12px;font-size:13px;font-weight:600}
 #koPanel .koopt[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 2px var(--ring);color:var(--fg)}
@@ -387,11 +389,12 @@ html[data-layout="zamonaviy"] .wrap{max-width:none}
 #koPanel .kores{margin-top:20px;width:100%;min-height:44px;background:transparent;border:1px solid var(--line);border-radius:12px;font-size:13px;color:var(--dim)}
 #koPanel .konote{font-size:12px;color:var(--faint);margin:10px 0 0;line-height:1.5}
 </style>
+<script src="til.js?v=1"></script>
 <script>
 /* ===== Ko'rinish sozlamalari (tema, rang, andoza) ===== */
 (function(){
 "use strict";
-const KEY="tk_ko", DEF={theme:"auto",accent:"default",layout:"klassik"};
+const KEY="tk_ko", DEF={theme:"auto",accent:"default",layout:"klassik",lang:"uz"};
 const ACC={
   default:{n:"Default",sw:"#5EEAD4",dk:["#5EEAD4","#062229","94,234,212","167,139,250"],lt:["#0E8F80","#FFFFFF","14,143,128","109,79,214"]},
   brand:{n:"Brand",sw:"#3B82F6",dk:["#60A5FA","#071735","96,165,250","34,211,238"],lt:["#1D4ED8","#FFFFFF","29,78,216","14,116,144"]},
@@ -403,6 +406,7 @@ const ACC={
 const LAY=[["klassik","Klassik","top"],["standart","Standart","line"],["ixcham","Ixcham","tops"],["zich","Zich","sidenar"],["ingichka","Ingichka","narrow"],
   ["markazlashgan","Markazlashgan","center"],["korxona","Korxona","sq"],["material","Material","pill"],["zamonaviy","Zamonaviy","side"]];
 const TEMA=[["auto","Avto"],["dark","Qora"],["light","Yorqin"]];
+const TILLAR=[["uz","O'zbekcha"],["ru","Русский"]];
 let P=Object.assign({},DEF), CODE="";
 const mq=window.matchMedia?matchMedia("(prefers-color-scheme: dark)"):null;
 const resolved=()=>P.theme==="auto"?((mq&&mq.matches)?"dark":"light"):P.theme;
@@ -419,12 +423,14 @@ function push(){
     try{ const d=f.contentDocument; if(!d||!d.documentElement) return; d.documentElement.dataset.theme=t;
       for(const k in v) if(k==="--accent"||k==="--onaccent"||k==="--accentbg"||k==="--ring"||k==="--linehi") d.documentElement.style.setProperty(k,v[k]);
       if(f.contentWindow.BAZA&&f.contentWindow.BAZA.theme) f.contentWindow.BAZA.theme(t);
+      if(f.contentWindow.TIL) f.contentWindow.TIL.set(P.lang);
     }catch(e){} });
 }
 function apply(){
   const h=document.documentElement, v=vars();
   h.dataset.theme=resolved(); h.dataset.layout=P.layout; h.dataset.accent=P.accent;
   for(const k in v) h.style.setProperty(k,v[k]);
+  if(window.TIL) TIL.set(P.lang);
   push(); mark();
 }
 function set(o){ Object.assign(P,o); wr(); apply(); }
@@ -449,8 +455,9 @@ function prev(kind){
 function build(){
   if(document.getElementById("koOv")) return;
   const el=document.createElement("div"); el.id="koOv"; el.hidden=true;
-  el.innerHTML='<div class="kobg"></div><aside id="koPanel" role="dialog" aria-modal="true" aria-label="Ko\'rinish sozlamalari">'+
-    '<header><b>Ko\'rinish</b><button type="button" class="kox" id="koX" aria-label="Yopish">✕</button></header>'+
+  el.innerHTML='<div class="kobg"></div><aside id="koPanel" role="dialog" aria-modal="true" aria-label="Rejim sozlamalari">'+
+    '<header><b>Rejim</b><button type="button" class="kox" id="koX" aria-label="Yopish">✕</button></header>'+
+    '<h3>Til</h3><div class="kogrid c2">'+TILLAR.map(t=>'<button type="button" class="koopt" data-k="lang" data-v="'+t[0]+'">'+t[1]+'</button>').join("")+'</div>'+
     '<h3>Menyu rangi</h3><div class="kogrid c3">'+Object.keys(ACC).map(k=>'<button type="button" class="koopt" data-k="accent" data-v="'+k+'"><i style="background:'+ACC[k].sw+'"></i>'+ACC[k].n+'</button>').join("")+'</div>'+
     '<h3>Tema</h3><div class="kogrid c3">'+TEMA.map(t=>'<button type="button" class="koopt" data-k="theme" data-v="'+t[0]+'">'+t[1]+'</button>').join("")+'</div>'+
     '<h3>Andoza</h3><div class="kogrid c3">'+LAY.map(l=>'<button type="button" class="kolay" data-k="layout" data-v="'+l[0]+'">'+prev(l[2])+'<span>'+l[1]+'</span></button>').join("")+'</div>'+
@@ -467,7 +474,7 @@ function build(){
 function wire(){
   build();
   const sup=document.querySelector(".sup");
-  if(sup&&!document.getElementById("koBtn")){ const b=document.createElement("button"); b.type="button"; b.id="koBtn"; b.className="mini noprint"; b.textContent="Ko'rinish";
+  if(sup&&!document.getElementById("koBtn")){ const b=document.createElement("button"); b.type="button"; b.id="koBtn"; b.className="mini noprint"; b.textContent="Rejim";
     b.onclick=()=>{ document.getElementById("koOv").hidden=false; const x=document.getElementById("koX"); if(x) x.focus(); }; sup.appendChild(b); }
   ["pframe","bframe","aframe"].forEach(id=>{ const f=document.getElementById(id); if(f) f.addEventListener("load",push); });
 }
@@ -518,12 +525,12 @@ if(document.readyState==="loading") document.addEventListener("DOMContentLoaded"
   </h1>
 </header>
 
-<nav class="vnav noprint n4" id="vnav" hidden aria-label="Bo'limlar">
+<nav class="vnav noprint" id="vnav" hidden aria-label="Bo'limlar">
   <button type="button" data-v="tek" aria-selected="true">Hujjatni tekshirish</button>
   <button type="button" data-v="src" aria-selected="false">Vakolatli organlar va reestrlar</button>
   <button type="button" data-v="nom" aria-selected="false">Tibbiy jihoz haqida ma'lumotnoma</button>
   <button type="button" data-v="baza" aria-selected="false">Tibbiy jihozlar bazasi</button>
-  <button type="button" data-v="agent" aria-selected="false" hidden>Pharmcontroluz_AI_Agent</button>
+  <button type="button" data-v="agent" aria-selected="false">Pharmcontroluz_AI_Agent</button>
 </nav>
 <div id="pview" class="noprint" hidden><iframe id="pframe" title="Vakolatli organlar va ma'lumotnoma" allow="clipboard-write"></iframe></div>
 <div id="bview" class="noprint" hidden><iframe id="bframe" title="Tibbiy jihozlar bazasi" allow="clipboard-write"></iframe></div>
@@ -1538,17 +1545,17 @@ function kutish(x,dev,uid){
   },()=>{ un(); chetlatish("Kirish rad etildi."); });
 }
 
-function agentRuxsat(code){
-  const b=document.querySelector('#vnav button[data-v="agent"]'); if(!b) return;
-  const set=ok=>{ b.hidden=!ok; $("vnav").classList.toggle("n4",!ok); if(!ok&&VIEW==="agent") korinish("tek"); };
-  set(false);
-  UNSUB.push(DB.doc("config/agent").onSnapshot(s=>{ const a=(s.exists&&s.data().allow)||[]; set(a.map(String).includes(String(code))); },()=>set(false)));
+function bazaRuxsat(code){   // 4-bo'lim faqat ruxsat ro'yxatidagi xodimga ko'rinadi
+  const b=document.querySelector('#vnav button[data-v="baza"]'); if(!b) return;
+  const set=ok=>{ b.hidden=!ok; $("vnav").classList.toggle("n4",!ok); if(!ok&&VIEW==="baza") korinish("tek"); };
+  // ro'yxat hali saqlanmagan bo'lsa yoki o'qib bo'lmasa — bo'lim hammaga ochiq qoladi
+  UNSUB.push(DB.doc("config/bazaruxsat").onSnapshot(s=>{ if(!s.exists||!Array.isArray(s.data().allow)){ set(true); return; } set(s.data().allow.map(String).includes(String(code))); },()=>set(true)));
 }
 function ichkari(x,st,dev,uid){
   SESS={code:x.code,name:x.name,pos:x.pos,role:st.role||"expert",dept:st.dept||x.dept||"reg",dev,uid};
   EXPERT={nm:x.name,pos:x.pos};
   if(window.KO) KO.login(x.code);
-  agentRuxsat(x.code);
+  bazaRuxsat(x.code);
   $("who").innerHTML=`Ekspert: <b>${esc(x.name)}</b> · ${esc(x.pos)} · ${esc(depNomi(SESS.dept))}`;
   KEYP=DB.doc("keys/nom").get().then(s=>(s.exists&&s.data().k)||"").catch(()=>"");
   $("vnav").hidden=false;

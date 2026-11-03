@@ -138,6 +138,7 @@ table.pl th{background:var(--head)}
 #st .bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .2s}
 .err{color:var(--stop)}
 </style>
+<script src="til.js?v=1"></script>
 </head>
 <body>
 
@@ -559,7 +560,9 @@ async function start(sess){
     if(!LOCAL){ const u=await authReady(); if(!u) throw new Error("Tizimga kirilmagan — asosiy sahifadan qayta kiring."); }
     try{ await yukla(); }
     catch(e){ if(!LOCAL&&/permission/i.test(String(e.message||e))){ await new Promise(r=>setTimeout(r,2500)); holat("Qayta urinilmoqda…",0); IDX=[]; FIRMA={}; ADRES={}; await yukla(); } else throw e; }
-  }catch(e){ $("st").innerHTML=`<span class="err">Bazani yuklab bo'lmadi: ${esc(e.message||e)}</span><p>Administrator bazani hali yuklamagan bo'lishi mumkin.</p>`; return; }
+  }catch(e){ const m=String(e.message||e);
+    $("st").innerHTML=/permission/i.test(m)?`<span class="err">Sizga bu bo'limga ruxsat berilmagan.</span><p>Ruxsat uchun administratorga murojaat qiling.</p>`
+      :`<span class="err">Bazani yuklab bo'lmadi: ${esc(m)}</span><p>Administrator bazani hali yuklamagan bo'lishi mumkin.</p>`; return; }
   sozla(); $("st").classList.add("hidden"); $("app").classList.remove("hidden");
 }
 window.BAZA={ start, theme:t=>{ document.documentElement.dataset.theme=t==="dark"?"dark":""; }, och:id=>ochKarta(+id) };
