@@ -5,6 +5,7 @@ const N=s=>String(s).replace(/[’ʻʼ‘`´]/g,"'").replace(/\s+/g," ").trim();
 const D={
 // --- kirish va umumiy ---
 "Shahzodbek O'roqov — tekshiruv konsoli":"Shahzodbek O'roqov — консоль проверки",
+"UzMDControl — Tibbiy jihozlar qo'mitasi":"UzMDControl — Комитет по медицинским изделиям","UzMDControl · Tibbiy jihozlar qo'mitasi":"UzMDControl · Комитет по медицинским изделиям",
 "Ekspert ma'lumotlari":"Данные эксперта",
 "Avval bo'limingizni, keyin ro'yxatdan o'zingizni tanlang va shaxsiy parolingizni kiriting.":"Сначала выберите свой отдел, затем себя в списке и введите личный пароль.",
 "Bo'lim / qo'mita":"Отдел / комитет","Yuklanmoqda…":"Загрузка…","Familiya, ism, otasining ismi":"Фамилия, имя, отчество",
@@ -126,6 +127,7 @@ const D={
 };
 const RX=[
 [/^Tibbiy jihozlar qo'mitasi · (.+) · (\d+)-nashr$/,"Комитет по медицинским изделиям · $1 · версия $2"],
+[/^UzMDControl · Tibbiy jihozlar qo'mitasi · (\d+)-nashr$/,"UzMDControl · Комитет по медицинским изделиям · версия $1"],
 [/^(\d+) ta yozuv$/,"Записей: $1"],
 [/^Masalan: (.*)$/,"Например: $1"],
 [/^(.+) — kartochkaga o'tish$/,"$1 — перейти к карточке"],
