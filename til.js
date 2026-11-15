@@ -127,7 +127,7 @@ const D={
 // --- 6-bo'lim (xatlar.html) ---
 "Xatlar nazorati":"Контроль писем","UzMDControl — Xatlar nazorati":"UzMDControl — Контроль писем","Muddati o'tgan xatlar":"Просроченные письма",
 "O'zgartirish uchun kelgan xatlar":"Письма на внесение изменений","Boshqa xatlar":"Прочие письма","Xatlar turi":"Тип писем","Ekran":"Экран",
-"Panel":"Панель","Ro'yxat":"Список","+ Yangi xat":"+ Новое письмо",
+"Bosh sahifa":"Главная","Ro'yxat":"Список","+ Yangi xat":"+ Новое письмо",
 "Faol xatlar":"Активные письма","Muddati o'tgan":"Просрочено","Javob kutilmoqda":"Ожидают ответа","Shu oy yakunlangan":"Завершено в этом месяце",
 "Ekspertlar jadvali, eng kechikkan xatlar va oylar grafigi keyingi bosqichda qo'shiladi.":"Таблица экспертов, самые просроченные письма и график по месяцам появятся на следующем этапе.",
 "Qidirish: raqam yoki murojaatchi":"Поиск: номер или заявитель","Ijrochi bo'yicha filtr":"Фильтр по исполнителю","Barcha ijrochilar":"Все исполнители",
@@ -141,7 +141,25 @@ const D={
 "Administrator":"Администратор","Ruxsatli xodim":"Сотрудник с доступом","Xatlar nazorati — administrator":"Контроль писем — администратор",
 "Bu sahifani alohida faqat administrator ochadi. Xodimlar asosiy sahifadagi 6-bo'limdan foydalanadi.":"Отдельно эту страницу открывает только администратор. Сотрудники пользуются 6-м разделом на главной странице.",
 "Google orqali kirish":"Войти через Google","Kirib bo'lmadi.":"Не удалось войти.","administrator emas.":"не является администратором.",
-"Namuna ma'lumot (?local)":"Демо-данные (?local)","Yangi xat qo'shish keyingi bosqichda ishga tushadi.":"Добавление писем заработает на следующем этапе."
+"Namuna ma'lumot (?local)":"Демо-данные (?local)",
+"Qidirish: raqam, murojaatchi yoki ijrochi":"Поиск: номер, заявитель или исполнитель","Tur bo'yicha filtr":"Фильтр по типу","Barcha turlar":"Все типы",
+"Kelgan sana:":"Дата поступления:","Kelgan sana — dan":"Дата поступления — с","Kelgan sana — gacha":"Дата поступления — по","Filtrlarni tozalash":"Сбросить фильтры",
+"Yangi xat":"Новое письмо","O'zgartirish uchun kelgan xat ·":"Письмо на внесение изменений ·","— majburiy":"— обязательно",
+"Kiruvchi raqam":"Входящий номер","Markaz elektron raqami":"Электронный номер Центра","Murojaatchi (korxona)":"Заявитель (организация)",
+"Ijrochi (ekspert)":"Исполнитель (эксперт)","Muddat (oxirgi kun)":"Срок (последний день)","Izoh":"Примечание",
+"— turini tanlang —":"— выберите тип —","— ijrochini tanlang —":"— выберите исполнителя —",
+"Majburiy maydonlarni to'ldiring:":"Заполните обязательные поля:","Majburiy maydonlarni to'ldiring.":"Заполните обязательные поля.",
+"Muddat kelgan sanadan oldin bo'lishi mumkin emas.":"Срок не может быть раньше даты поступления.",
+"Bunday kiruvchi raqamli xat allaqachon bor. Baribir qo'shilsinmi?":"Письмо с таким входящим номером уже есть. Всё равно добавить?",
+"Tarix":"История","faqat administrator":"только администратор","Muddat belgilanmagan":"Срок не установлен",
+"kun qoldi":"дн. осталось","kun o'tdi":"дн. просрочено","Bugun oxirgi kun":"Сегодня последний день",
+"Ekspert hali javob bermagan.":"Эксперт ещё не ответил.","«Yangi» holatiga qaytarish":"Вернуть в статус «Новое»","Yakunlangan sana":"Дата завершения",
+"Xatni yakunlaysizmi?":"Завершить письмо?","Ijrochini almashtirish":"Сменить исполнителя","Muddatni uzaytirish":"Продлить срок","Tahrirlash":"Редактировать","Yakunlash":"Завершить",
+"Yangi ijrochi":"Новый исполнитель","Sabab":"Причина","Yangi muddat":"Новый срок",
+"Ijrochini tanlang.":"Выберите исполнителя.","Bu xat allaqachon shu ijrochida.":"Письмо уже у этого исполнителя.","Yangi muddatni kiriting.":"Введите новый срок.",
+"Yangi muddat hozirgisidan keyin bo'lishi kerak.":"Новый срок должен быть позже текущего.","Uzaytirish sababini yozing.":"Укажите причину продления.",
+"Xat qo'shildi":"Письмо добавлено","Holat o'zgardi":"Статус изменён","Ijrochi almashtirildi":"Исполнитель сменён","Muddat uzaytirildi":"Срок продлён","Ma'lumot tahrirlandi":"Данные изменены",
+"Qolgan kun (manfiy — o'tgan)":"Осталось дней (минус — просрочено)"
 };
 const RX=[
 [/^Tibbiy jihozlar qo'mitasi · (.+) · (\d+)-nashr$/,"Комитет по медицинским изделиям · $1 · версия $2"],
@@ -170,7 +188,8 @@ const RX=[
 [/^Ish topilmadi: (.+)$/,"Дело не найдено: $1"],[/^Yuklab bo'lmadi: (.+)$/,"Не удалось загрузить: $1"],
 [/^Ilova nomlari yuklanmoqda… (.+)$/,"Загрузка названий приложений… $1"],
 [/^(\d+) ta pozitsiya$/,"позиций: $1"],
-[/^(\d+) kun o'tdi$/,"просрочено на $1 дн."],[/^(\d+) kun$/,"$1 дн."]
+[/^(\d+) kun o'tdi$/,"просрочено на $1 дн."],[/^(\d+) kun$/,"$1 дн."],
+[/^uzaytirilgan: (\d+)$/,"продлён: $1 раз"],[/^Saqlab bo'lmadi: (.*)$/,"Не удалось сохранить: $1"]
 ];
 let LANG="uz";
 const DONE=new Set();
