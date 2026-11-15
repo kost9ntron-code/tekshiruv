@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>UzMDControl — Xatlar nazorati</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:dark;--bg:#0A0E22;--panel:rgba(255,255,255,.045);--chip:rgba(255,255,255,.05);--field:rgba(255,255,255,.05);--fg:#E7EAF6;--dim:#98A1C4;--faint:#66709A;
+  --line:rgba(255,255,255,.12);--accent:#5EEAD4;--onaccent:#062229;--accentbg:rgba(94,234,212,.09);--ring:rgba(94,234,212,.22);--linehi:rgba(94,234,212,.45);
+  --ok:#A78BFA;--okbg:rgba(167,139,250,.13);--warn:#FBBF6E;--warnbg:rgba(251,191,110,.13);--stop:#FB7B8E;--stopbg:rgba(251,123,142,.13);
+  --mono:"Space Mono",ui-monospace,Consolas,monospace;--body:"Space Grotesk",system-ui,sans-serif}
+:root[data-theme="light"]{color-scheme:light;--bg:#F3F5FB;--panel:#FFFFFF;--chip:#EEF1F8;--field:#FFFFFF;--fg:#141A33;--dim:#4D5677;--faint:#7C84A3;--line:rgba(20,26,51,.14);
+  --accent:#0E8F80;--onaccent:#FFFFFF;--accentbg:rgba(14,143,128,.09);--ring:rgba(14,143,128,.22);--linehi:rgba(14,143,128,.55);--ok:#6D4FD6;--okbg:rgba(109,79,214,.10);
+  --warn:#A8620A;--warnbg:rgba(168,98,10,.10);--stop:#C62840;--stopbg:rgba(198,40,64,.09)}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--fg);font:14px/1.5 var(--body);-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+.hidden{display:none!important}
+.app{max-width:1400px;margin:0 auto;padding:16px 18px 28px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px}
+.hd{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.logo{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,var(--accent),var(--ok));flex:none}
+.hd h1{margin:0;font-size:18px;font-weight:700;letter-spacing:-.02em}
+.hd small{display:block;color:var(--dim);font-size:12px}
+.seg{display:flex;gap:4px;background:var(--chip);border:1px solid var(--line);border-radius:999px;padding:3px}
+.seg button{border:0;background:transparent;border-radius:999px;padding:7px 14px;min-height:34px;font-size:13px;font-weight:600;color:var(--dim)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--onaccent)}
+.hd .seg{margin-left:auto}
+.bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.bar .sp{flex:1}
+.btn{background:var(--accent);color:var(--onaccent);border:0;border-radius:10px;padding:8px 14px;min-height:38px;font-weight:600}
+.btn.gh{background:var(--chip);color:var(--fg);border:1px solid var(--line)}
+input[type=text],select{background:var(--field);border:1px solid var(--line);border-radius:10px;padding:8px 10px;min-height:38px}
+input:focus,select:focus{outline:none;border-color:var(--linehi);box-shadow:0 0 0 2px var(--ring)}
+select option,select optgroup{background:var(--bg);color:var(--fg)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin-bottom:14px}
+.stat{padding:14px 16px}
+.stat b{display:block;font:700 28px/1.1 var(--mono)}
+.stat span{color:var(--dim);font-size:13px}
+.stat.ot b{color:var(--stop)} .stat.wr b{color:var(--warn)} .stat.ok b{color:var(--ok)}
+.note{color:var(--dim);font-size:13px;padding:14px 16px}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chips button{font-size:12.5px;color:var(--dim);background:var(--chip);border:1px solid var(--line);border-radius:999px;padding:6px 12px;min-height:32px}
+.chips button[aria-pressed="true"]{color:var(--onaccent);background:var(--accent);border-color:var(--accent)}
+.chips button i{font-style:normal;font-family:var(--mono);font-size:11px;margin-left:6px;opacity:.8}
+.tw{overflow:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;font-weight:600;color:var(--dim);font-size:12px;padding:10px 12px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+tr:last-child td{border-bottom:0}
+td.m{font-family:var(--mono);font-size:12px;white-space:nowrap}
+.pill{display:inline-block;font:11px var(--mono);padding:3px 9px;border-radius:999px;background:var(--accentbg);color:var(--accent);white-space:nowrap}
+.pill.h0{background:var(--warnbg);color:var(--warn)} .pill.h5{background:var(--okbg);color:var(--ok)}
+.kun{font:700 12px var(--mono);white-space:nowrap}
+.kun.ot{color:var(--stop)} .kun.ya{color:var(--warn)} .kun.ok{color:var(--dim)}
+.empty{color:var(--dim);text-align:center;padding:28px 16px}
+.st{max-width:460px;margin:60px auto;padding:22px 24px;text-align:center}
+.st p{color:var(--dim);margin:8px 0 0}
+.err{color:var(--stop)}
+@media (max-width:640px){.app{padding:12px 12px 22px}.hd .seg{margin-left:0;width:100%}.seg button{flex:1;padding:7px 8px}}
+</style>
+<script src="til.js?v=2"></script>
+</head>
+<body>
+
+<div id="st" class="card st">Yuklanmoqda…</div>
+
+<div id="app" class="app hidden">
+  <header class="hd">
+    <div class="logo" aria-hidden="true"></div>
+    <div><h1>Xatlar nazorati</h1><small id="who"></small></div>
+    <div class="seg" id="bolim" role="group" aria-label="Xatlar turi">
+      <button type="button" data-b="a" aria-pressed="true">O'zgartirish uchun kelgan xatlar</button>
+      <button type="button" data-b="b" aria-pressed="false">Boshqa xatlar</button>
+    </div>
+  </header>
+
+  <!-- A. O'zgartirish uchun kelgan xatlar -->
+  <section id="secA">
+    <div class="bar">
+      <div class="seg" id="ekran" role="group" aria-label="Ekran">
+        <button type="button" data-e="panel" aria-pressed="true">Panel</button>
+        <button type="button" data-e="royxat" aria-pressed="false">Ro'yxat</button>
+      </div>
+      <span class="sp"></span>
+      <button type="button" class="btn" id="yangi" hidden>+ Yangi xat</button>
+    </div>
+
+    <div id="ePanel">
+      <div class="stats">
+        <div class="card stat"><b id="nFaol">0</b><span>Faol xatlar</span></div>
+        <div class="card stat ot"><b id="nOtgan">0</b><span>Muddati o'tgan</span></div>
+        <div class="card stat wr"><b id="nKut">0</b><span>Javob kutilmoqda</span></div>
+        <div class="card stat ok"><b id="nOy">0</b><span>Shu oy yakunlangan</span></div>
+      </div>
+      <div class="card note">Ekspertlar jadvali, eng kechikkan xatlar va oylar grafigi keyingi bosqichda qo'shiladi.</div>
+    </div>
+
+    <div id="eRoyxat" class="hidden">
+      <div class="bar">
+        <div class="chips" id="hFiltr"></div>
+      </div>
+      <div class="bar">
+        <input type="text" id="qidir" placeholder="Qidirish: raqam yoki murojaatchi" style="flex:1 1 260px">
+        <select id="fIjro" aria-label="Ijrochi bo'yicha filtr" hidden></select>
+      </div>
+      <div class="card tw">
+        <table>
+          <thead><tr><th>Kiruvchi №</th><th>Markaz №</th><th>Kelgan sana</th><th>Murojaatchi</th><th>O'zgartirish turi</th><th>Ijrochi</th><th>Muddat</th><th>Qoldi</th><th>Holat</th></tr></thead>
+          <tbody id="tb"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- B. Boshqa xatlar (arxiv) -->
+  <section id="secB" class="hidden">
+    <div class="card note">Kiruvchi va chiquvchi xatlar arxivi fayl saqlash yechimi kelishilgandan keyin quriladi.</div>
+  </section>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script>
+"use strict";
+const FB_CONFIG={apiKey:"AIzaSyBeZKgyvUInhF0K4xw4amfP1echBlu0wl0",authDomain:"tekshiruv-88c03.firebaseapp.com",projectId:"tekshiruv-88c03",
+  storageBucket:"tekshiruv-88c03.firebasestorage.app",messagingSenderId:"989419587759",appId:"1:989419587759:web:052e115735c4ff6d86ac5a"};
+const $=id=>document.getElementById(id);
+const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]||c));
+const LOCAL=new URLSearchParams(location.search).has("local");
+const EMB=(()=>{ try{ return window.top!==window.self && window.parent.location.host===location.host; }catch(_){ return false; } })();
+const DEPS=[["qom","Tibbiy jihozlar qo'mitasi"],["reg","Tibbiy jihozlarni ro'yxatdan o'tkazish bo'limi"]];
+const HOLAT=["Yangi","Qabul qildim","Zamechaniya yuborildi","Shartnomaga berildi","Ekspertiza jarayonida","Yakunlandi"];
+const TUR={nh:"Normativ hujjatga",ru:"RU ga",nhru:"Normativ hujjat va RU ga"};
+
+let DB=null, AUTH=null, SESS=null, ROLE="ekspert", DIR=[], XAT=[], UN=[];
+let HF="faol", QQ="", FI="";
+
+/* ---------- sanalar (YYYY-MM-DD matn) ---------- */
+const p2=n=>String(n).padStart(2,"0");
+function bugun(){ const d=new Date(); return d.getFullYear()+"-"+p2(d.getMonth()+1)+"-"+p2(d.getDate()); }
+function kunFarq(s){ const a=new Date(s+"T00:00:00"), b=new Date(bugun()+"T00:00:00"); return Math.round((a-b)/86400000); }
+const sanaK=s=>s?s.split("-").reverse().join("."):"";
+const otganmi=x=>(x.holat||0)<5 && x.muddat && x.muddat<bugun();
+
+/* ---------- ko'rinish ---------- */
+function holat(html){ $("st").innerHTML=html; $("st").classList.remove("hidden"); $("app").classList.add("hidden"); }
+function ochish(){ $("st").classList.add("hidden"); $("app").classList.remove("hidden"); }
+const ROLNOM={admin:"Administrator",ruxsatli:"Ruxsatli xodim",ekspert:"Ekspert"};
+
+function bosqich(sel,attr,val){ document.querySelectorAll(sel+" button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset[attr]===val))); }
+$("bolim").addEventListener("click",e=>{ const b=e.target.closest("button[data-b]"); if(!b) return;
+  bosqich("#bolim","b",b.dataset.b); $("secA").classList.toggle("hidden",b.dataset.b!=="a"); $("secB").classList.toggle("hidden",b.dataset.b!=="b"); });
+$("ekran").addEventListener("click",e=>{ const b=e.target.closest("button[data-e]"); if(!b) return;
+  bosqich("#ekran","e",b.dataset.e); $("ePanel").classList.toggle("hidden",b.dataset.e!=="panel"); $("eRoyxat").classList.toggle("hidden",b.dataset.e!=="royxat"); });
+$("hFiltr").addEventListener("click",e=>{ const b=e.target.closest("button[data-h]"); if(!b) return; HF=b.dataset.h; chiz(); });
+$("qidir").addEventListener("input",e=>{ QQ=e.target.value.trim().toLowerCase(); chiz(); });
+$("fIjro").addEventListener("change",e=>{ FI=e.target.value; chiz(); });
+$("yangi").addEventListener("click",()=>alert("Yangi xat qo'shish keyingi bosqichda ishga tushadi."));
+
+function ijrochiTanlov(){   // dir/list dan, bo'lim bo'yicha guruhlab
+  const g=DEPS.map(([k,n])=>{ const L=DIR.filter(x=>(x.dept||"reg")===k).sort((a,b)=>String(a.name).localeCompare(String(b.name)));
+    return L.length?`<optgroup label="${esc(n)}">`+L.map(x=>`<option value="${esc(x.code)}">${esc(x.name)}</option>`).join("")+`</optgroup>`:""; }).join("");
+  $("fIjro").innerHTML=`<option value="">Barcha ijrochilar</option>`+g;
+  $("fIjro").hidden=(ROLE==="ekspert");
+}
+
+function panel(){
+  const faol=XAT.filter(x=>(x.holat||0)<5), oy=bugun().slice(0,7);
+  $("nFaol").textContent=faol.length;
+  $("nOtgan").textContent=faol.filter(otganmi).length;
+  $("nKut").textContent=faol.filter(x=>!x.holat).length;
+  $("nOy").textContent=XAT.filter(x=>x.holat===5 && x.yakunSana && x.yakunSana.slice(0,7)===oy).length;
+}
+
+function chiz(){
+  panel();
+  const son=f=>XAT.filter(f).length;
+  const F=[["faol","Faol",x=>(x.holat||0)<5],["otgan","Muddati o'tgan",otganmi],["hammasi","Hammasi",()=>true]]
+    .concat(HOLAT.map((h,i)=>[String(i),h,x=>(x.holat||0)===i]));
+  $("hFiltr").innerHTML=F.map(([k,n,f])=>`<button type="button" data-h="${k}" aria-pressed="${HF===k}">${esc(n)}<i>${son(f)}</i></button>`).join("");
+  const hf=(F.find(f=>f[0]===HF)||F[0])[2];
+  const L=XAT.filter(hf)
+    .filter(x=>!FI||x.ijrochi===FI)
+    .filter(x=>!QQ||[x.kirNo,x.markazNo,x.korxona].some(v=>String(v||"").toLowerCase().includes(QQ)))
+    .sort((a,b)=>String(a.muddat||"").localeCompare(String(b.muddat||"")));
+  if(!L.length){ $("tb").innerHTML=`<tr><td colspan="9" class="empty">${esc(XAT.length?"Mos xat topilmadi.":"Hozircha xat yo'q.")}</td></tr>`; return; }
+  $("tb").innerHTML=L.map(x=>{
+    const h=x.holat||0, k=h<5&&x.muddat?kunFarq(x.muddat):null;
+    const kun=k==null?"—":k<0?`<span class="kun ot">${esc(-k+" kun o'tdi")}</span>`:`<span class="kun ${k<=3?"ya":"ok"}">${esc(k+" kun")}</span>`;
+    return `<tr><td class="m">${esc(x.kirNo)}</td><td class="m">${esc(x.markazNo)}</td><td class="m">${esc(sanaK(x.kelgan))}</td><td>${esc(x.korxona)}</td>
+      <td>${esc(TUR[x.tur]||x.tur||"")}</td><td>${esc(x.ijrochiNomi||x.ijrochi)}</td><td class="m">${esc(sanaK(x.muddat))}</td><td>${kun}</td>
+      <td><span class="pill h${h}">${esc(HOLAT[h]||"")}</span></td></tr>`;
+  }).join("");
+}
+
+/* ---------- ma'lumotlar ---------- */
+function kuzat(){
+  UN.forEach(f=>{ try{ f(); }catch(e){} }); UN=[];
+  const q=ROLE==="ekspert"?DB.collection("xatlar").where("ijrochi","==",String(SESS.code)):DB.collection("xatlar");
+  UN.push(q.onSnapshot(s=>{ XAT=s.docs.map(d=>Object.assign({id:d.id},d.data())); chiz(); },
+    e=>holat(`<span class="err">${esc("Xatlarni yuklab bo'lmadi.")}</span><p>${esc(e.message||e)}</p>`)));
+}
+async function boshla(){
+  $("who").innerHTML=(SESS.name?esc(SESS.name)+" · ":"")+`<span>${esc(ROLNOM[ROLE])}</span>`;
+  $("yangi").hidden=(ROLE==="ekspert");
+  try{ const d=await DB.doc("dir/list").get(); DIR=(d.exists&&d.data().items)||[]; }catch(e){ DIR=[]; }
+  ijrochiTanlov(); chiz(); ochish(); kuzat();
+}
+async function rolAniqla(){
+  if(ROLE==="admin") return;
+  try{ const s=await DB.doc("config/xatruxsat").get();
+    const a=(s.exists&&Array.isArray(s.data().allow))?s.data().allow.map(String):[];
+    ROLE=a.includes(String(SESS.code))?"ruxsatli":"ekspert";
+  }catch(e){ ROLE="ekspert"; }
+}
+
+/* index.html ichida: asosiy sahifa xodim sessiyasini beradi */
+async function start(sess){
+  if(SESS) return; SESS=sess||{};
+  const u=await new Promise(res=>{ const un=AUTH.onAuthStateChanged(x=>{ un(); res(x); }); });
+  if(!u){ holat(`<span class="err">${esc("Avval asosiy sahifadan tizimga kiring.")}</span>`); return; }
+  await rolAniqla(); boshla();
+}
+
+/* Alohida ochilganda: faqat administrator (Google) */
+function adminKirish(){
+  holat(`<b>${esc("Xatlar nazorati — administrator")}</b><p>${esc("Bu sahifani alohida faqat administrator ochadi. Xodimlar asosiy sahifadagi 6-bo'limdan foydalanadi.")}</p>
+    <p><button type="button" class="btn" id="gIn">${esc("Google orqali kirish")}</button></p><p class="err" id="gErr"></p>`);
+  $("gIn").onclick=async()=>{ const pr=new firebase.auth.GoogleAuthProvider(); pr.setCustomParameters({prompt:"select_account"});
+    try{ await AUTH.signInWithPopup(pr); }
+    catch(e){ if(e.code==="auth/popup-blocked"||e.code==="auth/operation-not-supported-in-this-environment") AUTH.signInWithRedirect(pr);
+      else if(e.code!=="auth/popup-closed-by-user") $("gErr").innerHTML=`<span>Kirib bo'lmadi.</span> `+esc(e.message||e.code); } };
+}
+function alohida(){
+  AUTH.onAuthStateChanged(async u=>{
+    if(!u||u.isAnonymous){ adminKirish(); return; }
+    let d; try{ d=await DB.doc("config/admin").get(); }catch(e){ holat(`<span class="err">${esc(e.message||e)}</span>`); return; }
+    if(!d.exists||d.data().uid!==u.uid){ await AUTH.signOut(); adminKirish(); $("gErr").innerHTML=esc(u.email)+` — <span>administrator emas.</span>`; return; }
+    if(SESS) return; SESS={name:u.displayName||u.email,code:"admin"}; ROLE="admin"; boshla();
+  });
+}
+
+/* ?local — Firebase'siz namuna ma'lumot bilan ko'rish (faqat dizaynni tekshirish uchun) */
+function namuna(){
+  const t=bugun(), qo=n=>{ const d=new Date(); d.setDate(d.getDate()+n); return d.getFullYear()+"-"+p2(d.getMonth()+1)+"-"+p2(d.getDate()); };
+  SESS={name:"Sinov",code:"admin"}; ROLE="admin";
+  DIR=[{code:"101",name:"Aliyev Anvar",dept:"reg"},{code:"102",name:"Karimova Dilnoza",dept:"reg"},{code:"201",name:"Rahimov Bobur",dept:"qom"}];
+  XAT=[
+    {kirNo:"01-12/345",markazNo:"E-2026-0101",kelgan:qo(-20),korxona:"MedTech LLC",tur:"ru",ijrochi:"101",ijrochiNomi:"Aliyev Anvar",muddat:qo(-3),holat:1},
+    {kirNo:"01-12/351",markazNo:"E-2026-0107",kelgan:qo(-6),korxona:"Shifo Farm",tur:"nh",ijrochi:"102",ijrochiNomi:"Karimova Dilnoza",muddat:qo(2),holat:0},
+    {kirNo:"01-12/360",markazNo:"E-2026-0115",kelgan:qo(-2),korxona:"Diagnostika Servis",tur:"nhru",ijrochi:"201",ijrochiNomi:"Rahimov Bobur",muddat:qo(12),holat:4},
+    {kirNo:"01-12/301",markazNo:"E-2026-0090",kelgan:qo(-30),korxona:"Med Line",tur:"ru",ijrochi:"101",ijrochiNomi:"Aliyev Anvar",muddat:qo(-10),holat:5,yakunSana:t}
+  ];
+  $("who").innerHTML=`Sinov · <span>Namuna ma'lumot (?local)</span>`;
+  $("yangi").hidden=false; ijrochiTanlov(); chiz(); ochish();
+}
+
+window.XATLAR={ start };
+(function(){
+  if(LOCAL){ namuna(); return; }
+  if(!window.firebase){ holat(`<span class="err">${esc("Tizimga ulanib bo'lmadi. Internet aloqasini tekshirib, sahifani yangilang.")}</span>`); return; }
+  firebase.initializeApp(FB_CONFIG); AUTH=firebase.auth(); DB=firebase.firestore();
+  if(!EMB) alohida();
+})();
+</script>
+</body>
+</html>

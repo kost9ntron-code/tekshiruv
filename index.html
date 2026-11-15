@@ -245,22 +245,24 @@ input[type=date]:focus{outline:0;border-color:var(--accent);box-shadow:0 0 0 3px
 #gate .gmnt b{display:block;color:var(--warn);font-size:15px;margin:0 0 6px}
 #gate .gmnt p{margin:0;font-size:13.5px;line-height:1.55;color:var(--fg)}
 #gate .gmnt .lnk{display:inline-block;width:auto;margin:12px 0 0;padding:0;background:none;border:0;color:var(--dim);font:500 12.5px var(--body);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
-.vnav{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:0 -20px 18px;padding:10px 20px;background:rgba(10,14,34,.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.vnav{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin:0 -20px 18px;padding:10px 20px;background:rgba(10,14,34,.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
 .vnav[hidden]{display:none}
 .vnav button{font:600 14px var(--body);color:var(--dim);background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:11px 10px;cursor:pointer;line-height:1.25}
 .vnav button:hover{color:var(--fg);border-color:var(--linehi)}
 .vnav button[aria-selected="true"]{color:var(--onaccent);background:var(--accent);border-color:var(--accent)}
 .vnav button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 #pview[hidden],#bview[hidden]{display:none}
-body[data-view="baza"] .wrap,body[data-view="agent"] .wrap{max-width:min(1640px,100%)}
-#aview[hidden]{display:none}
+body[data-view="baza"] .wrap,body[data-view="agent"] .wrap,body[data-view="xat"] .wrap{max-width:min(1640px,100%)}
+#aview[hidden],#xview[hidden]{display:none}
 .vnav button[hidden]{display:none!important}
-.vnav.n4{grid-template-columns:repeat(4,1fr)}
-body[data-view="baza"] .vnav,body[data-view="agent"] .vnav{margin-left:0;margin-right:0}
-#pframe,#bframe,#aframe{display:block;width:100%;height:70vh;border:0;background:var(--bg)}
-body[data-view="src"] .wrap>section.step,body[data-view="nom"] .wrap>section.step,body[data-view="baza"] .wrap>section.step,body[data-view="agent"] .wrap>section.step{display:none!important}
-body[data-view="src"] .wrap,body[data-view="nom"] .wrap,body[data-view="baza"] .wrap{padding-bottom:0}
-@media (max-width:640px){.vnav{gap:6px;padding:8px 20px}.vnav button{font-size:12px;padding:9px 4px}}
+.vnav.n4{grid-template-columns:repeat(5,1fr)}
+.vnav .xn{display:inline-block;min-width:20px;margin-left:6px;padding:1px 6px;border-radius:999px;background:var(--stop);color:#fff;font:700 11px/1.5 var(--mono);text-align:center;vertical-align:1px}
+.vnav .xn[hidden]{display:none}
+body[data-view="baza"] .vnav,body[data-view="agent"] .vnav,body[data-view="xat"] .vnav{margin-left:0;margin-right:0}
+#pframe,#bframe,#aframe,#xframe{display:block;width:100%;height:70vh;border:0;background:var(--bg)}
+body[data-view="src"] .wrap>section.step,body[data-view="nom"] .wrap>section.step,body[data-view="baza"] .wrap>section.step,body[data-view="agent"] .wrap>section.step,body[data-view="xat"] .wrap>section.step{display:none!important}
+body[data-view="src"] .wrap,body[data-view="nom"] .wrap,body[data-view="baza"] .wrap,body[data-view="xat"] .wrap{padding-bottom:0}
+@media (max-width:640px){.vnav,.vnav.n4{grid-template-columns:repeat(3,1fr);gap:6px;padding:8px 20px}.vnav button{font-size:12px;padding:9px 4px}}
 @media print{
   @page{size:A4;margin:16mm 15mm}
   body{background:#fff!important;color:#000}
@@ -389,7 +391,7 @@ html[data-layout="zamonaviy"] .wrap{max-width:none}
 #koPanel .kores{margin-top:20px;width:100%;min-height:44px;background:transparent;border:1px solid var(--line);border-radius:12px;font-size:13px;color:var(--dim)}
 #koPanel .konote{font-size:12px;color:var(--faint);margin:10px 0 0;line-height:1.5}
 </style>
-<script src="til.js?v=1"></script>
+<script src="til.js?v=2"></script>
 <script>
 /* ===== Ko'rinish sozlamalari (tema, rang, andoza) ===== */
 (function(){
@@ -419,7 +421,7 @@ function vars(){
 }
 function push(){
   const v=vars(), t=resolved();
-  ["pframe","bframe","aframe"].forEach(id=>{ const f=document.getElementById(id); if(!f) return;
+  ["pframe","bframe","aframe","xframe"].forEach(id=>{ const f=document.getElementById(id); if(!f) return;
     try{ const d=f.contentDocument; if(!d||!d.documentElement) return; d.documentElement.dataset.theme=t;
       for(const k in v) if(k==="--accent"||k==="--onaccent"||k==="--accentbg"||k==="--ring"||k==="--linehi") d.documentElement.style.setProperty(k,v[k]);
       if(f.contentWindow.BAZA&&f.contentWindow.BAZA.theme) f.contentWindow.BAZA.theme(t);
@@ -476,7 +478,7 @@ function wire(){
   const sup=document.querySelector(".sup");
   if(sup&&!document.getElementById("koBtn")){ const b=document.createElement("button"); b.type="button"; b.id="koBtn"; b.className="mini noprint"; b.textContent="Rejim";
     b.onclick=()=>{ document.getElementById("koOv").hidden=false; const x=document.getElementById("koX"); if(x) x.focus(); }; sup.appendChild(b); }
-  ["pframe","bframe","aframe"].forEach(id=>{ const f=document.getElementById(id); if(f) f.addEventListener("load",push); });
+  ["pframe","bframe","aframe","xframe"].forEach(id=>{ const f=document.getElementById(id); if(f) f.addEventListener("load",push); });
 }
 window.KO={ login:function(code){ CODE=String(code||""); const s=rd(KEY+"_"+CODE); if(s) Object.assign(P,DEF,s); wr(); apply(); }, push:push };
 Object.assign(P,DEF,rd(KEY)||{}); apply();
@@ -531,10 +533,12 @@ if(document.readyState==="loading") document.addEventListener("DOMContentLoaded"
   <button type="button" data-v="nom" aria-selected="false">Tibbiy jihoz haqida ma'lumotnoma</button>
   <button type="button" data-v="baza" aria-selected="false">Tibbiy jihozlar bazasi</button>
   <button type="button" data-v="agent" aria-selected="false">Pharmcontroluz_AI_Agent</button>
+  <button type="button" data-v="xat" aria-selected="false">Xatlar nazorati<span class="xn" id="xatn" hidden title="Muddati o'tgan xatlar"></span></button>
 </nav>
 <div id="pview" class="noprint" hidden><iframe id="pframe" title="Vakolatli organlar va ma'lumotnoma" allow="clipboard-write"></iframe></div>
 <div id="bview" class="noprint" hidden><iframe id="bframe" title="Tibbiy jihozlar bazasi" allow="clipboard-write"></iframe></div>
 <div id="aview" class="noprint" hidden><iframe id="aframe" title="Pharmcontroluz_AI_Agent" allow="clipboard-write"></iframe></div>
+<div id="xview" class="noprint" hidden><iframe id="xframe" title="Xatlar nazorati" allow="clipboard-write"></iframe></div>
 
 <section class="step" id="s1">
   <div class="sh"><span class="num">1</span><h2>Hujjatni kiriting</h2></div>
@@ -1551,11 +1555,23 @@ function bazaRuxsat(code){   // 4-bo'lim faqat ruxsat ro'yxatidagi xodimga ko'ri
   // ro'yxat hali saqlanmagan bo'lsa yoki o'qib bo'lmasa — bo'lim hammaga ochiq qoladi
   UNSUB.push(DB.doc("config/bazaruxsat").onSnapshot(s=>{ if(!s.exists||!Array.isArray(s.data().allow)){ set(true); return; } set(s.data().allow.map(String).includes(String(code))); },()=>set(true)));
 }
+function xatBelgi(code){   // 6-bo'lim: menyuda muddati o'tgan xatlar soni (qizil)
+  const el=$("xatn"), c=String(code); let un=null;
+  const p2=n=>String(n).padStart(2,"0"), bugun=()=>{ const d=new Date(); return d.getFullYear()+"-"+p2(d.getMonth()+1)+"-"+p2(d.getDate()); };
+  const sana=q=>{ const b=bugun(), n=q.docs.filter(d=>{ const x=d.data(); return (x.holat||0)<5 && x.muddat && x.muddat<b; }).length; el.textContent=n; el.hidden=!n; };
+  const kuz=ref=>{ if(un) un(); un=ref.onSnapshot(sana,()=>{ el.hidden=true; }); };
+  const ozi=()=>kuz(DB.collection("xatlar").where("ijrochi","==",c));
+  UNSUB.push(()=>{ if(un) un(); });
+  // ruxsatli xodim — barcha faol xatlar, ekspert — faqat o'ziga biriktirilganlar
+  UNSUB.push(DB.doc("config/xatruxsat").onSnapshot(s=>{ const a=s.exists&&Array.isArray(s.data().allow)?s.data().allow.map(String):[];
+    if(a.includes(c)) kuz(DB.collection("xatlar").where("holat","<",5)); else ozi(); },ozi));
+}
 function ichkari(x,st,dev,uid){
   SESS={code:x.code,name:x.name,pos:x.pos,role:st.role||"expert",dept:st.dept||x.dept||"reg",dev,uid};
   EXPERT={nm:x.name,pos:x.pos};
   if(window.KO) KO.login(x.code);
   bazaRuxsat(x.code);
+  xatBelgi(x.code);
   $("who").innerHTML=`Ekspert: <b>${esc(x.name)}</b> · ${esc(x.pos)} · ${esc(depNomi(SESS.dept))}`;
   KEYP=DB.doc("keys/nom").get().then(s=>(s.exists&&s.data().k)||"").catch(()=>"");
   $("vnav").hidden=false;
@@ -1643,16 +1659,25 @@ function ramkaB(){
     f.src="baza.html?v=5"; });
   return BF;
 }
+let XF=null;
+function ramkaX(){
+  if(XF) return XF; const f=$("xframe");
+  XF=new Promise(res=>{ f.addEventListener("load",()=>{ try{ f.contentWindow.XATLAR.start(SESS); }catch(e){} res(f); },{once:true});
+    f.src="xatlar.html?v=1"; });
+  return XF;
+}
 const yonMenyu=()=>getComputedStyle($("vnav")).position==="fixed";
-function kScroll(v){ (yonMenyu()?$(v==="baza"?"bview":v==="agent"?"aview":"pview"):$("vnav")).scrollIntoView({block:"start"}); }
-function ramkaOlcham(){ const h=Math.max(420,innerHeight-(yonMenyu()?24:$("vnav").offsetHeight+6))+"px"; if(!$("pview").hidden) $("pframe").style.height=h; if(!$("bview").hidden) $("bframe").style.height=h; if(!$("aview").hidden) $("aframe").style.height=h; }
+function kScroll(v){ (yonMenyu()?$(v==="baza"?"bview":v==="agent"?"aview":v==="xat"?"xview":"pview"):$("vnav")).scrollIntoView({block:"start"}); }
+function ramkaOlcham(){ const h=Math.max(420,innerHeight-(yonMenyu()?24:$("vnav").offsetHeight+6))+"px"; if(!$("pview").hidden) $("pframe").style.height=h; if(!$("bview").hidden) $("bframe").style.height=h; if(!$("aview").hidden) $("aframe").style.height=h; if(!$("xview").hidden) $("xframe").style.height=h; }
 function korinish(v){
   VIEW=v; document.body.dataset.view=v;
   document.querySelectorAll("#vnav button").forEach(b=>b.setAttribute("aria-selected",String(b.dataset.v===v)));
   $("pview").hidden=!(v==="src"||v==="nom");
   $("bview").hidden=(v!=="baza");
   $("aview").hidden=(v!=="agent");
-  if(v==="agent"){ ramkaOlcham(); kScroll(v); if(!$("aframe").src) $("aframe").src="agent.html?v=1"; }
+  $("xview").hidden=(v!=="xat");
+  if(v==="xat"){ ramkaOlcham(); kScroll(v); ramkaX(); }
+  else if(v==="agent"){ ramkaOlcham(); kScroll(v); if(!$("aframe").src) $("aframe").src="agent.html?v=1"; }
   else if(v==="baza"){ ramkaOlcham(); kScroll(v); ramkaB(); }
   else if(v!=="tek"){ ramkaOlcham(); kScroll(v);
     ramka().then(f=>{ try{ f.contentWindow.TK.mode(v); }catch(e){} }); }

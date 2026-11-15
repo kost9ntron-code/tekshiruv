@@ -123,7 +123,25 @@ const D={
 "Shartnoma summalari, to'lovlar va korrespondensiya bu yerda ko'rsatilmaydi.":"Суммы договора, платежи и корреспонденция здесь не показываются.",
 "‹ Kartochkaga qaytish":"‹ Вернуться к карточке","Tibbiy jihozlar bazasi · Ish kartochkasi":"База медицинских изделий · Карточка дела","Asosiy ma'lumotlar":"Основные сведения",
 "Ro'yxatga olish va shartnoma":"Регистрация и договор","Ekspertiza jarayoni":"Ход экспертизы","Ilova yo'q.":"Приложений нет.",
-"Summalar, rekvizitlar, xatlar bu yerda ko'rsatilmaydi. Tahrirlash yo'q.":"Суммы, реквизиты и письма здесь не показываются. Редактирование недоступно."
+"Summalar, rekvizitlar, xatlar bu yerda ko'rsatilmaydi. Tahrirlash yo'q.":"Суммы, реквизиты и письма здесь не показываются. Редактирование недоступно.",
+// --- 6-bo'lim (xatlar.html) ---
+"Xatlar nazorati":"Контроль писем","UzMDControl — Xatlar nazorati":"UzMDControl — Контроль писем","Muddati o'tgan xatlar":"Просроченные письма",
+"O'zgartirish uchun kelgan xatlar":"Письма на внесение изменений","Boshqa xatlar":"Прочие письма","Xatlar turi":"Тип писем","Ekran":"Экран",
+"Panel":"Панель","Ro'yxat":"Список","+ Yangi xat":"+ Новое письмо",
+"Faol xatlar":"Активные письма","Muddati o'tgan":"Просрочено","Javob kutilmoqda":"Ожидают ответа","Shu oy yakunlangan":"Завершено в этом месяце",
+"Ekspertlar jadvali, eng kechikkan xatlar va oylar grafigi keyingi bosqichda qo'shiladi.":"Таблица экспертов, самые просроченные письма и график по месяцам появятся на следующем этапе.",
+"Qidirish: raqam yoki murojaatchi":"Поиск: номер или заявитель","Ijrochi bo'yicha filtr":"Фильтр по исполнителю","Barcha ijrochilar":"Все исполнители",
+"Kiruvchi №":"Входящий №","Markaz №":"№ Центра","Kelgan sana":"Дата поступления","Murojaatchi":"Заявитель","O'zgartirish turi":"Тип изменения",
+"Ijrochi":"Исполнитель","Muddat":"Срок","Qoldi":"Осталось","Holat":"Статус","Faol":"Активные","Hammasi":"Все",
+"Yangi":"Новое","Qabul qildim":"Принял","Zamechaniya yuborildi":"Замечания отправлены","Shartnomaga berildi":"Передано на договор",
+"Ekspertiza jarayonida":"В процессе экспертизы","Yakunlandi":"Завершено",
+"Normativ hujjatga":"В нормативный документ","RU ga":"В РУ","Normativ hujjat va RU ga":"В нормативный документ и РУ",
+"Mos xat topilmadi.":"Подходящих писем не найдено.","Hozircha xat yo'q.":"Писем пока нет.","Xatlarni yuklab bo'lmadi.":"Не удалось загрузить письма.",
+"Kiruvchi va chiquvchi xatlar arxivi fayl saqlash yechimi kelishilgandan keyin quriladi.":"Архив входящих и исходящих писем будет создан после согласования способа хранения файлов.",
+"Administrator":"Администратор","Ruxsatli xodim":"Сотрудник с доступом","Xatlar nazorati — administrator":"Контроль писем — администратор",
+"Bu sahifani alohida faqat administrator ochadi. Xodimlar asosiy sahifadagi 6-bo'limdan foydalanadi.":"Отдельно эту страницу открывает только администратор. Сотрудники пользуются 6-м разделом на главной странице.",
+"Google orqali kirish":"Войти через Google","Kirib bo'lmadi.":"Не удалось войти.","administrator emas.":"не является администратором.",
+"Namuna ma'lumot (?local)":"Демо-данные (?local)","Yangi xat qo'shish keyingi bosqichda ishga tushadi.":"Добавление писем заработает на следующем этапе."
 };
 const RX=[
 [/^Tibbiy jihozlar qo'mitasi · (.+) · (\d+)-nashr$/,"Комитет по медицинским изделиям · $1 · версия $2"],
@@ -151,7 +169,8 @@ const RX=[
 [/^Yuklanmoqda: (.+)$/,"Загрузка: $1"],
 [/^Ish topilmadi: (.+)$/,"Дело не найдено: $1"],[/^Yuklab bo'lmadi: (.+)$/,"Не удалось загрузить: $1"],
 [/^Ilova nomlari yuklanmoqda… (.+)$/,"Загрузка названий приложений… $1"],
-[/^(\d+) ta pozitsiya$/,"позиций: $1"]
+[/^(\d+) ta pozitsiya$/,"позиций: $1"],
+[/^(\d+) kun o'tdi$/,"просрочено на $1 дн."],[/^(\d+) kun$/,"$1 дн."]
 ];
 let LANG="uz";
 const DONE=new Set();
