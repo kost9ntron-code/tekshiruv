@@ -166,6 +166,13 @@ const D={
 "Oylar bo'yicha kelgan va yakunlangan xatlar":"Поступившие и завершённые письма по месяцам",
 "Yan":"Янв","Fev":"Фев","Mar":"Мар","Apr":"Апр","Iyn":"Июн","Iyl":"Июл","Avg":"Авг","Sen":"Сен","Okt":"Окт","Noy":"Ноя","Dek":"Дек",
 "Yanvar":"Январь","Fevral":"Февраль","Mart":"Март","Aprel":"Апрель","May":"Май","Iyun":"Июнь","Iyul":"Июль","Avgust":"Август","Sentabr":"Сентябрь","Oktabr":"Октябрь","Noyabr":"Ноябрь","Dekabr":"Декабрь",
+"Yo'nalish":"Направление","Kiruvchi":"Входящее","Chiquvchi":"Исходящее","Sana":"Дата","Sana:":"Дата:","Sana — dan":"Дата — с","Sana — gacha":"Дата — по",
+"Xat raqami":"Номер письма","Kimdan / kimga":"От кого / кому","Kimdan / kimga (tashkilot)":"От кого / кому (организация)","Mavzu":"Тема","Havolalar":"Ссылки",
+"Qidirish: raqam, tashkilot yoki mavzu":"Поиск: номер, организация или тема","Boshqa xatlar (arxiv) ·":"Прочие письма (архив) ·","— tanlang —":"— выберите —",
+"Har qatorda bitta havola: https://drive.google.com/…":"По одной ссылке в строке: https://drive.google.com/…",
+"Havola https:// bilan boshlanishi kerak:":"Ссылка должна начинаться с https://:","Ko'pi bilan 20 ta havola qo'shish mumkin.":"Можно добавить не более 20 ссылок.",
+"Havola yo'q.":"Ссылок нет.","Fayllar":"Файлы","Fayllar — server bosqichida qo'shiladi":"Файлы — будут добавлены на серверном этапе",
+"Boshqa xatlarni yuklab bo'lmadi.":"Не удалось загрузить прочие письма.",
 "Muddati o'tgan xatlaringiz bor":"У вас есть просроченные письма","Ularni «Xatlar nazorati» bo'limida ko'ring.":"Посмотрите их в разделе «Контроль писем».","Ko'rish":"Посмотреть"
 };
 const RX=[

@@ -88,6 +88,14 @@ td.r.ot{color:var(--stop);font-weight:700}
 .gjad table{margin-top:6px}
 .gjad td,.gjad th{padding:5px 8px}
 @media (max-width:900px){.ikki{grid-template-columns:1fr}}
+/* --- B. Boshqa xatlar --- */
+#bTb tr[data-id]{cursor:pointer}
+#bTb tr[data-id]:hover,#bTb tr[data-id]:focus{background:var(--accentbg);outline:none}
+.pill.kir{background:var(--accentbg);color:var(--accent)} .pill.chiq{background:var(--okbg);color:var(--ok)}
+.hav{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.hav a{color:var(--accent);word-break:break-all;text-decoration:none}
+.hav a:hover{text-decoration:underline}
+.fayl{border:1px dashed var(--line);border-radius:12px;padding:16px;color:var(--faint);text-align:center;background:var(--chip);font-size:13px}
 .chips{display:flex;gap:6px;flex-wrap:wrap}
 .chips button{font-size:12.5px;color:var(--dim);background:var(--chip);border:1px solid var(--line);border-radius:999px;padding:6px 12px;min-height:32px}
 .chips button[aria-pressed="true"]{color:var(--onaccent);background:var(--accent);border-color:var(--accent)}
@@ -155,7 +163,7 @@ td.m{font-family:var(--mono);font-size:12px;white-space:nowrap}
 @media (max-width:640px){.app{padding:12px 12px 22px}.hd .seg{margin-left:0;width:100%}.seg button{flex:1;padding:7px 8px}
   .fg{grid-template-columns:1fr}.top{grid-template-columns:1fr}.kv{grid-template-columns:1fr}.kv dt{margin-top:6px}.qadam{grid-template-columns:repeat(5,minmax(0,1fr))}.ov{padding:8px}}
 </style>
-<script src="til.js?v=5"></script>
+<script src="til.js?v=6"></script>
 </head>
 <body>
 
@@ -237,7 +245,25 @@ td.m{font-family:var(--mono);font-size:12px;white-space:nowrap}
 
   <!-- B. Boshqa xatlar (arxiv) -->
   <section id="secB" class="hidden">
-    <div class="card note">Kiruvchi va chiquvchi xatlar arxivi fayl saqlash yechimi kelishilgandan keyin quriladi.</div>
+    <div class="bar">
+      <div class="chips" id="bYon"></div>
+      <span class="sp"></span>
+      <button type="button" class="btn" id="bYangi">+ Yangi xat</button>
+    </div>
+    <div class="bar">
+      <input type="text" id="bQidir" placeholder="Qidirish: raqam, tashkilot yoki mavzu" style="flex:1 1 260px">
+      <label>Sana: <input type="date" id="bD1" aria-label="Sana — dan"></label>
+      <label>— <input type="date" id="bD2" aria-label="Sana — gacha"></label>
+      <button type="button" class="lnk" id="bTozala">Filtrlarni tozalash</button>
+      <button type="button" class="btn gh" id="bCsv">Excel (CSV)</button>
+    </div>
+    <p class="card note err" id="bErr" hidden></p>
+    <div class="card tw">
+      <table>
+        <thead><tr><th>Yo'nalish</th><th>Sana</th><th>Xat raqami</th><th>Kimdan / kimga</th><th>Mavzu</th><th>Havolalar</th></tr></thead>
+        <tbody id="bTb"></tbody>
+      </table>
+    </div>
   </section>
 </div>
 
@@ -272,6 +298,41 @@ td.m{font-family:var(--mono);font-size:12px;white-space:nowrap}
       <div class="sec" id="kTarixS" hidden>
         <h3>Tarix <span class="pill">faqat administrator</span></h3>
         <ul class="tarix" id="kTarix"></ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- B. Boshqa xat: yangi / tahrirlash oynasi -->
+<div id="ovB" class="ov hidden" role="dialog" aria-modal="true" aria-labelledby="bfT">
+  <div class="box">
+    <header><div><h2 id="bfT">Yangi xat</h2><small>Boshqa xatlar (arxiv) · <b class="err">*</b> — majburiy</small></div><button type="button" class="x" data-byop aria-label="Yopish">✕</button></header>
+    <div class="bd">
+      <div class="fg">
+        <label>Yo'nalish <b>*</b><select id="bfYon"><option value="">— tanlang —</option><option value="kir">Kiruvchi</option><option value="chiq">Chiquvchi</option></select></label>
+        <label>Sana <b>*</b><input type="date" id="bfSana"></label>
+        <label>Xat raqami <b>*</b><input type="text" id="bfRaq" maxlength="99" autocomplete="off"></label>
+        <label>Kimdan / kimga (tashkilot) <b>*</b><input type="text" id="bfTash" maxlength="299" autocomplete="off"></label>
+        <label class="w">Mavzu <b>*</b><input type="text" id="bfMav" maxlength="499" autocomplete="off"></label>
+        <label class="w">Havolalar<textarea id="bfHav" maxlength="4000" placeholder="Har qatorda bitta havola: https://drive.google.com/…"></textarea></label>
+        <label class="w">Izoh<textarea id="bfIzh" maxlength="2000"></textarea></label>
+      </div>
+      <p class="ferr" id="bfErr"></p>
+    </div>
+    <div class="ft"><button type="button" class="btn gh" data-byop>Bekor qilish</button><button type="button" class="btn" id="bfSaqla">Saqlash</button></div>
+  </div>
+</div>
+
+<!-- B. Boshqa xat kartochkasi -->
+<div id="ovBK" class="ov hidden" role="dialog" aria-modal="true" aria-labelledby="bkT">
+  <div class="box">
+    <header><div><h2 id="bkT"></h2><small id="bkS"></small></div><button type="button" class="x" data-bkyop aria-label="Yopish">✕</button></header>
+    <div class="bd">
+      <div id="bkInfo"></div>
+      <div class="amal"><button type="button" class="btn gh" id="bkTahrir">Tahrirlash</button></div>
+      <div class="sec" id="bkTarixS" hidden>
+        <h3>Tarix <span class="pill">faqat administrator</span></h3>
+        <ul class="tarix" id="bkTarix"></ul>
       </div>
     </div>
   </div>
@@ -338,7 +399,8 @@ $("fTozala").addEventListener("click",()=>{ QQ=FI=FT=D1=D2=""; HF="faol"; ["qidi
 $("csv").addEventListener("click",csvYukla);
 $("tb").addEventListener("click",e=>{ const r=e.target.closest("tr[data-id]"); if(r) kartaOch(r.dataset.id); });
 $("tb").addEventListener("keydown",e=>{ const r=e.target.closest("tr[data-id]"); if(r&&e.key==="Enter") kartaOch(r.dataset.id); });
-document.addEventListener("keydown",e=>{ if(e.key!=="Escape") return; if(!$("ovYangi").classList.contains("hidden")) yangiYop(); else if(!$("ovKarta").classList.contains("hidden")) kartaYop(); });
+document.addEventListener("keydown",e=>{ if(e.key!=="Escape") return; const och=id=>!$(id).classList.contains("hidden");
+  if(och("ovYangi")) yangiYop(); else if(och("ovB")) bFormYop(); else if(och("ovKarta")) kartaYop(); else if(och("ovBK")) bKartaYop(); });
 
 function ijrochiOpt(tanlangan){   // dir/list dan, bo'lim bo'yicha guruhlab
   return DEPS.map(([k,n])=>{ const L=DIR.filter(x=>(x.dept||"reg")===k).sort((a,b)=>String(a.name).localeCompare(String(b.name)));
@@ -620,8 +682,8 @@ $("kAmal").addEventListener("click",async e=>{
 });
 
 /* tarix — faqat administratorga */
-function tarixChiz(L){
-  $("kTarix").innerHTML=L.length?L.map(t=>`<li><div class="vq">${esc(vaqtK(t.ts))} · ${esc(t.kimNomi||t.kim)}</div>
+function tarixChiz(L,el){
+  $(el||"kTarix").innerHTML=L.length?L.map(t=>`<li><div class="vq">${esc(vaqtK(t.ts))} · ${esc(t.kimNomi||t.kim)}</div>
     <div><b>${esc(AMAL[t.amal]||t.amal)}</b>${t.oldin||t.keyin?`<span class="ok2">: </span>${t.oldin?`<span>${esc(t.oldin)}</span> → `:""}<span>${esc(t.keyin)}</span>`:""}</div>
     ${t.sabab?`<div class="ok2"><span>Sabab</span>: ${esc(t.sabab)}</div>`:""}</li>`).join(""):`<li class="ok2">Hali yozuv yo'q.</li>`;
 }
@@ -632,6 +694,133 @@ function tarixKuzat(id){
   $("kTarix").innerHTML=`<li class="ok2">Yuklanmoqda…</li>`;
   TUN=DB.collection("xatlar").doc(id).collection("tarix").orderBy("ts","desc").limit(300)
     .onSnapshot(s=>tarixChiz(s.docs.map(d=>d.data())),e=>{ $("kTarix").innerHTML=`<li class="err">${esc(e.message||e)}</li>`; });
+}
+
+/* ================= B. Boshqa xatlar (arxiv, holat va muddatsiz) — faqat admin va ruxsatli xodim ================= */
+const YON={kir:"Kiruvchi",chiq:"Chiquvchi"};
+const BMAYDON={yonalish:"Yo'nalish",sana:"Sana",raqam:"Xat raqami",tashkilot:"Kimdan / kimga (tashkilot)",mavzu:"Mavzu",havolalar:"Havolalar",izoh:"Izoh"};
+let BX=[], BUN=null, BY="", BQ="", BD1="", BD2="", BROY=[], BOPEN=null, BTUN=null, BEDIT=null;
+const TARIXB={};   // ?local rejimi uchun
+
+const urlmi=s=>{ try{ const u=new URL(s); return u.protocol==="https:"||u.protocol==="http:"; }catch(e){ return false; } };
+const havolaQisqa=s=>{ try{ const u=new URL(s), t=u.host+u.pathname; return t.length>60?t.slice(0,57)+"…":t; }catch(e){ return s; } };
+
+$("bYon").addEventListener("click",e=>{ const b=e.target.closest("button[data-y]"); if(!b) return; BY=b.dataset.y; bChiz(); });
+$("bQidir").addEventListener("input",e=>{ BQ=e.target.value.trim().toLowerCase(); bChiz(); });
+$("bD1").addEventListener("change",e=>{ BD1=e.target.value; bChiz(); });
+$("bD2").addEventListener("change",e=>{ BD2=e.target.value; bChiz(); });
+$("bTozala").addEventListener("click",()=>{ BY=BQ=BD1=BD2=""; ["bQidir","bD1","bD2"].forEach(id=>$(id).value=""); bChiz(); });
+$("bCsv").addEventListener("click",bCsvYukla);
+$("bYangi").addEventListener("click",()=>bFormOch(null));
+$("bTb").addEventListener("click",e=>{ const r=e.target.closest("tr[data-id]"); if(r) bKartaOch(r.dataset.id); });
+$("bTb").addEventListener("keydown",e=>{ const r=e.target.closest("tr[data-id]"); if(r&&e.key==="Enter") bKartaOch(r.dataset.id); });
+
+function bChiz(){
+  const son=y=>BX.filter(x=>!y||x.yonalish===y).length;
+  $("bYon").innerHTML=[["","Hammasi"],["kir","Kiruvchi"],["chiq","Chiquvchi"]].map(([k,n])=>`<button type="button" data-y="${k}" aria-pressed="${BY===k}">${esc(n)}<i>${son(k)}</i></button>`).join("");
+  BROY=BX.filter(x=>!BY||x.yonalish===BY)
+    .filter(x=>(!BD1||String(x.sana||"")>=BD1)&&(!BD2||String(x.sana||"")<=BD2))
+    .filter(x=>!BQ||[x.raqam,x.tashkilot,x.mavzu,x.izoh].some(v=>String(v||"").toLowerCase().includes(BQ)))
+    .sort((a,b)=>String(b.sana||"").localeCompare(String(a.sana||"")));   // yangilari tepada
+  $("bCsv").disabled=!BROY.length;
+  $("bTb").innerHTML=BROY.length?BROY.map(x=>{ const h=(x.havolalar||[]).length;
+    return `<tr data-id="${esc(x.id)}" tabindex="0"><td><span class="pill ${x.yonalish==="chiq"?"chiq":"kir"}">${esc(YON[x.yonalish]||x.yonalish)}</span></td>
+      <td class="m">${esc(sanaK(x.sana))}</td><td class="m">${esc(x.raqam)}</td><td>${esc(x.tashkilot)}</td><td>${esc(x.mavzu)}</td><td class="m">${h?"🔗 "+h:"—"}</td></tr>`; }).join("")
+    :`<tr><td colspan="6" class="empty">${esc(BX.length?"Mos xat topilmadi.":"Hozircha xat yo'q.")}</td></tr>`;
+  if(BOPEN) bKartaChiz();
+}
+
+function bCsvYukla(){
+  const q=v=>{ v=String(v==null?"":v); return /[";\r\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v; };
+  const H=["Yo'nalish","Sana","Xat raqami","Kimdan / kimga","Mavzu","Havolalar","Izoh"].map(T);
+  const R=BROY.map(x=>[T(YON[x.yonalish]||x.yonalish),sanaK(x.sana),x.raqam,x.tashkilot,x.mavzu,(x.havolalar||[]).join(" | "),x.izoh||""]);
+  const s="﻿"+[H].concat(R).map(r=>r.map(q).join(";")).join("\r\n");   // UTF-8 + BOM, «;» — Excel uchun
+  const a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([s],{type:"text/csv;charset=utf-8"}));
+  a.download="boshqa_xatlar_"+bugun()+".csv"; document.body.appendChild(a); a.click();
+  setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },1500);
+}
+
+/* yozish: xat + tarix yozuvi bitta paketda */
+async function bQosh(d){
+  const t=tarixYozuv({amal:"yaratildi",keyin:d.raqam+" · "+d.tashkilot});
+  if(LOCAL){ const id="B"+Date.now(); BX.push(Object.assign({id,yaratildi:new Date()},d)); TARIXB[id]=[Object.assign(t,{ts:new Date()})]; bChiz(); return id; }
+  const ref=DB.collection("boshqa_xatlar").doc(), b=DB.batch(), sv=FS.serverTimestamp();
+  b.set(ref,Object.assign({},d,{yaratildi:sv,yangilandi:sv}));
+  b.set(ref.collection("tarix").doc(),Object.assign(t,{ts:sv}));
+  await b.commit(); return ref.id;
+}
+async function bYoz(id,ozg,t){
+  t=tarixYozuv(t);
+  if(LOCAL){ Object.assign(BX.find(z=>z.id===id),ozg,{yangilandi:new Date()}); (TARIXB[id]=TARIXB[id]||[]).unshift(Object.assign(t,{ts:new Date()})); bChiz(); if(BOPEN===id) bTarixKuzat(id); return; }
+  const ref=DB.collection("boshqa_xatlar").doc(id), b=DB.batch(), sv=FS.serverTimestamp();
+  b.update(ref,Object.assign({},ozg,{yangilandi:sv}));
+  b.set(ref.collection("tarix").doc(),Object.assign(t,{ts:sv}));
+  await b.commit();
+}
+
+/* yangi / tahrirlash oynasi */
+$("ovB").addEventListener("click",e=>{ if(e.target===$("ovB")||e.target.closest("[data-byop]")) bFormYop(); });
+function bFormOch(x){
+  BEDIT=x?x.id:null;
+  $("bfT").textContent=x?"Tahrirlash":"Yangi xat";
+  $("bfYon").value=x?x.yonalish:""; $("bfSana").value=x?x.sana:bugun(); $("bfRaq").value=x?x.raqam:""; $("bfTash").value=x?x.tashkilot:"";
+  $("bfMav").value=x?x.mavzu:""; $("bfHav").value=x?(x.havolalar||[]).join("\n"):""; $("bfIzh").value=x?(x.izoh||""):""; $("bfErr").textContent="";
+  $("ovB").classList.remove("hidden"); $("bfYon").focus();
+}
+function bFormYop(){ $("ovB").classList.add("hidden"); BEDIT=null; }
+$("bfSaqla").addEventListener("click",async()=>{
+  const v=id=>$(id).value.trim();
+  const hav=$("bfHav").value.split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
+  const d={yonalish:v("bfYon"),sana:v("bfSana"),raqam:v("bfRaq"),tashkilot:v("bfTash"),mavzu:v("bfMav"),havolalar:hav,izoh:v("bfIzh")};
+  const yoq=[["yonalish","Yo'nalish"],["sana","Sana"],["raqam","Xat raqami"],["tashkilot","Kimdan / kimga (tashkilot)"],["mavzu","Mavzu"]].filter(([k])=>!d[k]);
+  if(yoq.length){ $("bfErr").innerHTML=`<span>Majburiy maydonlarni to'ldiring:</span> `+yoq.map(([,n])=>`<span>${esc(n)}</span>`).join(", "); return; }
+  const yomon=hav.filter(s=>!urlmi(s));
+  if(yomon.length){ $("bfErr").innerHTML=`<span>Havola https:// bilan boshlanishi kerak:</span> `+esc(yomon[0]); return; }
+  if(hav.length>20){ $("bfErr").innerHTML=`<span>Ko'pi bilan 20 ta havola qo'shish mumkin.</span>`; return; }
+  $("bfSaqla").disabled=true;
+  let id=BEDIT, ok;
+  if(!BEDIT){
+    ok=await xavfsiz(async()=>{ id=await bQosh(Object.assign(d,{yaratdi:men().kim})); });
+  } else {
+    const x=BX.find(z=>z.id===BEDIT)||{};
+    const o=Object.keys(d).filter(k=>k==="havolalar"?JSON.stringify(x.havolalar||[])!==JSON.stringify(d.havolalar):String(x[k]||"")!==d[k]);
+    if(!o.length){ $("bfSaqla").disabled=false; bFormYop(); return; }
+    const fmt=(k,val)=>BMAYDON[k]+": "+(k==="sana"?sanaK(val):k==="yonalish"?(YON[val]||val):k==="havolalar"?((val||[]).length+" ta"):(val||"—"));
+    const ozg={}; o.forEach(k=>ozg[k]=d[k]);
+    ok=await xavfsiz(()=>bYoz(BEDIT,ozg,{amal:"tahrir",oldin:o.map(k=>fmt(k,x[k])).join("; "),keyin:o.map(k=>fmt(k,d[k])).join("; ")}));
+  }
+  $("bfSaqla").disabled=false;
+  if(ok){ bFormYop(); bKartaOch(id); }
+});
+
+/* kartochka */
+$("ovBK").addEventListener("click",e=>{ if(e.target===$("ovBK")||e.target.closest("[data-bkyop]")) bKartaYop(); });
+$("bkTahrir").addEventListener("click",()=>{ const x=BX.find(z=>z.id===BOPEN); if(x) bFormOch(x); });
+function bKartaOch(id){ BOPEN=id; bKartaChiz(); bTarixKuzat(id); $("ovBK").classList.remove("hidden"); $("ovBK").scrollTop=0; }
+function bKartaYop(){ BOPEN=null; if(BTUN){ BTUN(); BTUN=null; } $("ovBK").classList.add("hidden"); }
+function bKartaChiz(){
+  const x=BX.find(z=>z.id===BOPEN); if(!x){ bKartaYop(); return; }
+  $("bkT").textContent=x.raqam+" · "+x.tashkilot;
+  $("bkS").innerHTML=`<span class="pill ${x.yonalish==="chiq"?"chiq":"kir"}">${esc(YON[x.yonalish]||x.yonalish)}</span> ${esc(sanaK(x.sana))}`;
+  const kv=[["Yo'nalish",`<span>${esc(YON[x.yonalish]||x.yonalish)}</span>`],["Sana",esc(sanaK(x.sana))],["Xat raqami",esc(x.raqam)],
+    ["Kimdan / kimga (tashkilot)",esc(x.tashkilot)],["Mavzu",esc(x.mavzu)],["Izoh",x.izoh?esc(x.izoh):"—"]];
+  const hav=(x.havolalar||[]).filter(urlmi);   // faqat http(s) havolalar ochiladi
+  $("bkInfo").innerHTML=`<dl class="kv">${kv.map(([k,v])=>`<dt>${esc(k)}</dt><dd>${v}</dd>`).join("")}</dl>
+    <div class="sec"><h3>Havolalar</h3>${hav.length?`<ul class="hav">${hav.map(u=>`<li><a href="${esc(u)}" target="_blank" rel="noopener noreferrer">${esc(havolaQisqa(u))}</a></li>`).join("")}</ul>`:`<p class="ok2" style="margin:0">Havola yo'q.</p>`}</div>
+    <div class="sec"><h3>Fayllar</h3><div class="fayl">Fayllar — server bosqichida qo'shiladi</div></div>`;
+}
+function bTarixKuzat(id){
+  if(BTUN){ BTUN(); BTUN=null; }
+  $("bkTarixS").hidden=(ROLE!=="admin"); if(ROLE!=="admin") return;
+  if(LOCAL){ tarixChiz(TARIXB[id]||[],"bkTarix"); return; }
+  $("bkTarix").innerHTML=`<li class="ok2">Yuklanmoqda…</li>`;
+  BTUN=DB.collection("boshqa_xatlar").doc(id).collection("tarix").orderBy("ts","desc").limit(300)
+    .onSnapshot(s=>tarixChiz(s.docs.map(d=>d.data()),"bkTarix"),e=>{ $("bkTarix").innerHTML=`<li class="err">${esc(e.message||e)}</li>`; });
+}
+function kuzatB(){
+  if(BUN) BUN();
+  BUN=DB.collection("boshqa_xatlar").onSnapshot(s=>{ BX=s.docs.map(d=>Object.assign({id:d.id},d.data())); $("bErr").hidden=true; bChiz(); },
+    e=>{ $("bErr").hidden=false; $("bErr").innerHTML=`<span>Boshqa xatlarni yuklab bo'lmadi.</span> `+esc(e.message||e); });
 }
 
 /* ---------- ma'lumotlar ---------- */
@@ -648,9 +837,10 @@ function ruxsatYoq(){ holat(`<span class="err">Sizga bu bo'limga ruxsat berilmag
 function kimLine(){ $("who").innerHTML=(SESS.name?esc(SESS.name)+" · ":"")+`<span>${esc(ROLNOM[ROLE])}</span>`+(LOCAL?` · <span>Namuna ma'lumot (?local)</span>`:""); }
 async function boshla(){
   kimLine(); $("yangi").hidden=!tahrirchi();
+  $("bolim").classList.toggle("hidden",!tahrirchi());   // «Boshqa xatlar» — faqat admin va ruxsatli xodim
   if(!LOCAL){ try{ const d=await DB.doc("dir/list").get(); DIR=(d.exists&&d.data().items)||[]; }catch(e){ DIR=[]; } }
-  filtrTanlov(); chiz();
-  if(LOCAL) ochish(); else kuzat();   // sahifa birinchi ma'lumot kelgach ochiladi
+  filtrTanlov(); chiz(); bChiz();
+  if(LOCAL) ochish(); else{ kuzat(); if(tahrirchi()) kuzatB(); }   // sahifa birinchi ma'lumot kelgach ochiladi
 }
 async function rolAniqla(){
   if(ROLE==="admin") return;
@@ -711,6 +901,13 @@ function namuna(){
   for(let i=0;i<30;i++){ const k=-(8+i*11), ij=DIR[i%3];
     XAT.push(z("a"+i,{kirNo:"01-11/"+(200+i),markazNo:"E-2026-"+String(10+i).padStart(4,"0"),kelgan:qo(k),korxona:K[i%K.length],tur:["ru","nh","nhru"][i%3],
       ijrochi:ij.code,ijrochiNomi:ij.name,ijrochiDept:ij.dept,muddat:qo(k+20),holat:5,yakunSana:qo(k+5+i%9)})); }
+  const bz=(id,o)=>{ const x=Object.assign({id,havolalar:[],izoh:""},o); TARIXB[id]=[{kim:"admin",kimNomi:ADMIN_NOMI,amal:"yaratildi",oldin:"",keyin:x.raqam+" · "+x.tashkilot,sabab:"",ts:new Date(x.sana+"T09:30:00")}]; return x; };
+  BX=[
+    bz("b1",{yonalish:"kir",sana:qo(-1),raqam:"04-3/1187",tashkilot:"Sog'liqni saqlash vazirligi",mavzu:"Tibbiy jihozlar reestrini yangilash to'g'risida",havolalar:["https://drive.google.com/file/d/namuna-1/view"]}),
+    bz("b2",{yonalish:"chiq",sana:qo(-3),raqam:"02-15/402",tashkilot:"Farmatsevtika tarmog'ini rivojlantirish agentligi",mavzu:"Ekspertiza natijalari bo'yicha ma'lumot",izoh:"Javob 10 kun ichida kutilmoqda."}),
+    bz("b3",{yonalish:"kir",sana:qo(-12),raqam:"01-07/95",tashkilot:"MedTech LLC",mavzu:"Ro'yxatdan o'tkazish guvohnomasining nusxasi",havolalar:["https://drive.google.com/file/d/namuna-2/view","https://example.com/hujjat.pdf"]}),
+    bz("b4",{yonalish:"chiq",sana:qo(-40),raqam:"02-15/351",tashkilot:"Shifo Farm",mavzu:"Qo'shimcha hujjatlar so'rovi"})
+  ];
   XAT.push(z("n5",{kirNo:"01-12/210",markazNo:"E-2026-0060",kelgan:qo(-45),korxona:"Sog'lom Hayot",tur:"nh",ijrochi:"201",ijrochiNomi:"Rahimov Bobur Akmalovich",ijrochiDept:"qom",muddat:qo(-15),holat:2}));
   boshla();
 }
