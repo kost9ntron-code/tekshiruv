@@ -159,7 +159,8 @@ const D={
 "Ijrochini tanlang.":"Выберите исполнителя.","Bu xat allaqachon shu ijrochida.":"Письмо уже у этого исполнителя.","Yangi muddatni kiriting.":"Введите новый срок.",
 "Yangi muddat hozirgisidan keyin bo'lishi kerak.":"Новый срок должен быть позже текущего.","Uzaytirish sababini yozing.":"Укажите причину продления.",
 "Xat qo'shildi":"Письмо добавлено","Holat o'zgardi":"Статус изменён","Ijrochi almashtirildi":"Исполнитель сменён","Muddat uzaytirildi":"Срок продлён","Ma'lumot tahrirlandi":"Данные изменены",
-"Qolgan kun (manfiy — o'tgan)":"Осталось дней (минус — просрочено)"
+"Qolgan kun (manfiy — o'tgan)":"Осталось дней (минус — просрочено)",
+"Muddat belgilash":"Установить срок","Muddat belgilandi":"Срок установлен"
 };
 const RX=[
 [/^Tibbiy jihozlar qo'mitasi · (.+) · (\d+)-nashr$/,"Комитет по медицинским изделиям · $1 · версия $2"],

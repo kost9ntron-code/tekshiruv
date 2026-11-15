@@ -115,7 +115,7 @@ td.m{font-family:var(--mono);font-size:12px;white-space:nowrap}
 @media (max-width:640px){.app{padding:12px 12px 22px}.hd .seg{margin-left:0;width:100%}.seg button{flex:1;padding:7px 8px}
   .fg{grid-template-columns:1fr}.top{grid-template-columns:1fr}.kv{grid-template-columns:1fr}.kv dt{margin-top:6px}.qadam{grid-template-columns:repeat(5,minmax(0,1fr))}.ov{padding:8px}}
 </style>
-<script src="til.js?v=3"></script>
+<script src="til.js?v=4"></script>
 </head>
 <body>
 
@@ -189,13 +189,13 @@ td.m{font-family:var(--mono);font-size:12px;white-space:nowrap}
     <header><div><h2 id="yT">Yangi xat</h2><small>O'zgartirish uchun kelgan xat · <b class="err">*</b> — majburiy</small></div><button type="button" class="x" data-yop aria-label="Yopish">✕</button></header>
     <div class="bd">
       <div class="fg">
-        <label>Kiruvchi raqam <b>*</b><input type="text" id="yKir" maxlength="99" autocomplete="off"></label>
+        <label>Kiruvchi raqam<input type="text" id="yKir" maxlength="99" autocomplete="off"></label>
         <label>Markaz elektron raqami <b>*</b><input type="text" id="yMar" maxlength="99" autocomplete="off"></label>
-        <label>Kelgan sana <b>*</b><input type="date" id="yKel"></label>
+        <label>Kelgan sana<input type="date" id="yKel"></label>
         <label>Murojaatchi (korxona) <b>*</b><input type="text" id="yKor" maxlength="299" autocomplete="off"></label>
         <label>O'zgartirish turi <b>*</b><select id="yTur"></select></label>
         <label>Ijrochi (ekspert) <b>*</b><select id="yIjr"></select></label>
-        <label>Muddat (oxirgi kun) <b>*</b><input type="date" id="yMud"></label>
+        <label>Muddat (oxirgi kun)<input type="date" id="yMud"></label>
         <label class="w">Izoh<textarea id="yIzh" maxlength="2000"></textarea></label>
       </div>
       <p class="ferr" id="yErr"></p>
@@ -234,7 +234,7 @@ const EMB=(()=>{ try{ return window.top!==window.self && window.parent.location.
 const DEPS=[["qom","Tibbiy jihozlar qo'mitasi"],["reg","Tibbiy jihozlarni ro'yxatdan o'tkazish bo'limi"]];
 const HOLAT=["Yangi","Qabul qildim","Zamechaniya yuborildi","Shartnomaga berildi","Ekspertiza jarayonida","Yakunlandi"];
 const TUR={nh:"Normativ hujjatga",ru:"RU ga",nhru:"Normativ hujjat va RU ga"};
-const AMAL={yaratildi:"Xat qo'shildi",holat:"Holat o'zgardi",ijrochi:"Ijrochi almashtirildi",muddat:"Muddat uzaytirildi",tahrir:"Ma'lumot tahrirlandi"};
+const AMAL={yaratildi:"Xat qo'shildi",holat:"Holat o'zgardi",ijrochi:"Ijrochi almashtirildi",muddat:"Muddat uzaytirildi",muddatQoy:"Muddat belgilandi",tahrir:"Ma'lumot tahrirlandi"};
 const MAYDON={kirNo:"Kiruvchi raqam",markazNo:"Markaz elektron raqami",kelgan:"Kelgan sana",korxona:"Murojaatchi (korxona)",tur:"O'zgartirish turi",izoh:"Izoh"};
 const ADMIN_NOMI="Shahzodbek O'roqov";
 
@@ -310,12 +310,12 @@ function chiz(){
     .filter(x=>!FT||x.tur===FT)
     .filter(x=>(!D1||String(x.kelgan||"")>=D1)&&(!D2||String(x.kelgan||"")<=D2))
     .filter(x=>!QQ||[x.kirNo,x.markazNo,x.korxona,x.ijrochiNomi].some(v=>String(v||"").toLowerCase().includes(QQ)))
-    .sort((a,b)=>String(a.muddat||"").localeCompare(String(b.muddat||"")));
+    .sort((a,b)=>String(a.muddat||"9999").localeCompare(String(b.muddat||"9999")));   // muddatsizlar oxirida
   $("csv").disabled=!ROYXAT.length;
   if(!ROYXAT.length){ $("tb").innerHTML=`<tr><td colspan="9" class="empty">${esc(XAT.length?"Mos xat topilmadi.":"Hozircha xat yo'q.")}</td></tr>`; }
   else $("tb").innerHTML=ROYXAT.map(x=>{ const h=x.holat||0;
-    return `<tr data-id="${esc(x.id)}" tabindex="0"><td class="m">${esc(x.kirNo)}</td><td class="m">${esc(x.markazNo)}</td><td class="m">${esc(sanaK(x.kelgan))}</td><td>${esc(x.korxona)}</td>
-      <td>${esc(TUR[x.tur]||x.tur||"")}</td><td>${esc(x.ijrochiNomi||x.ijrochi)}</td><td class="m">${esc(sanaK(x.muddat))}</td><td>${kunHtml(x)}</td>
+    return `<tr data-id="${esc(x.id)}" tabindex="0"><td class="m">${esc(x.kirNo||"—")}</td><td class="m">${esc(x.markazNo)}</td><td class="m">${esc(sanaK(x.kelgan)||"—")}</td><td>${esc(x.korxona)}</td>
+      <td>${esc(TUR[x.tur]||x.tur||"")}</td><td>${esc(x.ijrochiNomi||x.ijrochi)}</td><td class="m">${x.muddat?esc(sanaK(x.muddat)):`<span class="kun ok">Muddat belgilanmagan</span>`}</td><td>${kunHtml(x)}</td>
       <td><span class="pill h${h}">${esc(HOLAT[h]||"")}</span></td></tr>`;
   }).join("");
   if(OPEN) kartaChiz();
@@ -337,7 +337,7 @@ function csvYukla(){
 function men(){ return ROLE==="admin"?{kim:"admin",kimNomi:SESS.name||ADMIN_NOMI}:{kim:String(SESS.code),kimNomi:SESS.name||""}; }
 function tarixYozuv(t){ return Object.assign(men(),{oldin:"",keyin:"",sabab:""},t); }
 async function qosh(d){
-  const t=tarixYozuv({amal:"yaratildi",keyin:d.kirNo+" · "+d.korxona});
+  const t=tarixYozuv({amal:"yaratildi",keyin:[d.kirNo,d.korxona].filter(Boolean).join(" · ")});
   if(LOCAL){ const id="L"+Date.now(); XAT.push(Object.assign({id,yaratildi:new Date()},d)); TARIX[id]=[Object.assign(t,{ts:new Date()})]; chiz(); return id; }
   const ref=DB.collection("xatlar").doc(), b=DB.batch(), sv=FS.serverTimestamp();
   b.set(ref,Object.assign({},d,{yaratildi:sv,yangilandi:sv}));
@@ -368,10 +368,11 @@ function yangiYop(){ $("ovYangi").classList.add("hidden"); $("yangi").focus(); }
 $("ySaqla").addEventListener("click",async()=>{
   const v=id=>$(id).value.trim();
   const d={kirNo:v("yKir"),markazNo:v("yMar"),kelgan:v("yKel"),korxona:v("yKor"),tur:v("yTur"),ijrochi:v("yIjr"),muddat:v("yMud"),izoh:v("yIzh")};
-  const yoq=[["kirNo","Kiruvchi raqam"],["markazNo","Markaz elektron raqami"],["kelgan","Kelgan sana"],["korxona","Murojaatchi (korxona)"],["tur","O'zgartirish turi"],["ijrochi","Ijrochi (ekspert)"],["muddat","Muddat (oxirgi kun)"]].filter(([k])=>!d[k]);
+  // majburiy faqat shu 4 ta; qolganlari bo'sh bo'lsa "" bo'lib yoziladi
+  const yoq=[["markazNo","Markaz elektron raqami"],["korxona","Murojaatchi (korxona)"],["tur","O'zgartirish turi"],["ijrochi","Ijrochi (ekspert)"]].filter(([k])=>!d[k]);
   if(yoq.length){ $("yErr").innerHTML=`<span>Majburiy maydonlarni to'ldiring:</span> `+yoq.map(([,n])=>`<span>${esc(n)}</span>`).join(", "); return; }
-  if(d.muddat<d.kelgan){ $("yErr").innerHTML=`<span>Muddat kelgan sanadan oldin bo'lishi mumkin emas.</span>`; return; }
-  if(XAT.some(x=>String(x.kirNo).toLowerCase()===d.kirNo.toLowerCase()) && !confirm("Bunday kiruvchi raqamli xat allaqachon bor. Baribir qo'shilsinmi?")) return;
+  if(d.muddat&&d.kelgan&&d.muddat<d.kelgan){ $("yErr").innerHTML=`<span>Muddat kelgan sanadan oldin bo'lishi mumkin emas.</span>`; return; }
+  if(d.kirNo && XAT.some(x=>String(x.kirNo||"").toLowerCase()===d.kirNo.toLowerCase()) && !confirm("Bunday kiruvchi raqamli xat allaqachon bor. Baribir qo'shilsinmi?")) return;
   const ij=DIR.find(x=>String(x.code)===d.ijrochi)||{};
   Object.assign(d,{ijrochiNomi:ij.name||"",ijrochiDept:ij.dept||"reg",holat:0,uzaytirildi:0,yakunSana:"",yaratdi:men().kim});
   $("ySaqla").disabled=true;
@@ -403,14 +404,14 @@ function bosaOladi(i,h){   // holatni kim qaysi bosqichga o'tkaza oladi
 function kartaChiz(){
   const x=joriy(); if(!x){ kartaYop(); return; }
   const h=x.holat||0;
-  $("kT").textContent=x.kirNo+" · "+x.korxona;
+  $("kT").textContent=[x.kirNo,x.korxona].filter(Boolean).join(" · ");
   $("kS").innerHTML=`<span>Markaz elektron raqami</span>: ${esc(x.markazNo)}`;
   const q=[1,2,3,4,5].map(i=>`<button type="button" data-h="${i}" class="${i<=h?"on":""}${i===h?" joriy":""}"${bosaOladi(i,h)?"":" disabled"}><i>${i===5?"✓":i}</i><span>${esc(HOLAT[i])}</span></button>`).join("");
   const izoh=h===0?`<p class="hnote"><span class="pill h0">Yangi</span> <span>Ekspert hali javob bermagan.</span></p>`:"";
   const qayt=tahrirchi()&&h>0?`<p class="hnote"><button type="button" class="lnk" data-h="0">«Yangi» holatiga qaytarish</button></p>`:"";
-  const kv=[["Kiruvchi raqam",esc(x.kirNo)],["Markaz elektron raqami",esc(x.markazNo)],["Kelgan sana",esc(sanaK(x.kelgan))],["Murojaatchi (korxona)",esc(x.korxona)],
+  const kv=[["Kiruvchi raqam",esc(x.kirNo||"—")],["Markaz elektron raqami",esc(x.markazNo)],["Kelgan sana",esc(sanaK(x.kelgan)||"—")],["Murojaatchi (korxona)",esc(x.korxona)],
     ["O'zgartirish turi",`<span>${esc(TUR[x.tur]||x.tur||"")}</span>`],["Ijrochi (ekspert)",esc(x.ijrochiNomi||x.ijrochi)],
-    ["Muddat (oxirgi kun)",esc(sanaK(x.muddat))+(x.uzaytirildi?` <span class="pill">${esc("uzaytirilgan: "+x.uzaytirildi)}</span>`:"")],
+    ["Muddat (oxirgi kun)",(x.muddat?esc(sanaK(x.muddat)):`<span>Muddat belgilanmagan</span>`)+(x.uzaytirildi?` <span class="pill">${esc("uzaytirilgan: "+x.uzaytirildi)}</span>`:"")],
     ["Izoh",x.izoh?esc(x.izoh):"—"]].concat(h===5?[["Yakunlangan sana",esc(sanaK(x.yakunSana))]]:[]);
   $("kInfo").innerHTML=`<div class="top">${hisobHtml(x)}<div><div class="qadam" role="group" aria-label="Holat">${q}</div>${izoh}${qayt}</div></div>
     <dl class="kv">${kv.map(([k,v])=>`<dt>${esc(k)}</dt><dd>${v}</dd>`).join("")}</dl>`;
@@ -432,20 +433,20 @@ function amalChiz(){
   const h=x.holat||0;
   const tug=`<div class="amal">
     <button type="button" class="btn gh" data-a="ijrochi">Ijrochini almashtirish</button>
-    <button type="button" class="btn gh" data-a="muddat">Muddatni uzaytirish</button>
+    <button type="button" class="btn gh" data-a="muddat">${x.muddat?"Muddatni uzaytirish":"Muddat belgilash"}</button>
     <button type="button" class="btn gh" data-a="tahrir">Tahrirlash</button>
     ${h<5?`<button type="button" class="btn" data-a="yakun">Yakunlash</button>`:""}</div>`;
   let f="";
   if(AFORM==="ijrochi") f=`<div class="apanel"><h3>Ijrochini almashtirish</h3><div class="fg">
       <label>Yangi ijrochi <b>*</b><select id="aIjr"><option value="">— ijrochini tanlang —</option>${ijrochiOpt(x.ijrochi)}</select></label>
       <label>Sabab<input type="text" id="aSab" maxlength="300"></label></div>${formTugma()}</div>`;
-  else if(AFORM==="muddat") f=`<div class="apanel"><h3>Muddatni uzaytirish</h3><div class="fg">
+  else if(AFORM==="muddat") f=`<div class="apanel"><h3>${x.muddat?"Muddatni uzaytirish":"Muddat belgilash"}</h3><div class="fg">
       <label>Yangi muddat <b>*</b><input type="date" id="aMud" value="${esc(x.muddat||"")}"></label>
-      <label>Sabab <b>*</b><input type="text" id="aSab" maxlength="300"></label></div>${formTugma()}</div>`;
+      <label>Sabab${x.muddat?" <b>*</b>":""}<input type="text" id="aSab" maxlength="300"></label></div>${formTugma()}</div>`;
   else if(AFORM==="tahrir") f=`<div class="apanel"><h3>Tahrirlash</h3><div class="fg">
-      <label>Kiruvchi raqam <b>*</b><input type="text" id="tKir" maxlength="99" value="${esc(x.kirNo)}"></label>
+      <label>Kiruvchi raqam<input type="text" id="tKir" maxlength="99" value="${esc(x.kirNo)}"></label>
       <label>Markaz elektron raqami <b>*</b><input type="text" id="tMar" maxlength="99" value="${esc(x.markazNo)}"></label>
-      <label>Kelgan sana <b>*</b><input type="date" id="tKel" value="${esc(x.kelgan)}"></label>
+      <label>Kelgan sana<input type="date" id="tKel" value="${esc(x.kelgan)}"></label>
       <label>Murojaatchi (korxona) <b>*</b><input type="text" id="tKor" maxlength="299" value="${esc(x.korxona)}"></label>
       <label>O'zgartirish turi <b>*</b><select id="tTur">${turOpt(x.tur)}</select></label>
       <label class="w">Izoh<textarea id="tIzh" maxlength="2000">${esc(x.izoh||"")}</textarea></label></div>${formTugma()}</div>`;
@@ -472,12 +473,16 @@ $("kAmal").addEventListener("click",async e=>{
   } else if(AFORM==="muddat"){
     const m=v("aMud"), s=v("aSab");
     if(!m) return xato("Yangi muddatni kiriting.");
-    if(m<=String(x.muddat||"")) return xato("Yangi muddat hozirgisidan keyin bo'lishi kerak.");
-    if(!s) return xato("Uzaytirish sababini yozing.");
-    ozg={muddat:m,uzaytirildi:(x.uzaytirildi||0)+1}; t={amal:"muddat",oldin:sanaK(x.muddat),keyin:sanaK(m),sabab:s};
+    if(x.kelgan&&m<x.kelgan) return xato("Muddat kelgan sanadan oldin bo'lishi mumkin emas.");
+    if(x.muddat){   // uzaytirish: sabab majburiy, hisoblagich oshadi
+      if(m<=x.muddat) return xato("Yangi muddat hozirgisidan keyin bo'lishi kerak.");
+      if(!s) return xato("Uzaytirish sababini yozing.");
+      ozg={muddat:m,uzaytirildi:(x.uzaytirildi||0)+1}; t={amal:"muddat",oldin:sanaK(x.muddat),keyin:sanaK(m),sabab:s};
+    } else { ozg={muddat:m}; t={amal:"muddatQoy",keyin:sanaK(m),sabab:s}; }
   } else if(AFORM==="tahrir"){
     const y={kirNo:v("tKir"),markazNo:v("tMar"),kelgan:v("tKel"),korxona:v("tKor"),tur:v("tTur"),izoh:v("tIzh")};
-    if(!y.kirNo||!y.markazNo||!y.kelgan||!y.korxona||!y.tur) return xato("Majburiy maydonlarni to'ldiring.");
+    if(!y.markazNo||!y.korxona||!y.tur) return xato("Majburiy maydonlarni to'ldiring.");
+    if(y.kelgan&&x.muddat&&x.muddat<y.kelgan) return xato("Muddat kelgan sanadan oldin bo'lishi mumkin emas.");
     const o=Object.keys(y).filter(k=>String(x[k]||"")!==y[k]);
     if(!o.length){ AFORM=""; amalChiz(); return; }
     const fmt=(k,val)=>MAYDON[k]+": "+(k==="kelgan"?sanaK(val):k==="tur"?(TUR[val]||val):(val||"—"));
