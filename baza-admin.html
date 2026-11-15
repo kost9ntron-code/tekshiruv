@@ -62,6 +62,19 @@ code{font-family:"Space Mono",monospace;font-size:12.5px}
       <button class="btn" id="agSave" type="button">Ruxsatlarni saqlash</button><span id="agMsg" class="d" style="margin:0"></span>
     </div>
   </div>
+  <div class="card">
+    <h2 style="margin:0 0 6px;font-size:18px">6-bo'lim: Xatlar nazorati — ruxsatlar</h2>
+    <p class="d" style="margin:0 0 4px">Belgilangan xodimlar barcha xatlarni ko'radi, xat qo'shadi, ijrochi va muddatni o'zgartiradi, yakunlaydi. Tarixni faqat administrator ko'radi.</p>
+    <p class="d" style="margin:0 0 12px;font-size:13px">Belgilanmagan ekspert bo'limni faqat o'ziga xat biriktirilgan bo'lsa ko'radi — o'z xatlarini va 1–4 holatni belgilay oladi.</p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+      <button class="btn ghost" id="xrAll" type="button" style="padding:8px 14px;min-height:36px">Hammasini belgilash</button>
+      <button class="btn ghost" id="xrNone" type="button" style="padding:8px 14px;min-height:36px">Hammasini olib tashlash</button>
+    </div>
+    <div id="xrList" class="log" style="font-family:inherit;font-size:14px;max-height:420px">Yuklanmoqda…</div>
+    <div style="display:flex;gap:10px;align-items:center;margin-top:12px;flex-wrap:wrap">
+      <button class="btn" id="xrSave" type="button">Ruxsatlarni saqlash</button><span id="xrMsg" class="d" style="margin:0"></span>
+    </div>
+  </div>
   </div>
 </div>
 
@@ -91,7 +104,7 @@ AUTH.onAuthStateChanged(async u=>{
   if(!u||u.isAnonymous){ $("login").style.display=""; $("app").style.display="none"; $("app2").style.display="none"; return; }
   let d; try{ d=await DB.doc("config/admin").get(); }catch(e){ $("lerr").textContent="Bazaga ulanib bo'lmadi: "+(e.message||e); return; }
   if(!d.exists||d.data().uid!==u.uid){ $("lerr").textContent=u.email+" — administrator emas."; await AUTH.signOut(); return; }
-  $("login").style.display="none"; $("app").style.display=""; $("me").textContent=u.email; agentLoad();
+  $("login").style.display="none"; $("app").style.display=""; $("me").textContent=u.email; agentLoad(); xatLoad();
   try{ const m=await DB.doc("baza/meta").get();
     $("joriy").textContent=m.exists?`Hozirgi baza: ${(m.data().counts||{}).izd||"?"} ta ish, yuklangan ${BazaCore.fromISO((m.data().ver||"").slice(0,10))}.`:"Saytda hali baza yo'q.";
   }catch(e){ $("joriy").textContent="Hozirgi baza holatini o'qib bo'lmadi: "+(e.message||e); }
@@ -121,6 +134,29 @@ $("agSave").onclick=async()=>{
   try{ await DB.doc("config/bazaruxsat").set({allow:codes,ts:firebase.firestore.FieldValue.serverTimestamp()}); $("agMsg").innerHTML=`<span class="ok">Saqlandi: ${codes.length} ta xodimga ruxsat.</span>`; }
   catch(e){ $("agMsg").innerHTML=`<span class="err">Saqlab bo'lmadi: ${esc(e.message||e)}</span>`; }
   $("agSave").disabled=false;
+};
+
+/* ---------- 6-bo'lim (Xatlar nazorati) ruxsatlari — config/xatruxsat.allow ---------- */
+let XRDIR=[];
+async function xatLoad(){
+  try{
+    const [d,c]=await Promise.all([DB.doc("dir/list").get(),DB.doc("config/xatruxsat").get()]);
+    XRDIR=(d.exists&&d.data().items)||[];
+    const allow=new Set(((c.exists&&c.data().allow)||[]).map(String));
+    const by={}; XRDIR.forEach(x=>{ const k=x.dept||"reg"; (by[k]=by[k]||[]).push(x); });
+    $("xrList").innerHTML=Object.keys(by).map(k=>`<div style="margin:6px 0 4px;color:var(--accent);font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase">${esc(DEPN[k]||k)}</div>`+
+      by[k].map(x=>`<label style="display:flex;gap:10px;align-items:center;padding:6px 4px;cursor:pointer"><input type="checkbox" data-code="${esc(x.code)}" ${allow.has(String(x.code))?"checked":""} style="width:18px;height:18px"> <span>${esc(x.name)}</span><span class="d" style="margin:0;font-size:12px">${esc(x.pos||"")}</span></label>`).join("")).join("")||"Xodimlar ro'yxati bo'sh.";
+    $("xrMsg").textContent=allow.size?("Hozir ruxsat: "+allow.size+" ta xodim."):"Hozir hech kimga ruxsat yo'q.";
+  }catch(e){ $("xrList").innerHTML=`<span class="err">Yuklab bo'lmadi: ${esc(e.message||e)}. Firestore qoidasi qo'shilganini tekshiring.</span>`; }
+}
+$("xrAll").onclick=()=>document.querySelectorAll("#xrList input").forEach(i=>i.checked=true);
+$("xrNone").onclick=()=>document.querySelectorAll("#xrList input").forEach(i=>i.checked=false);
+$("xrSave").onclick=async()=>{
+  const codes=[...document.querySelectorAll("#xrList input:checked")].map(i=>{ const c=i.dataset.code; const o=XRDIR.find(x=>String(x.code)===c); return o?o.code:c; });
+  $("xrSave").disabled=true; $("xrMsg").textContent="Saqlanmoqda…";
+  try{ await DB.doc("config/xatruxsat").set({allow:codes,ts:firebase.firestore.FieldValue.serverTimestamp()}); $("xrMsg").innerHTML=`<span class="ok">Saqlandi: ${codes.length} ta xodimga ruxsat.</span>`; }
+  catch(e){ $("xrMsg").innerHTML=`<span class="err">Saqlab bo'lmadi: ${esc(e.message||e)}</span>`; }
+  $("xrSave").disabled=false;
 };
 
 $("files").onchange=async e=>{
