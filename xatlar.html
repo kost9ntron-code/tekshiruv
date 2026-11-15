@@ -512,14 +512,19 @@ function tarixKuzat(id){
 function kuzat(){
   UN.forEach(f=>{ try{ f(); }catch(e){} }); UN=[];
   const q=ROLE==="ekspert"?DB.collection("xatlar").where("ijrochi","==",String(SESS.code)):DB.collection("xatlar");
-  UN.push(q.onSnapshot(s=>{ XAT=s.docs.map(d=>Object.assign({id:d.id},d.data())); chiz(); },
+  UN.push(q.onSnapshot(s=>{ XAT=s.docs.map(d=>Object.assign({id:d.id},d.data()));
+      // ekspertga bo'lim faqat kamida bitta xat biriktirilgan bo'lsa ochiladi (jonli: xat biriktirilishi bilan ochiladi)
+      if(ROLE==="ekspert"&&!XAT.length){ kartaYop(); yangiYop(); ruxsatYoq(); return; }
+      chiz(); ochish(); },
     e=>holat(`<span class="err">${esc("Xatlarni yuklab bo'lmadi.")}</span><p>${esc(e.message||e)}</p>`)));
 }
+function ruxsatYoq(){ holat(`<span class="err">Sizga bu bo'limga ruxsat berilmagan.</span><p>Ruxsat uchun administratorga murojaat qiling.</p>`); }
 function kimLine(){ $("who").innerHTML=(SESS.name?esc(SESS.name)+" · ":"")+`<span>${esc(ROLNOM[ROLE])}</span>`+(LOCAL?` · <span>Namuna ma'lumot (?local)</span>`:""); }
 async function boshla(){
   kimLine(); $("yangi").hidden=!tahrirchi();
   if(!LOCAL){ try{ const d=await DB.doc("dir/list").get(); DIR=(d.exists&&d.data().items)||[]; }catch(e){ DIR=[]; } }
-  filtrTanlov(); chiz(); ochish(); if(!LOCAL) kuzat();
+  filtrTanlov(); chiz();
+  if(LOCAL) ochish(); else kuzat();   // sahifa birinchi ma'lumot kelgach ochiladi
 }
 async function rolAniqla(){
   if(ROLE==="admin") return;
@@ -537,7 +542,7 @@ async function start(sess){
   await rolAniqla(); boshla();
 }
 
-/* Alohida ochilganda: faqat administrator (Google) */
+/* Alohida ochilganda: administrator (Google) yoki shu brauzerda kirgan xodim */
 function adminKirish(){
   holat(`<b>Xatlar nazorati — administrator</b><p>Bu sahifani alohida faqat administrator ochadi. Xodimlar asosiy sahifadagi 6-bo'limdan foydalanadi.</p>
     <p><button type="button" class="btn" id="gIn">Google orqali kirish</button></p><p class="err" id="gErr"></p>`);
@@ -548,7 +553,15 @@ function adminKirish(){
 }
 function alohida(){
   AUTH.onAuthStateChanged(async u=>{
-    if(!u||u.isAnonymous){ adminKirish(); return; }
+    if(!u){ adminKirish(); return; }
+    if(u.isAnonymous){   // xodim sessiyasi: kodni sessions/{uid} dan, to'liq ismni xodimlar ro'yxatidan olamiz
+      let s=null; try{ s=await DB.doc("sessions/"+u.uid).get(); }catch(e){}
+      if(!s||!s.exists||!s.data().code){ adminKirish(); return; }
+      if(SESS) return;
+      const code=String(s.data().code);
+      let x={}; try{ const d=await DB.doc("dir/list").get(); x=((d.exists&&d.data().items)||[]).find(i=>String(i.code)===code)||{}; }catch(e){}
+      SESS={code,name:x.name||""}; await rolAniqla(); boshla(); return;
+    }
     let d; try{ d=await DB.doc("config/admin").get(); }catch(e){ holat(`<span class="err">${esc(e.message||e)}</span>`); return; }
     if(!d.exists||d.data().uid!==u.uid){ await AUTH.signOut(); adminKirish(); $("gErr").innerHTML=esc(u.email)+` — <span>administrator emas.</span>`; return; }
     if(SESS) return; SESS={name:d.data().name||ADMIN_NOMI,code:"admin"}; ROLE="admin"; boshla();
