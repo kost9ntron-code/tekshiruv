@@ -160,7 +160,13 @@ const D={
 "Yangi muddat hozirgisidan keyin bo'lishi kerak.":"Новый срок должен быть позже текущего.","Uzaytirish sababini yozing.":"Укажите причину продления.",
 "Xat qo'shildi":"Письмо добавлено","Holat o'zgardi":"Статус изменён","Ijrochi almashtirildi":"Исполнитель сменён","Muddat uzaytirildi":"Срок продлён","Ma'lumot tahrirlandi":"Данные изменены",
 "Qolgan kun (manfiy — o'tgan)":"Осталось дней (минус — просрочено)",
-"Muddat belgilash":"Установить срок","Muddat belgilandi":"Срок установлен"
+"Muddat belgilash":"Установить срок","Muddat belgilandi":"Срок установлен",
+"Ekspertlar":"Эксперты","Eng eski xat":"Самое старое письмо","Eng kechikkan xatlar":"Самые просроченные письма","Muddati o'tgan xat yo'q.":"Просроченных писем нет.",
+"Oylar bo'yicha":"По месяцам","so'nggi 12 oy":"последние 12 месяцев","Kelgan":"Поступило","Yakunlangan":"Завершено","Jadval ko'rinishi":"В виде таблицы","Oy":"Месяц",
+"Oylar bo'yicha kelgan va yakunlangan xatlar":"Поступившие и завершённые письма по месяцам",
+"Yan":"Янв","Fev":"Фев","Mar":"Мар","Apr":"Апр","Iyn":"Июн","Iyl":"Июл","Avg":"Авг","Sen":"Сен","Okt":"Окт","Noy":"Ноя","Dek":"Дек",
+"Yanvar":"Январь","Fevral":"Февраль","Mart":"Март","Aprel":"Апрель","May":"Май","Iyun":"Июнь","Iyul":"Июль","Avgust":"Август","Sentabr":"Сентябрь","Oktabr":"Октябрь","Noyabr":"Ноябрь","Dekabr":"Декабрь",
+"Muddati o'tgan xatlaringiz bor":"У вас есть просроченные письма","Ularni «Xatlar nazorati» bo'limida ko'ring.":"Посмотрите их в разделе «Контроль писем».","Ko'rish":"Посмотреть"
 };
 const RX=[
 [/^Tibbiy jihozlar qo'mitasi · (.+) · (\d+)-nashr$/,"Комитет по медицинским изделиям · $1 · версия $2"],

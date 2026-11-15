@@ -48,6 +48,46 @@ select option,select optgroup{background:var(--box);color:var(--fg)}
 .stat span{color:var(--dim);font-size:13px}
 .stat.ot b{color:var(--stop)} .stat.wr b{color:var(--warn)} .stat.ok b{color:var(--ok)}
 .note{color:var(--dim);font-size:13px;padding:14px 16px}
+/* --- Bosh sahifa --- */
+:root{--s1:#3987e5;--s2:#d95926}
+:root[data-theme="light"]{--s1:#2a78d6;--s2:#eb6834}
+.blok{padding:14px 16px;margin-bottom:14px}
+.blok h3{margin:0 0 10px;font-size:14px}
+.blok h3 small{color:var(--faint);font-weight:400;font-size:12px;margin-left:6px}
+.ikki{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:14px}
+.ikki .blok{margin-bottom:0}
+th.r,td.r{text-align:right;font-family:var(--mono);font-size:12.5px}
+td.r.ot{color:var(--stop);font-weight:700}
+.ekt tbody tr{cursor:pointer}
+.ekt tbody tr:hover,.ekt tbody tr:focus{background:var(--accentbg);outline:none}
+.ekt td small{display:block;color:var(--dim);font-size:12px}
+.kech{list-style:none;margin:0;padding:0}
+.kech li+li{border-top:1px solid var(--line)}
+.kech button{display:grid;grid-template-columns:auto 1fr;gap:2px 12px;align-items:center;width:100%;text-align:left;background:none;border:0;padding:9px 4px;border-radius:8px}
+.kech button:hover,.kech button:focus-visible{background:var(--accentbg);outline:none}
+.kech .kun{grid-row:span 2;min-width:74px}
+.kech small{color:var(--dim);font-size:12px}
+.kech .bo{color:var(--dim);padding:10px 4px}
+.leg{display:flex;gap:16px;font-size:12.5px;color:var(--dim);margin-bottom:6px}
+.leg i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.leg i.s1{background:var(--s1)} .leg i.s2{background:var(--s2)}
+.graf{position:relative}
+.graf svg{display:block;width:100%;height:auto;overflow:visible}
+.graf .gr{stroke:var(--line);stroke-width:1}
+.graf .ax{fill:var(--faint);font:10px var(--mono)}
+.graf .ox{fill:var(--dim);font:11px var(--body)}
+.graf .b1{fill:var(--s1)} .graf .b2{fill:var(--s2)}
+.graf .hit{fill:transparent;cursor:default}
+.graf .hit:hover,.graf .hit:focus{fill:var(--accentbg);outline:none}
+.tip{position:absolute;z-index:5;pointer-events:none;background:var(--box);border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-size:12.5px;box-shadow:0 8px 24px rgba(0,0,0,.3);white-space:nowrap;transform:translate(-50%,-100%)}
+.tip b{display:block;margin-bottom:3px}
+.tip i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:6px}
+.tip span{font-family:var(--mono);margin-left:6px}
+.gjad{margin-top:10px;font-size:12.5px;color:var(--dim)}
+.gjad summary{cursor:pointer}
+.gjad table{margin-top:6px}
+.gjad td,.gjad th{padding:5px 8px}
+@media (max-width:900px){.ikki{grid-template-columns:1fr}}
 .chips{display:flex;gap:6px;flex-wrap:wrap}
 .chips button{font-size:12.5px;color:var(--dim);background:var(--chip);border:1px solid var(--line);border-radius:999px;padding:6px 12px;min-height:32px}
 .chips button[aria-pressed="true"]{color:var(--onaccent);background:var(--accent);border-color:var(--accent)}
@@ -115,7 +155,7 @@ td.m{font-family:var(--mono);font-size:12px;white-space:nowrap}
 @media (max-width:640px){.app{padding:12px 12px 22px}.hd .seg{margin-left:0;width:100%}.seg button{flex:1;padding:7px 8px}
   .fg{grid-template-columns:1fr}.top{grid-template-columns:1fr}.kv{grid-template-columns:1fr}.kv dt{margin-top:6px}.qadam{grid-template-columns:repeat(5,minmax(0,1fr))}.ov{padding:8px}}
 </style>
-<script src="til.js?v=4"></script>
+<script src="til.js?v=5"></script>
 </head>
 <body>
 
@@ -149,7 +189,25 @@ td.m{font-family:var(--mono);font-size:12px;white-space:nowrap}
         <div class="card stat wr"><b id="nKut">0</b><span>Javob kutilmoqda</span></div>
         <div class="card stat ok"><b id="nOy">0</b><span>Shu oy yakunlangan</span></div>
       </div>
-      <div class="card note">Ekspertlar jadvali, eng kechikkan xatlar va oylar grafigi keyingi bosqichda qo'shiladi.</div>
+      <div class="card blok">
+        <h3>Ekspertlar</h3>
+        <div class="tw"><table class="ekt">
+          <thead><tr><th>Ijrochi</th><th class="r">Faol</th><th class="r">Muddati o'tgan</th><th class="r">Javob kutilmoqda</th><th class="r">Shu oy yakunlangan</th><th>Eng eski xat</th></tr></thead>
+          <tbody id="tbE"></tbody>
+        </table></div>
+      </div>
+      <div class="ikki">
+        <div class="card blok">
+          <h3>Eng kechikkan xatlar</h3>
+          <ul class="kech" id="kech"></ul>
+        </div>
+        <div class="card blok">
+          <h3>Oylar bo'yicha <small>so'nggi 12 oy</small></h3>
+          <div class="leg"><span><i class="s1"></i>Kelgan</span><span><i class="s2"></i>Yakunlangan</span></div>
+          <div class="graf" id="graf"></div>
+          <details class="gjad"><summary>Jadval ko'rinishi</summary><div class="tw"><table id="grafT"></table></div></details>
+        </div>
+      </div>
     </div>
 
     <div id="eRoyxat" class="hidden">
@@ -261,8 +319,15 @@ const ROLNOM={admin:"Administrator",ruxsatli:"Ruxsatli xodim",ekspert:"Ekspert"}
 function bosqich(sel,attr,val){ document.querySelectorAll(sel+" button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset[attr]===val))); }
 $("bolim").addEventListener("click",e=>{ const b=e.target.closest("button[data-b]"); if(!b) return;
   bosqich("#bolim","b",b.dataset.b); $("secA").classList.toggle("hidden",b.dataset.b!=="a"); $("secB").classList.toggle("hidden",b.dataset.b!=="b"); });
-$("ekran").addEventListener("click",e=>{ const b=e.target.closest("button[data-e]"); if(!b) return;
-  bosqich("#ekran","e",b.dataset.e); $("eBosh").classList.toggle("hidden",b.dataset.e!=="bosh"); $("eRoyxat").classList.toggle("hidden",b.dataset.e!=="royxat"); });
+function ekranOch(e){ bosqich("#ekran","e",e); $("eBosh").classList.toggle("hidden",e!=="bosh"); $("eRoyxat").classList.toggle("hidden",e!=="royxat"); }
+$("ekran").addEventListener("click",e=>{ const b=e.target.closest("button[data-e]"); if(b) ekranOch(b.dataset.e); });
+$("tbE").addEventListener("click",e=>{ const r=e.target.closest("tr[data-c]"); if(r) ijrochiRoyxati(r.dataset.c); });
+$("tbE").addEventListener("keydown",e=>{ const r=e.target.closest("tr[data-c]"); if(r&&e.key==="Enter") ijrochiRoyxati(r.dataset.c); });
+$("kech").addEventListener("click",e=>{ const b=e.target.closest("button[data-id]"); if(b) kartaOch(b.dataset.id); });
+function ijrochiRoyxati(c){   // ekspertlar jadvalidan: shu ijrochining faol xatlari
+  HF="faol"; FI=tahrirchi()?c:""; $("fIjro").value=FI; ekranOch("royxat"); chiz();
+}
+function otganKor(){ QQ=FI=FT=D1=D2=""; ["qidir","fIjro","fTur","fD1","fD2"].forEach(id=>$(id).value=""); HF="otgan"; ekranOch("royxat"); chiz(); }   // index.html dagi ogohlantirishdan
 $("hFiltr").addEventListener("click",e=>{ const b=e.target.closest("button[data-h]"); if(!b) return; HF=b.dataset.h; chiz(); });
 $("qidir").addEventListener("input",e=>{ QQ=e.target.value.trim().toLowerCase(); chiz(); });
 $("fIjro").addEventListener("change",e=>{ FI=e.target.value; chiz(); });
@@ -292,7 +357,68 @@ function bosh(){
   $("nOtgan").textContent=faol.filter(otganmi).length;
   $("nKut").textContent=faol.filter(x=>!x.holat).length;
   $("nOy").textContent=XAT.filter(x=>x.holat===5 && x.yakunSana && x.yakunSana.slice(0,7)===oy).length;
+  ekspertlar(oy); kechikkanlar(faol); grafik();
 }
+
+/* ekspertlar jadvali: muddati o'tganlar ko'pi tepada; «eng eski xat» — eng avval kelgan faol xat */
+function ekspertlar(oy){
+  const G={};
+  XAT.forEach(x=>{ const c=String(x.ijrochi||""); (G[c]=G[c]||{c,nom:x.ijrochiNomi||c,L:[]}).L.push(x); });
+  const R=Object.values(G).map(g=>{ const f=g.L.filter(x=>(x.holat||0)<5);
+    const eski=f.filter(x=>x.kelgan).sort((a,b)=>a.kelgan.localeCompare(b.kelgan))[0];
+    return Object.assign(g,{faol:f.length,otgan:f.filter(otganmi).length,kut:f.filter(x=>!x.holat).length,
+      oy:g.L.filter(x=>x.holat===5&&String(x.yakunSana||"").slice(0,7)===oy).length,eski}); })
+    .sort((a,b)=>b.otgan-a.otgan||b.faol-a.faol||String(a.nom).localeCompare(String(b.nom)));
+  $("tbE").innerHTML=R.length?R.map(g=>`<tr data-c="${esc(g.c)}" tabindex="0"><td>${esc(g.nom)}</td><td class="r">${g.faol}</td>
+      <td class="r${g.otgan?" ot":""}">${g.otgan}</td><td class="r">${g.kut}</td><td class="r">${g.oy}</td>
+      <td>${g.eski?`<span class="kun ok">${esc(sanaK(g.eski.kelgan))}</span><small>${esc(g.eski.korxona)}</small>`:"—"}</td></tr>`).join("")
+    :`<tr><td colspan="6" class="empty">Hozircha xat yo'q.</td></tr>`;
+}
+
+function kechikkanlar(faol){
+  const L=faol.filter(otganmi).sort((a,b)=>a.muddat.localeCompare(b.muddat)).slice(0,8);
+  $("kech").innerHTML=L.length?L.map(x=>`<li><button type="button" data-id="${esc(x.id)}">${kunHtml(x)}
+      <span>${esc([x.kirNo,x.korxona].filter(Boolean).join(" · "))}</span>
+      <small>${esc(x.ijrochiNomi||x.ijrochi)} · ${esc(sanaK(x.muddat))}</small></button></li>`).join("")
+    :`<li class="bo">Muddati o'tgan xat yo'q.</li>`;
+}
+
+/* oylar grafigi: so'nggi 12 oyda kelgan va yakunlangan xatlar (guruhlangan ustunlar, bitta o'q) */
+const OY=["Yan","Fev","Mar","Apr","May","Iyn","Iyl","Avg","Sen","Okt","Noy","Dek"];
+const OYTO=["Yanvar","Fevral","Mart","Aprel","May","Iyun","Iyul","Avgust","Sentabr","Oktabr","Noyabr","Dekabr"];
+let GD=[];
+function grafik(){
+  const d=new Date(); d.setDate(1);
+  GD=[]; for(let i=11;i>=0;i--){ const m=new Date(d.getFullYear(),d.getMonth()-i,1); GD.push({k:m.getFullYear()+"-"+p2(m.getMonth()+1),m:m.getMonth(),y:m.getFullYear(),a:0,b:0}); }
+  const ix={}; GD.forEach((g,i)=>ix[g.k]=i);
+  XAT.forEach(x=>{ const a=ix[String(x.kelgan||"").slice(0,7)]; if(a!=null) GD[a].a++;
+    const b=x.holat===5?ix[String(x.yakunSana||"").slice(0,7)]:null; if(b!=null) GD[b].b++; });
+  const W=640,H=210,pl=30,pr=6,pt=10,pb=24,pw=W-pl-pr,ph=H-pt-pb,gw=pw/12,bw=Math.min(14,(gw-12)/2);
+  const mx=Math.max(1,...GD.map(g=>Math.max(g.a,g.b))), st=Math.max(1,Math.ceil(mx/4)), top=st*Math.ceil(mx/st);
+  const y=v=>pt+ph-v/top*ph;
+  const ust=(x,v,c)=>{ if(!v) return ""; const yy=y(v), h=pt+ph-yy, r=Math.min(4,h);   // tepasi 4px yumaloq, asosi to'g'ri
+    return `<path class="${c}" d="M${x},${pt+ph}V${yy+r}Q${x},${yy} ${x+r},${yy}H${x+bw-r}Q${x+bw},${yy} ${x+bw},${yy+r}V${pt+ph}Z"/>`; };
+  let s="";
+  for(let v=0;v<=top;v+=st) s+=`<line class="gr" x1="${pl}" x2="${W-pr}" y1="${y(v)}" y2="${y(v)}"/><text class="ax" x="${pl-6}" y="${y(v)+3}" text-anchor="end">${v}</text>`;
+  GD.forEach((g,i)=>{ const x0=pl+i*gw, c=x0+gw/2;
+    s+=ust(c-bw-1,g.a,"b1")+ust(c+1,g.b,"b2")+`<text class="ox" x="${c}" y="${H-6}" text-anchor="middle">${OY[g.m]}</text>`
+      +`<rect class="hit" data-i="${i}" x="${x0}" y="${pt}" width="${gw}" height="${ph}" rx="6" tabindex="0" aria-label="${esc(OYTO[g.m]+" "+g.y+": "+g.a+" / "+g.b)}"/>`; });
+  $("graf").innerHTML=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Oylar bo'yicha kelgan va yakunlangan xatlar">${s}</svg><div class="tip" id="tip" hidden></div>`;
+  $("grafT").innerHTML=`<thead><tr><th>Oy</th><th class="r">Kelgan</th><th class="r">Yakunlangan</th></tr></thead><tbody>`
+    +GD.map(g=>`<tr><td>${esc(OYTO[g.m])} ${g.y}</td><td class="r">${g.a}</td><td class="r">${g.b}</td></tr>`).join("")+`</tbody>`;
+}
+function tipKor(e){
+  const r=e.target.closest&&e.target.closest(".hit"), t=$("tip"); if(!t) return;
+  if(!r){ t.hidden=true; return; }
+  const g=GD[+r.dataset.i], box=$("graf").getBoundingClientRect(), rb=r.getBoundingClientRect();
+  t.innerHTML=`<b>${esc(OYTO[g.m])} ${g.y}</b><div><i style="background:var(--s1)"></i>Kelgan<span>${g.a}</span></div><div><i style="background:var(--s2)"></i>Yakunlangan<span>${g.b}</span></div>`;
+  t.hidden=false;
+  const x=Math.min(Math.max(rb.left-box.left+rb.width/2,70),box.width-70);
+  t.style.left=x+"px"; t.style.top=(rb.top-box.top+4)+"px";
+}
+$("graf").addEventListener("mouseover",tipKor); $("graf").addEventListener("focusin",tipKor);
+$("graf").addEventListener("mouseleave",()=>{ const t=$("tip"); if(t) t.hidden=true; });
+$("graf").addEventListener("focusout",()=>{ const t=$("tip"); if(t) t.hidden=true; });
 
 function kunHtml(x){
   const h=x.holat||0, k=h<5&&x.muddat?kunFarq(x.muddat):null;
@@ -580,10 +706,16 @@ function namuna(){
     z("n3",{kirNo:"01-12/360",markazNo:"E-2026-0115",kelgan:qo(-2),korxona:"Diagnostika Servis",tur:"nhru",ijrochi:"201",ijrochiNomi:"Rahimov Bobur Akmalovich",ijrochiDept:"qom",muddat:qo(12),holat:4}),
     z("n4",{kirNo:"01-12/301",markazNo:"E-2026-0090",kelgan:qo(-30),korxona:"Med Line",tur:"ru",ijrochi:"101",ijrochiNomi:"Aliyev Anvar Bahodirovich",ijrochiDept:"reg",muddat:qo(-10),holat:5,yakunSana:bugun()})
   ];
+  // grafik va jadval uchun o'tgan oylardagi yakunlangan xatlar
+  const K=["Medline Group","Shifo Farm","Sog'lom Hayot","BioMed Asia","MedTech LLC","Diagnostika Servis"];
+  for(let i=0;i<30;i++){ const k=-(8+i*11), ij=DIR[i%3];
+    XAT.push(z("a"+i,{kirNo:"01-11/"+(200+i),markazNo:"E-2026-"+String(10+i).padStart(4,"0"),kelgan:qo(k),korxona:K[i%K.length],tur:["ru","nh","nhru"][i%3],
+      ijrochi:ij.code,ijrochiNomi:ij.name,ijrochiDept:ij.dept,muddat:qo(k+20),holat:5,yakunSana:qo(k+5+i%9)})); }
+  XAT.push(z("n5",{kirNo:"01-12/210",markazNo:"E-2026-0060",kelgan:qo(-45),korxona:"Sog'lom Hayot",tur:"nh",ijrochi:"201",ijrochiNomi:"Rahimov Bobur Akmalovich",ijrochiDept:"qom",muddat:qo(-15),holat:2}));
   boshla();
 }
 
-window.XATLAR={ start };
+window.XATLAR={ start, otgan:otganKor };
 (function(){
   if(LOCAL){ namuna(); return; }
   if(!window.firebase){ holat(`<span class="err">${esc("Tizimga ulanib bo'lmadi. Internet aloqasini tekshirib, sahifani yangilang.")}</span>`); return; }
